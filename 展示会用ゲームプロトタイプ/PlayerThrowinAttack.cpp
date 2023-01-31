@@ -85,6 +85,8 @@ void PlayerThrowinAttack::draw()
 	DrawFormatString(0, 30, GetColor(255, 255, 255), "%d", playerDirections);
 }
 
+
+//ƒvƒŒƒCƒ„[‚Æ‚Ì“–‚½‚è”»’è
 bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
 {
 	float playerLeft = pos.x;
@@ -100,6 +102,8 @@ bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
 	return true;
 }
 
+
+//“Š±•¨‚Æ‚Ì“–‚½‚è”»’è
 bool PlayerThrowinAttack::enemyCollision(const Vec2& pos)
 {
 	if (isEnabled) {

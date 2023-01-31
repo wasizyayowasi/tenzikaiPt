@@ -11,6 +11,7 @@ ObjectHp::~ObjectHp()
 
 void ObjectHp::update()
 {
+
 }
 
 void ObjectHp::draw(Vec2 pos)
