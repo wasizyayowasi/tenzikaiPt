@@ -12,8 +12,6 @@ BugSpace::BugSpace()
 
 void BugSpace::update()
 {
-	Pad::update();
-	
 	
 	if (Pad::isPress(PAD_INPUT_5)) {
 		if (!pushKey) {

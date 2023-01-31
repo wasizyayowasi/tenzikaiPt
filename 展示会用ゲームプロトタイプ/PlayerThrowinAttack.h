@@ -17,6 +17,7 @@ public:
 	void draw();
 
 	bool playerCollision(const Vec2& pos);
+	bool enemyCollision(const Vec2& pos);
 
 	void deadFlyingObject();
 

@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ObjectHp.cpp" />
     <ClCompile Include="Object\BugSpace.cpp" />
     <ClCompile Include="Object\Enemy.cpp" />
     <ClCompile Include="PlayerThrowinAttack.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ObjectHp.h" />
     <ClInclude Include="Object\BugSpace.h" />
     <ClInclude Include="Object\Enemy.h" />
     <ClInclude Include="game.h" />

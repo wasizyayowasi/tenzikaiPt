@@ -16,6 +16,8 @@ GameMain::GameMain()
 
 void GameMain::update()
 {
+	Pad::update();
+
 	player->update();
 	space->update();
 	if (hiddenPlayer()) {

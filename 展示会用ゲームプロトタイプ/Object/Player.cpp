@@ -4,16 +4,19 @@
 #include "DxLib.h"
 #include "TimeLimit.h"
 #include "../PlayerThrowinAttack.h"
+#include "../ObjectHp.h"
 
 Player::Player()
 {
 	limit = new TimeLimit;
+	hp = new ObjectHp;
 	flyingObject = std::make_shared<PlayerThrowinAttack>();
+	hp->setObjectMaxHp(playerHp);
 }
 
 void Player::update()
 {
-	Pad::update();
+	hp->setObjectHp(playerHp);
 
 	//’n–Ê‚Æ‚Ì”»’è
 	pos += vec;
@@ -75,6 +78,9 @@ void Player::update()
 		}
 	}
 	
+	if (Pad::isTrigger(PAD_INPUT_6)) {
+		playerHp--;
+	}
 	
 	limit->playerGetPos(pos);
 
@@ -106,28 +112,70 @@ void Player::draw()
 		flyingObject->draw();
 	}
 
-	DrawFormatString(0, 220, GetColor(255, 255, 255), "%d", aiu);
+	hp->draw(pos);
+
+	DrawFormatString(0, 220, GetColor(255, 255, 255), "aiu : %d", aiu);
 }
 
 //‰B‚ê‚é
 bool Player::beHidden()
 {
-
-	if (Pad::isTrigger(PAD_INPUT_4)) {
-		aiu++;
-	}
-
-	if (hidden) {
-		DrawString(0, 220, "aiu", GetColor(255, 255, 255));
+	if (hidden == true) {
 		if (!push) {
-			DrawString(0, 240, "kakiku", GetColor(255, 255, 255));
-			if (Pad::isPress(PAD_INPUT_4)) {
-				DrawString(0, 200, "sasisu", GetColor(255, 255, 255));
+			if (Pad::isTrigger(PAD_INPUT_4)) {
 				push = true;
 			}
 		}
-
+		else {
+			if (Pad::isTrigger(PAD_INPUT_4)) {
+				push = false;
+			}
+		}
 	}
+
 	return push;
+}
+
+//bool Player::enemyCollision(Vec2 enemyPos)
+//{
+//	
+//
+//	float enemyLeft = enemyPos.x;
+//	float enemyTop = enemyPos.y;
+//	float enemyRight = enemyPos.x + 50;
+//	float enemyBottom = enemyPos.y + 64;
+//
+//	if (enemyLeft > pos.x)				return false;
+//	DrawString(400, 0, "aiu", GetColor(255, 255, 255));
+//	if (enemyRight < pos.x + 50)		return false;
+//	DrawString(400, 15, "aiu2", GetColor(255, 255, 255));
+//	if (enemyTop <= pos.y)				return false;
+//	DrawString(400, 30, "aiu3", GetColor(255, 255, 255));
+//	if (enemyBottom <= pos.y + 64)		return false;
+//	DrawString(400, 45, "aiu4", GetColor(255, 255, 255));
+//
+//	return false;
+//}
+
+void Player::damege()
+{
+	if (--time < 0) {
+		if (playerHp > 0) {
+			playerHp--;
+			time = 60;
+		}
+	}
+}
+
+int Player::enemyAttack(Vec2 enemyPos)
+{
+	if (flyingObject->enemyCollision(enemyPos)) {
+		enemyHit = true;
+	}
+	else {
+		enemyHit = false;
+	}
+
+	return enemyHit;
 }
 

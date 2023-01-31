@@ -22,7 +22,6 @@ bool PlayerThrowinAttack::isEnable() const
 
 void PlayerThrowinAttack::init()
 {
-	isEnabled = false;
 	landingObject = false;
 	isEnabled = false;
 	vec = { 5.0f,0.0f };
@@ -82,7 +81,7 @@ void PlayerThrowinAttack::update()
 
 void PlayerThrowinAttack::draw()
 {
-	DrawBox(flyingObjectPos.x, flyingObjectPos.y, flyingObjectPos.x + 20, flyingObjectPos.y + 20, GetColor(0, 255, 0), true);
+	DrawBox(flyingObjectPos.x, flyingObjectPos.y, flyingObjectPos.x + 20, flyingObjectPos.y + 20, GetColor(252, 15, 192), true);
 	DrawFormatString(0, 30, GetColor(255, 255, 255), "%d", playerDirections);
 }
 
@@ -99,6 +98,31 @@ bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
 	if (playerBottom <= flyingObjectPos.y)		return false;
 
 	return true;
+}
+
+bool PlayerThrowinAttack::enemyCollision(const Vec2& pos)
+{
+	if (isEnabled) {
+		float enemyLeft = pos.x;
+		float enemyTop = pos.y;
+		float enemyRight = pos.x + 30;
+		float enemyBottom = pos.y + 30;
+
+		if (enemyLeft > flyingObjectPos.x + 20)		return false;
+		DrawString(400, 0, "aiu1", 0xffffff);
+		if (enemyRight < flyingObjectPos.x)			return false;
+		DrawString(400, 15, "aiu2", 0xffffff);
+		if (enemyTop >= flyingObjectPos.y + 20)		return false;
+		DrawString(400, 30, "aiu3", 0xffffff);
+		if (enemyBottom <= flyingObjectPos.y)		return false;
+		DrawString(400, 45, "aiu4", 0xffffff);
+
+		return true;
+	}
+	else {
+		return false;
+	}
+	
 }
 
 

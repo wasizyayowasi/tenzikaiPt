@@ -3,6 +3,7 @@
 #include <DxLib.h>
 
 class Player;
+class ObjectHp;
 
 class Enemy
 {
@@ -21,8 +22,12 @@ public:
 
 	void hitFlyingObject();
 private:
+	int enemyHp = 10;
+
 	bool hit = false;
 	bool chase = false;
+
+	bool stop = false;
 
 	bool isEnabled = false;
 
@@ -32,5 +37,6 @@ private:
 	Vec2 vec = {5.0f,1.0f};
 
 	Player* player;
+	ObjectHp* hp;
 };
 
