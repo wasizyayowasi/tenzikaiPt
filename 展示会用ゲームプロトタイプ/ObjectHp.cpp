@@ -1,19 +1,6 @@
 #include "ObjectHp.h"
 #include "DxLib.h"
 
-ObjectHp::ObjectHp()
-{
-}
-
-ObjectHp::~ObjectHp()
-{
-}
-
-void ObjectHp::update()
-{
-
-}
-
 void ObjectHp::draw(Vec2 pos)
 {
 	if (hp > 0) {

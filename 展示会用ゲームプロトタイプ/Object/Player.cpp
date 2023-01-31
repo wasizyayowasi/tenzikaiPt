@@ -6,6 +6,13 @@
 #include "../PlayerThrowinAttack.h"
 #include "../ObjectHp.h"
 
+namespace {
+	constexpr int playerSizeX = 50;
+	constexpr int playerSizeY = 64;
+
+	constexpr int groundY = 700;
+}
+
 Player::Player()
 {
 	limit = new TimeLimit;
@@ -20,8 +27,8 @@ void Player::update()
 
 	//’n–Ê‚Æ‚Ì”»’è
 	PlayerPos += vec;
-	if (PlayerPos.y + 64 > 700) {
-		PlayerPos.y = 700-64;
+	if (PlayerPos.y + playerSizeY > groundY) {
+		PlayerPos.y = groundY - playerSizeY;
 		hit = true;
 	}
 	else {
@@ -108,7 +115,7 @@ void Player::draw()
 
 	DrawFormatString(0, 45, GetColor(255, 255, 255), "%d", hpDisplayTime);
 
-	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + 50, PlayerPos.y + 64, GetColor(255, 255, 255), true);
+	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
 	
 	if (playerDirections == 1) {
 		DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);

@@ -4,13 +4,12 @@
 class ObjectHp
 {
 public:
-	ObjectHp();
-	~ObjectHp();
+	ObjectHp(){}
+	~ObjectHp(){}
 
 	void setObjectHp(int obJectHp) { hp = obJectHp; }
 	void setObjectMaxHp(int obJectMaxHp) { maxHp = obJectMaxHp; }
 
-	void update();
 	void draw(Vec2 pos);
 private:
 	int hp = 0;
