@@ -11,7 +11,7 @@ class Player
 {
 public:
 	Player();
-	~Player() {}
+	~Player() { delete hp; delete limit; }
 
 	Vec2 getPos()const { return PlayerPos; }
 
@@ -49,8 +49,6 @@ private:
 	bool enemyHit = false;
 	//‹ßÚUŒ‚
 	bool proximityAttack = false;
-
-	int aiu = 0;
 
 	int time = 0;
 

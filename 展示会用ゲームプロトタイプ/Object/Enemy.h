@@ -9,7 +9,7 @@ class Enemy
 {
 public:
 	Enemy();
-	~Enemy() { delete player; }
+	~Enemy() { delete hp; }
 
 	Vec2 getPos()const { return enemyPos; }
 	void setPlayer(Player* dPlayer) { player = dPlayer; }

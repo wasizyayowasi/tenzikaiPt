@@ -65,14 +65,7 @@ void Player::update()
 	}
 
 	//ˆÈ‰ºUŒ‚Žè’iŽÀ‘•—\’è
-	//‹ßÚUŒ‚
-	if (Pad::isTrigger(PAD_INPUT_2)) {
-		proximityAttack = true;
-	}
-	else {
-		proximityAttack = false;
-	}
-
+	// 
 	//“Š±
 	if (Pad::isTrigger(PAD_INPUT_3)) {
 		if (!flyingObject->isEnable()) {
@@ -87,6 +80,18 @@ void Player::update()
 			flyingObject->deadFlyingObject();
 		}
 	}
+
+
+	//‹ßÚUŒ‚
+	if (!flyingObject->isEnable()) {
+		if (Pad::isTrigger(PAD_INPUT_2)) {
+			proximityAttack = true;
+		}
+		else {
+			proximityAttack = false;
+		}
+	}
+
 	
 	//HP‚Ì•\Ž¦
 	if (hpDisplay) {
@@ -113,15 +118,14 @@ void Player::draw()
 		}
 	}
 
-	DrawFormatString(0, 45, GetColor(255, 255, 255), "%d", hpDisplayTime);
-
-	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
-	
-	if (playerDirections == 1) {
-		DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);
-	}
-	else if (playerDirections == 2) {
-		DrawBox(PlayerPos.x + 50, PlayerPos.y, PlayerPos.x + 70, PlayerPos.y + 10, GetColor(255, 0, 0), true);
+	if (!push) {
+		DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
+		if (playerDirections == 1) {
+			DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);
+		}
+		else if (playerDirections == 2) {
+			DrawBox(PlayerPos.x + 50, PlayerPos.y, PlayerPos.x + 70, PlayerPos.y + 10, GetColor(255, 0, 0), true);
+		}
 	}
 	
 	//ƒ^ƒCƒ}[
@@ -139,8 +143,6 @@ void Player::draw()
 	if (hpDisplay) {
 		hp->draw(PlayerPos);
 	}
-
-	DrawFormatString(0, 220, GetColor(255, 255, 255), "aiu : %d", aiu);
 }
 
 //‰B‚ê‚é

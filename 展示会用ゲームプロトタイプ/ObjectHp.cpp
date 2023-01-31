@@ -1,6 +1,7 @@
 #include "ObjectHp.h"
 #include "DxLib.h"
 
+//hp‚Ì•\Ž¦
 void ObjectHp::draw(Vec2 pos)
 {
 	if (hp > 0) {

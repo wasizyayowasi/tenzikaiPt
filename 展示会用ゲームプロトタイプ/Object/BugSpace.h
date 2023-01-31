@@ -10,7 +10,7 @@ class BugSpace
 {
 public:
 	BugSpace();
-	~BugSpace() { delete player/*, delete enemy*/; }
+	~BugSpace() {}
 
 	void update();
 	void draw();
@@ -18,11 +18,12 @@ public:
 	void setPlayer(Player* dPlayer) { player = dPlayer; }
 
 	void enemySetPlayer();
+
+	void setPos(Vec2 pos) { spacePos = pos; }
 private:
-	int a = 0;
 	bool pushKey = false;
 
-	Vec2 spacePos = { 800.0f,400.0f };
+	Vec2 spacePos = { 0.0f,0.0f };
 
 	//Enemy* enemy;
 	Player* player;

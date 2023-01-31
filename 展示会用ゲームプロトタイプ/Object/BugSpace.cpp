@@ -10,6 +10,7 @@ BugSpace::BugSpace()
 	}
 }
 
+//バグスペースの更新
 void BugSpace::update()
 {
 	
@@ -19,7 +20,6 @@ void BugSpace::update()
 			for (auto& enemy : enemy_) {
 				if (!enemy->isEnable()) {
 					enemy->dispatch(spacePos);
-					a++;
 					break;
 				}
 			}
@@ -40,7 +40,6 @@ void BugSpace::update()
 
 void BugSpace::draw()
 {
-	DrawFormatString(0, 15, GetColor(255, 255, 255), "%d", a);
 	DrawBox(spacePos.x, spacePos.y, spacePos.x + 50, spacePos.y + 60, GetColor(255, 0, 0), true);
 	for (auto& enemy : enemy_) {
 		if (enemy->isEnable()) {

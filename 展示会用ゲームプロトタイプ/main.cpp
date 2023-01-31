@@ -27,6 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	GameMain main;
 
+	main.init();
 
 	while (ProcessMessage() == 0) {
 

@@ -8,20 +8,44 @@
 GameMain::GameMain()
 {
 	player = new Player;
-	space = new BugSpace;
-	
-	space->setPlayer(player);
-	space->enemySetPlayer();
+	for (auto& space : space) {
+		space = std::make_shared<BugSpace>();
+	}
+	for (auto& space : space) {
+		space->setPlayer(player);
+	}
+	for (auto& space : space) {
+		space->enemySetPlayer();
+	}
+}
+
+void GameMain::init()
+{
+	for (auto& space : space) {
+		space->setPos({x, y});
+		x += 100.0f;
+		y += 100.0f;
+	}
 }
 
 void GameMain::update()
 {
 	Pad::update();
 
+	if (Pad::isPress(PAD_INPUT_RIGHT)) {
+		fieldX -= 10;
+	}
+	if (Pad::isPress(PAD_INPUT_LEFT)) {
+		fieldX += 10;
+	}
+
 	player->update();
-	space->update();
+
+	for (auto& space : space) {
+		space->update();
+	}
+
 	if (hiddenPlayer()) {
-		DrawString(0, 135, "hidden", GetColor(255, 255, 255));
 		player->hiddenBlockTrue();
 	}
 	else {
@@ -37,10 +61,12 @@ void GameMain::draw()
 	//‰B‚êêŠ
 	DrawBox(hiddenBlockX, hiddenBlockY, hiddenBlockX + 100, hiddenBlockY + 100, GetColor(100, 255, 0), true);
 
-	DrawFormatString(0, 0, GetColor(255, 255, 255), "%f:%f", player->getPos().x, player->getPos().y);
+	for (auto& space : space) {
+		space->draw();
+	}
+
 	player->draw();
 
-	space->draw();
 }
 
 struct ColData {
