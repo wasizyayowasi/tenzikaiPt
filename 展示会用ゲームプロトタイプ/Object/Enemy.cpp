@@ -15,6 +15,9 @@ void Enemy::dispatch(const Vec2& pos)
 {
 	enemyPos = pos;
 	isEnabled = true;
+	enemyHp = 9;
+	hpDisplay = false;
+	hpDisplayTime = 120;
 }
 
 void Enemy::update()
@@ -94,6 +97,21 @@ void Enemy::update()
 		isEnabled = false;
 	}
 
+	if (player->proximityAttackCollision(enemyPos)) {
+		enemyHp -= 3;
+		hpDisplay = true;
+	}
+
+	if (hpDisplay) {
+		if (--hpDisplayTime < 0) {
+			hpDisplay = false;
+			hpDisplayTime = 120;
+		}
+	}
+
+	if (enemyHp <= 0) {
+		isEnabled = false;
+	}
 }
 
 void Enemy::draw()
@@ -101,7 +119,9 @@ void Enemy::draw()
 	DrawBox(enemyPos.x - 70, enemyPos.y - 70, enemyPos.x + 100, enemyPos.y + 100, GetColor(255, 0, 0), false);
 	DrawBox(enemyPos.x, enemyPos.y, enemyPos.x + 30, enemyPos.y + 30, GetColor(0, 0, 255), true);
 
-	hp->draw(enemyPos);
+	if (hpDisplay) {
+		hp->draw(enemyPos);
+	}
 }
 
 bool Enemy::isEnable() const

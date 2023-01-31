@@ -22,11 +22,12 @@ public:
 
 	void hitFlyingObject();
 private:
-	int enemyHp = 10;
+	int enemyHp = 9;
+	int hpDisplayTime = 120;
 
 	bool hit = false;
 	bool chase = false;
-
+	bool hpDisplay = false;
 	bool stop = false;
 
 	bool isEnabled = false;

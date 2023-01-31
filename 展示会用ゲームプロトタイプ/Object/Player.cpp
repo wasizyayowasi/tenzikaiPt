@@ -19,9 +19,9 @@ void Player::update()
 	hp->setObjectHp(playerHp);
 
 	//’n–Ê‚Æ‚Ì”»’è
-	pos += vec;
-	if (pos.y + 64 > 700) {
-		pos.y = 700-64;
+	PlayerPos += vec;
+	if (PlayerPos.y + 64 > 700) {
+		PlayerPos.y = 700-64;
 		hit = true;
 	}
 	else {
@@ -30,19 +30,19 @@ void Player::update()
 
 	//ˆÚ“®
 	if (Pad::isPress(PAD_INPUT_LEFT)) {
-		pos.x -= 10;
+		PlayerPos.x -= 10;
 		playerDirections = 1;
 	}
 	if (Pad::isPress(PAD_INPUT_RIGHT)) {
-		pos.x += 10;
+		PlayerPos.x += 10;
 		playerDirections = 2;
 	}
 	if (Pad::isPress(PAD_INPUT_UP)) {
-		pos.y -= 10;
+		PlayerPos.y -= 10;
 	}
 	if (!hit) {
 		if (Pad::isPress(PAD_INPUT_DOWN)) {
-			pos.y += 10;
+			PlayerPos.y += 10;
 		}
 	}
 
@@ -60,44 +60,61 @@ void Player::update()
 	//ˆÈ‰ºUŒ‚Žè’iŽÀ‘•—\’è
 	//‹ßÚUŒ‚
 	if (Pad::isTrigger(PAD_INPUT_2)) {
-
+		proximityAttack = true;
+	}
+	else {
+		proximityAttack = false;
 	}
 
 	//“Š±
 	if (Pad::isTrigger(PAD_INPUT_3)) {
 		if (!flyingObject->isEnable()) {
-			flyingObject->attack(pos,playerDirections);
+			flyingObject->attack(PlayerPos,playerDirections);
 		}
 	}
 	if (flyingObject->isEnable()) {
 		flyingObject->update();
 	}
 	if (flyingObject->landing()) {
-		if (flyingObject->playerCollision(pos)) {
+		if (flyingObject->playerCollision(PlayerPos)) {
 			flyingObject->deadFlyingObject();
 		}
 	}
 	
-	if (Pad::isTrigger(PAD_INPUT_6)) {
-		playerHp--;
+	//HP‚Ì•\Ž¦
+	if (hpDisplay) {
+		if (--hpDisplayTime < 0) {
+			hpDisplay = false;
+			hpDisplayTime = 120;
+		}
 	}
 	
-	limit->playerGetPos(pos);
+	limit->playerGetPos(PlayerPos);
 
 }
 
 //•`‰æ
 void Player::draw()
 {
-	DrawFormatString(0, 45, GetColor(255, 255, 255), "%d", playerDirections);
+	//‹ßÚUŒ‚
+	if (proximityAttack) {
+		if (playerDirections == 1) {
+			DrawBox(PlayerPos.x - 5, PlayerPos.y + 10, PlayerPos.x - 65, PlayerPos.y + 50, 0xff00ff, true);
+		}
+		else {
+			DrawBox(PlayerPos.x + 55, PlayerPos.y + 10, PlayerPos.x + 115, PlayerPos.y + 50, 0xff00ff, true);
+		}
+	}
 
-	DrawBox(pos.x, pos.y, pos.x + 50, pos.y + 64, GetColor(255, 255, 255), true);
+	DrawFormatString(0, 45, GetColor(255, 255, 255), "%d", hpDisplayTime);
+
+	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + 50, PlayerPos.y + 64, GetColor(255, 255, 255), true);
 	
 	if (playerDirections == 1) {
-		DrawBox(pos.x - 20, pos.y, pos.x, pos.y + 10, GetColor(255, 0, 0), true);
+		DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);
 	}
 	else if (playerDirections == 2) {
-		DrawBox(pos.x + 50, pos.y, pos.x + 70, pos.y + 10, GetColor(255, 0, 0), true);
+		DrawBox(PlayerPos.x + 50, PlayerPos.y, PlayerPos.x + 70, PlayerPos.y + 10, GetColor(255, 0, 0), true);
 	}
 	
 	//ƒ^ƒCƒ}[
@@ -112,7 +129,9 @@ void Player::draw()
 		flyingObject->draw();
 	}
 
-	hp->draw(pos);
+	if (hpDisplay) {
+		hp->draw(PlayerPos);
+	}
 
 	DrawFormatString(0, 220, GetColor(255, 255, 255), "aiu : %d", aiu);
 }
@@ -136,33 +155,15 @@ bool Player::beHidden()
 	return push;
 }
 
-//bool Player::enemyCollision(Vec2 enemyPos)
-//{
-//	
-//
-//	float enemyLeft = enemyPos.x;
-//	float enemyTop = enemyPos.y;
-//	float enemyRight = enemyPos.x + 50;
-//	float enemyBottom = enemyPos.y + 64;
-//
-//	if (enemyLeft > pos.x)				return false;
-//	DrawString(400, 0, "aiu", GetColor(255, 255, 255));
-//	if (enemyRight < pos.x + 50)		return false;
-//	DrawString(400, 15, "aiu2", GetColor(255, 255, 255));
-//	if (enemyTop <= pos.y)				return false;
-//	DrawString(400, 30, "aiu3", GetColor(255, 255, 255));
-//	if (enemyBottom <= pos.y + 64)		return false;
-//	DrawString(400, 45, "aiu4", GetColor(255, 255, 255));
-//
-//	return false;
-//}
-
 void Player::damege()
 {
+	hpDisplay = true;
+
 	if (--time < 0) {
 		if (playerHp > 0) {
 			playerHp--;
 			time = 60;
+			hpDisplayTime = 120;
 		}
 	}
 }
@@ -179,3 +180,35 @@ int Player::enemyAttack(Vec2 enemyPos)
 	return enemyHit;
 }
 
+bool Player::proximityAttackCollision(const Vec2& pos)
+{
+	float enemyLeft = pos.x;
+	float enemyTop = pos.y;
+	float enemyRight = pos.x + 30;
+	float enemyBottom = pos.y + 30;
+
+	if (proximityAttack) {
+		if (playerDirections == 1) {
+			if (enemyLeft > PlayerPos.x - 5)			return false;
+			DrawString(600, 0, "aiu1", 0xffffff);
+			if (enemyRight < PlayerPos.x - 65)			return false;
+			DrawString(600, 15, "aiu1", 0xffffff);
+			if (enemyTop <= PlayerPos.y + 10)			return false;
+			DrawString(600, 30, "aiu1", 0xffffff);
+			if (enemyBottom <= PlayerPos.y + 50)		return false;
+			DrawString(600, 45, "aiu1", 0xffffff);
+		}
+		else if (playerDirections == 2) {
+			if (enemyLeft > PlayerPos.x + 115)			return false;
+			DrawString(600, 0, "aiu1", 0xffffff);
+			if (enemyRight < PlayerPos.x + 55)			return false;
+			DrawString(600, 15, "aiu1", 0xffffff);
+			if (enemyTop <= PlayerPos.y + 10)			return false;
+			DrawString(600, 30, "aiu1", 0xffffff);
+			if (enemyBottom <= PlayerPos.y + 50)		return false;
+			DrawString(600, 45, "aiu1", 0xffffff);
+		}
+		return true;
+	}
+	return false;
+}
