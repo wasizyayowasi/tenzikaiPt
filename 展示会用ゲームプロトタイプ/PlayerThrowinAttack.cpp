@@ -109,13 +109,9 @@ bool PlayerThrowinAttack::enemyCollision(const Vec2& pos)
 		float enemyBottom = pos.y + 30;
 
 		if (enemyLeft > flyingObjectPos.x + 20)		return false;
-		DrawString(400, 0, "aiu1", 0xffffff);
 		if (enemyRight < flyingObjectPos.x)			return false;
-		DrawString(400, 15, "aiu2", 0xffffff);
 		if (enemyTop >= flyingObjectPos.y + 20)		return false;
-		DrawString(400, 30, "aiu3", 0xffffff);
 		if (enemyBottom <= flyingObjectPos.y)		return false;
-		DrawString(400, 45, "aiu4", 0xffffff);
 
 		return true;
 	}
