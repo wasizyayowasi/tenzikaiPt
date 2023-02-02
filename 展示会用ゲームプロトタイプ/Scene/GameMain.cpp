@@ -8,8 +8,8 @@
 GameMain::GameMain()
 {
 	player = new Player;
-	for (auto& space : space) {
-		space = std::make_shared<BugSpace>();
+	for (int i = 0; i < 3;i++) {
+		space[i] = std::make_shared<BugSpace>(i);
 	}
 	for (auto& space : space) {
 		space->setPlayer(player);
@@ -22,9 +22,8 @@ GameMain::GameMain()
 void GameMain::init()
 {
 	for (auto& space : space) {
-		space->setPos({x, y});
-		x += 100.0f;
-		y += 100.0f;
+		space->setPos({static_cast<float>(GetRand(Game::kScreenWidth - 50)), 600.0f});
+		
 	}
 }
 
@@ -46,10 +45,17 @@ void GameMain::update()
 	}
 
 	if (hiddenPlayer()) {
-		player->hiddenBlockTrue();
+		player->setHidden(true);
 	}
 	else {
-		player->hiddenBlockFalse();
+		player->setHidden(false);
+	}
+
+	if (ladderCollision()) {
+		player->setLadder(true);
+	}
+	else {
+		player->setLadder(false);
 	}
 }
 
@@ -57,9 +63,15 @@ void GameMain::draw()
 {
 	//’n–Ê
 	DrawBox(0, 700, Game::kScreenWidth, Game::kScreenHeight, GetColor(255, 255, 0), true);
+	DrawString(0, 700, "’n–Ê", 0x000000);
 
 	//‰B‚êêŠ
 	DrawBox(hiddenBlockX, hiddenBlockY, hiddenBlockX + 100, hiddenBlockY + 100, GetColor(100, 255, 0), true);
+	DrawString(hiddenBlockX, hiddenBlockY, "‰B‚êêŠ", 0x000000);
+
+	//’òŽq
+	DrawBox(ladderBlockX, ladderBlockY, ladderBlockX + 70, ladderBlockY + 500, GetColor(100, 100, 100), true);
+	DrawString(ladderBlockX, ladderBlockY, "’òŽq", 0xffffff);
 
 	for (auto& space : space) {
 		space->draw();
@@ -80,6 +92,10 @@ ColData colData[] = {
 	{600,600,700,700}
 };
 
+ColData ladderColData[] = {
+	{300,200,370,700}
+};
+
 bool GameMain::hiddenPlayer() {
 
 	float playerLeft = player->getPos().x;
@@ -92,6 +108,27 @@ bool GameMain::hiddenPlayer() {
 		if (playerLeft > data.right)continue;
 		if (playerBottom < data.top)continue;
 		if (playerTop > data.bottom)continue;
+		return true;
+	}
+	return false;
+}
+
+bool GameMain::ladderCollision()
+{
+	float playerLeft = player->getPos().x + 25;
+	float playerRight = player->getPos().x + 26;
+	float playerTop = player->getPos().y;
+	float playerBottom = player->getPos().y + 64;
+
+	for (ColData data : ladderColData) {
+		if (playerRight < data.left)continue;
+		DrawString(300, 0, "aiu1", 0xffffff);
+		if (playerLeft > data.right)continue;
+		DrawString(300, 15, "aiu1", 0xffffff);
+		if (playerBottom < data.top)continue;
+		DrawString(300, 30, "aiu1", 0xffffff);
+		if (playerTop > data.bottom)continue;
+		DrawString(300, 45, "aiu1", 0xffffff);
 		return true;
 	}
 	return false;

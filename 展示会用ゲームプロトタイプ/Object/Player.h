@@ -20,14 +20,18 @@ public:
 
 	bool beHidden();
 
-	void hiddenBlockTrue() { hidden = true; }
-	void hiddenBlockFalse() { hidden = false, push = false; }
+	void setHidden(bool temporaryHidden) { hidden = temporaryHidden; }
+	void setLadder(bool temporaryLadder) { ladder = temporaryLadder; }
 
 	void damege();
 
 	int enemyAttack(Vec2 enemyPos);
 
 	bool proximityAttackCollision(const Vec2& pos);
+
+	bool repairSpace(const Vec2& pos);
+
+	void setRepair(/*bool temporaryRepair*/int num);
 private:
 	int playerDirections = 1;
 
@@ -40,6 +44,8 @@ private:
 	bool timeDisplay = false;
 	//オブジェクトに隠れているか
 	bool hidden = false;
+	bool ladder = false;
+	bool upperLimit = false;
 
 	bool hit = false;
 	//隠れるボタンを押したか
@@ -50,13 +56,16 @@ private:
 	//近接攻撃
 	bool proximityAttack = false;
 
+	int repair = 0;
+	//bool repair = false;
+
 	int time = 0;
 
 	TimeLimit* limit;
 	ObjectHp* hp;
 
 	Vec2 PlayerPos = {100.0f,636.0f};
-	Vec2 vec = { 0.0f,1.0f };
+	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;
 };

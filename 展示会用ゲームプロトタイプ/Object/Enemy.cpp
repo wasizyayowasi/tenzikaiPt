@@ -2,7 +2,7 @@
 #include "DxLib.h"
 #include "../game.h"
 #include "Player.h"
-#include "../ObjectHp.h"
+#include "ObjectHp.h"
 
 
 Enemy::Enemy()

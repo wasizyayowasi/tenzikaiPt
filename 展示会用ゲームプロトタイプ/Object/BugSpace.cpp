@@ -1,9 +1,10 @@
 #include "BugSpace.h"
 #include "DxLib.h"
 #include "Enemy.h"
+#include "Player.h"
 #include "../Pad.h"
 
-BugSpace::BugSpace()
+BugSpace::BugSpace(int spaceNum):num(spaceNum)
 {
 	for (auto& enemy : enemy_) {
 		enemy = std::make_shared<Enemy>();
@@ -36,11 +37,16 @@ void BugSpace::update()
 		}
 	}
 
+	if (player->repairSpace(spacePos)) {
+		player->setRepair(1);
+	}
 }
 
 void BugSpace::draw()
 {
 	DrawBox(spacePos.x, spacePos.y, spacePos.x + 50, spacePos.y + 60, GetColor(255, 0, 0), true);
+	DrawString(spacePos.x, spacePos.y, "‹óŠÔ", 0xffffff);
+
 	for (auto& enemy : enemy_) {
 		if (enemy->isEnable()) {
 			enemy->draw();

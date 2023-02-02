@@ -54,11 +54,11 @@
     <ClCompile Include="Object\TimeLimit.cpp">
       <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerThrowinAttack.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Object\ObjectHp.cpp">
+      <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectHp.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Object\PlayerThrowinAttack.cpp">
+      <Filter>ソース ファイル\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -89,11 +89,11 @@
     <ClInclude Include="Object\TimeLimit.h">
       <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerThrowinAttack.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Object\ObjectHp.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectHp.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Object\PlayerThrowinAttack.h">
+      <Filter>ヘッダー ファイル\Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

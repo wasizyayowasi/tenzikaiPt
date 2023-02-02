@@ -1,5 +1,6 @@
 #pragma once
 #include "../Vec2.h"
+#include "ObjectHp.h"
 #include <memory>
 #include <array>
 
@@ -9,7 +10,7 @@ class Enemy;
 class BugSpace
 {
 public:
-	BugSpace();
+	BugSpace(int spaceNum);
 	~BugSpace() {}
 
 	void update();
@@ -21,11 +22,12 @@ public:
 
 	void setPos(Vec2 pos) { spacePos = pos; }
 private:
+	int num = 0;
+
 	bool pushKey = false;
 
 	Vec2 spacePos = { 0.0f,0.0f };
 
-	//Enemy* enemy;
 	Player* player;
 
 	std::array<std::shared_ptr<Enemy>, 16>enemy_;

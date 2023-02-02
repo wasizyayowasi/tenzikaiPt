@@ -18,13 +18,16 @@ public:
 	void draw();
 
 	bool hiddenPlayer();
+
+	bool ladderCollision();
 private:
 	bool hidden = false;
 
 	int hiddenBlockX = 600;
 	int hiddenBlockY = 600;
 
-	float x = 100.0f,y = 200.0f;
+	int ladderBlockX = 300;
+	int ladderBlockY = 200;
 
 	float fieldX = 0.0f, fieldY = 700.0f;
 

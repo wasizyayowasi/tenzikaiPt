@@ -1,6 +1,6 @@
 #include "PlayerThrowinAttack.h"
-#include "game.h"
-#include "Pad.h"
+#include "../game.h"
+#include "../Pad.h"
 #include <math.h>
 
 PlayerThrowinAttack::PlayerThrowinAttack()
@@ -64,7 +64,7 @@ void PlayerThrowinAttack::update()
 	}
 
 	//îÕàÕäOÇ≈è¡Ç¶ÇÈ
-	if (pos.x < 0) {
+	if (pos.x < -30) {
 		init();
 	}
 	if (pos.x - 20 > Game::kScreenWidth) {
@@ -82,7 +82,7 @@ void PlayerThrowinAttack::update()
 void PlayerThrowinAttack::draw()
 {
 	DrawBox(flyingObjectPos.x, flyingObjectPos.y, flyingObjectPos.x + 20, flyingObjectPos.y + 20, GetColor(252, 15, 192), true);
-	DrawFormatString(0, 30, GetColor(255, 255, 255), "%d", playerDirections);
+	DrawString(flyingObjectPos.x, flyingObjectPos.y - 10, "íe", 0xffffff);
 }
 
 
@@ -106,23 +106,29 @@ bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
 //ìäù±ï®Ç∆ÇÃìñÇΩÇËîªíË
 bool PlayerThrowinAttack::enemyCollision(const Vec2& pos)
 {
+	
 	if (isEnabled) {
-		float enemyLeft = pos.x;
-		float enemyTop = pos.y;
-		float enemyRight = pos.x + 30;
-		float enemyBottom = pos.y + 30;
+		if (!landingObject) {
+			float enemyLeft = pos.x;
+			float enemyTop = pos.y;
+			float enemyRight = pos.x + 30;
+			float enemyBottom = pos.y + 30;
 
-		if (enemyLeft > flyingObjectPos.x + 20)		return false;
-		if (enemyRight < flyingObjectPos.x)			return false;
-		if (enemyTop >= flyingObjectPos.y + 20)		return false;
-		if (enemyBottom <= flyingObjectPos.y)		return false;
+			if (enemyLeft > flyingObjectPos.x + 20)		return false;
+			if (enemyRight < flyingObjectPos.x)			return false;
+			if (enemyTop >= flyingObjectPos.y + 20)		return false;
+			if (enemyBottom <= flyingObjectPos.y)		return false;
 
-		return true;
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	else {
 		return false;
 	}
-	
+
 }
 
 

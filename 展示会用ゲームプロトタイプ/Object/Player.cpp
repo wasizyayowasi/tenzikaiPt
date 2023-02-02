@@ -3,8 +3,8 @@
 #include "TimeLimit.h"
 #include "DxLib.h"
 #include "TimeLimit.h"
-#include "../PlayerThrowinAttack.h"
-#include "../ObjectHp.h"
+#include "PlayerThrowinAttack.h"
+#include "ObjectHp.h"
 
 namespace {
 	constexpr int playerSizeX = 50;
@@ -23,16 +23,24 @@ Player::Player()
 
 void Player::update()
 {
+	
+
 	hp->setObjectHp(playerHp);
 
-	//’n–Ê‚Æ‚Ì”»’è
-	PlayerPos += vec;
-	if (PlayerPos.y + playerSizeY > groundY) {
-		PlayerPos.y = groundY - playerSizeY;
-		hit = true;
+	if (!ladder) {
+		if (upperLimit) {
+			vec.y = 20.0f;
+		}
+		else {
+			vec.y = 10.0f;
+		}
+		PlayerPos += vec;
 	}
-	else {
-		hit = false;
+
+	if (Pad::isPress(PAD_INPUT_UP)) {
+		if (!ladder) {
+			upperLimit = true;
+		}
 	}
 
 	//ˆÚ“®
@@ -44,28 +52,46 @@ void Player::update()
 		PlayerPos.x += 10;
 		playerDirections = 2;
 	}
-	if (Pad::isPress(PAD_INPUT_UP)) {
-		PlayerPos.y -= 10;
+	if (ladder) {
+		if (!upperLimit) {
+			if (Pad::isPress(PAD_INPUT_UP)) {
+				PlayerPos.y -= 10;
+			}
+		}
 	}
+	
 	if (!hit) {
 		if (Pad::isPress(PAD_INPUT_DOWN)) {
 			PlayerPos.y += 10;
 		}
 	}
 
+	//’n–Ê‚Æ‚Ì”»’è
+	if (PlayerPos.y + playerSizeY > groundY) {
+		PlayerPos.y = groundY - playerSizeY;
+		hit = true;
+		upperLimit = false;
+	}
+	else {
+		hit = false;
+	}
+
+
 	//C•œƒ^ƒCƒ}[
 	if (!flyingObject->isEnable()) {
-		if (Pad::isPress(PAD_INPUT_1)) {
-			limit->update();
-			timeDisplay = true;
-		}
-		else {
-			timeDisplay = false;
+		if (repair == 1) {
+			if (Pad::isPress(PAD_INPUT_1)) {
+				limit->update();
+				timeDisplay = true;
+			}
+			else {
+				timeDisplay = false;
+			}
 		}
 	}
 
-	//ˆÈ‰ºUŒ‚Žè’iŽÀ‘•—\’è
-	// 
+
+	//ˆÈ‰ºUŒ‚Žè’iŽÀ‘•—\’è 
 	//“Š±
 	if (Pad::isTrigger(PAD_INPUT_3)) {
 		if (!flyingObject->isEnable()) {
@@ -103,6 +129,8 @@ void Player::update()
 	
 	limit->playerGetPos(PlayerPos);
 
+	repair = 0;
+
 }
 
 //•`‰æ
@@ -111,23 +139,29 @@ void Player::draw()
 	//‹ßÚUŒ‚
 	if (proximityAttack) {
 		if (playerDirections == 1) {
-			DrawBox(PlayerPos.x - 5, PlayerPos.y + 10, PlayerPos.x - 65, PlayerPos.y + 50, 0xff00ff, true);
+			DrawBox(PlayerPos.x - 65, PlayerPos.y + 10, PlayerPos.x - 5, PlayerPos.y + 50, 0xff00ff, true);
+			DrawString(PlayerPos.x - 65, PlayerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
 		}
 		else {
 			DrawBox(PlayerPos.x + 55, PlayerPos.y + 10, PlayerPos.x + 115, PlayerPos.y + 50, 0xff00ff, true);
-		}
-	}
-
-	if (!push) {
-		DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
-		if (playerDirections == 1) {
-			DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);
-		}
-		else if (playerDirections == 2) {
-			DrawBox(PlayerPos.x + 50, PlayerPos.y, PlayerPos.x + 70, PlayerPos.y + 10, GetColor(255, 0, 0), true);
+			DrawString(PlayerPos.x + 55, PlayerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
 		}
 	}
 	
+	if (!push) {
+		if (playerDirections == 1) {
+			DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);
+			DrawString(PlayerPos.x - 20, PlayerPos.y - 15, "Œü‚«", 0xffffff);
+		}
+		else if (playerDirections == 2) {
+			DrawBox(PlayerPos.x + 50, PlayerPos.y, PlayerPos.x + 70, PlayerPos.y + 10, GetColor(255, 0, 0), true);
+			DrawString(PlayerPos.x + 50, PlayerPos.y - 15, "Œü‚«", 0xffffff);
+		}
+	}
+	
+	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
+	DrawString(PlayerPos.x, PlayerPos.y + 30, "ƒvƒŒƒCƒ„[", 0xff00ff);
+
 	//ƒ^ƒCƒ}[
 	if (!flyingObject->isEnable()) {
 		if (timeDisplay) {
@@ -189,6 +223,8 @@ int Player::enemyAttack(Vec2 enemyPos)
 	return enemyHit;
 }
 
+
+//‹ßÚUŒ‚‚Ì“–‚½‚è”»’è
 bool Player::proximityAttackCollision(const Vec2& pos)
 {
 	float enemyLeft = pos.x;
@@ -220,4 +256,37 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 		return true;
 	}
 	return false;
+}
+
+
+bool Player::repairSpace(const Vec2& pos)
+{
+	float spaceLeft = pos.x;
+	float spaceTop = pos.y;
+	float spaceRight = pos.x + 50;
+	float spaceBottom = pos.y + 60;
+
+	if (spaceLeft > PlayerPos.x + 50)				return false;
+	DrawString(600, 0, "aiu1", 0xffffff);
+	if (spaceRight < PlayerPos.x)					return false;
+	DrawString(600, 15, "aiu1", 0xffffff);
+	if (spaceTop > PlayerPos.y + 64)				return false;
+	DrawString(600, 30, "aiu1", 0xffffff);
+	if (spaceBottom < PlayerPos.y)					return false;
+	DrawString(600, 45, "aiu1", 0xffffff);
+		
+	return true;
+
+}
+
+void Player::setRepair(/*bool temporaryRepair*/int num)
+{
+	
+	repair = num;
+	if (repair) {
+		DrawString(700, 0, "’¼‚¹‚é‚æ", 0xffffff);
+	}
+	else {
+		DrawString(700, 15, "’¼‚¹‚È‚¢‚æ", 0xffffff);
+	}
 }
