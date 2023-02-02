@@ -3,7 +3,6 @@
 #include <memory>
 #include <array>
 
-class TimeLimit;
 class PlayerThrowinAttack;
 class ObjectHp;
 
@@ -11,7 +10,7 @@ class Player
 {
 public:
 	Player();
-	~Player() { delete hp; delete limit; }
+	~Player() { delete hp; }
 
 	Vec2 getPos()const { return PlayerPos; }
 
@@ -31,7 +30,9 @@ public:
 
 	bool repairSpace(const Vec2& pos);
 
-	void setRepair(/*bool temporaryRepair*/int num);
+	void setRepair(int num);
+
+	int returnSpaceHpDisplay() { return spaceHpDisplay; }
 private:
 	int playerDirections = 1;
 
@@ -41,7 +42,7 @@ private:
 	//hp表示
 	bool hpDisplay = false;
 	//hp表示の時間
-	bool timeDisplay = false;
+	bool spaceHpDisplay = false;
 	//オブジェクトに隠れているか
 	bool hidden = false;
 	bool ladder = false;
@@ -61,7 +62,6 @@ private:
 
 	int time = 0;
 
-	TimeLimit* limit;
 	ObjectHp* hp;
 
 	Vec2 PlayerPos = {100.0f,636.0f};

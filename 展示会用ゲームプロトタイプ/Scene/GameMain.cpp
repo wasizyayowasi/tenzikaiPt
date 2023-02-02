@@ -8,9 +8,11 @@
 GameMain::GameMain()
 {
 	player = new Player;
+	//空間のデータを作る
 	for (int i = 0; i < 3;i++) {
 		space[i] = std::make_shared<BugSpace>(i);
 	}
+	//プレイヤーのデータを送る
 	for (auto& space : space) {
 		space->setPlayer(player);
 	}
@@ -19,31 +21,31 @@ GameMain::GameMain()
 	}
 }
 
+
 void GameMain::init()
 {
+	//空間の場所をランダムで設定
 	for (auto& space : space) {
 		space->setPos({static_cast<float>(GetRand(Game::kScreenWidth - 50)), 600.0f});
-		
 	}
 }
 
 void GameMain::update()
 {
+	//入力装置の情報を読み取る
 	Pad::update();
 
-	if (Pad::isPress(PAD_INPUT_RIGHT)) {
-		fieldX -= 10;
-	}
-	if (Pad::isPress(PAD_INPUT_LEFT)) {
-		fieldX += 10;
-	}
-
+	//プレイヤーの更新
 	player->update();
 
+	//空間の更新
 	for (auto& space : space) {
-		space->update();
+		if (space->isEnable()) {
+			space->update();
+		}
 	}
 
+	//身を隠せる状態にいるかの正否を返す
 	if (hiddenPlayer()) {
 		player->setHidden(true);
 	}
@@ -51,6 +53,7 @@ void GameMain::update()
 		player->setHidden(false);
 	}
 
+	//梯子に登れる状態なのか正否を返す
 	if (ladderCollision()) {
 		player->setLadder(true);
 	}
@@ -65,6 +68,9 @@ void GameMain::draw()
 	DrawBox(0, 700, Game::kScreenWidth, Game::kScreenHeight, GetColor(255, 255, 0), true);
 	DrawString(0, 700, "地面", 0x000000);
 
+	DrawBox(100, ladderBlockY, ladderBlockX, ladderBlockY + 50, GetColor(255, 255, 0), true);
+	DrawString(100, ladderBlockY, "地面", 0x000000);
+
 	//隠れ場所
 	DrawBox(hiddenBlockX, hiddenBlockY, hiddenBlockX + 100, hiddenBlockY + 100, GetColor(100, 255, 0), true);
 	DrawString(hiddenBlockX, hiddenBlockY, "隠れ場所", 0x000000);
@@ -73,10 +79,14 @@ void GameMain::draw()
 	DrawBox(ladderBlockX, ladderBlockY, ladderBlockX + 70, ladderBlockY + 500, GetColor(100, 100, 100), true);
 	DrawString(ladderBlockX, ladderBlockY, "梯子", 0xffffff);
 
+	//空間の描画
 	for (auto& space : space) {
-		space->draw();
+		if (space->isEnable()) {
+			space->draw();
+		}
 	}
 
+	//プレイヤーの描画
 	player->draw();
 
 }
@@ -88,14 +98,17 @@ struct ColData {
 	int bottom;
 };
 
+//隠れ場所のデータ
 ColData colData[] = {
 	{600,600,700,700}
 };
 
+//梯子のデータ
 ColData ladderColData[] = {
 	{300,200,370,700}
 };
 
+//隠れ場所とプレイヤーの当たり判定
 bool GameMain::hiddenPlayer() {
 
 	float playerLeft = player->getPos().x;
@@ -113,6 +126,7 @@ bool GameMain::hiddenPlayer() {
 	return false;
 }
 
+//梯子とプレイヤーの当たり判定
 bool GameMain::ladderCollision()
 {
 	float playerLeft = player->getPos().x + 25;

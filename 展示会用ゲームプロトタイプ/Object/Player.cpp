@@ -1,8 +1,6 @@
 #include "Player.h"
 #include "../Pad.h"
-#include "TimeLimit.h"
 #include "DxLib.h"
-#include "TimeLimit.h"
 #include "PlayerThrowinAttack.h"
 #include "ObjectHp.h"
 
@@ -15,7 +13,6 @@ namespace {
 
 Player::Player()
 {
-	limit = new TimeLimit;
 	hp = new ObjectHp;
 	flyingObject = std::make_shared<PlayerThrowinAttack>();
 	hp->setObjectMaxHp(playerHp);
@@ -23,10 +20,10 @@ Player::Player()
 
 void Player::update()
 {
-	
-
+	//毎フレーム、プレイヤーのHPを確認する
 	hp->setObjectHp(playerHp);
 
+	//重力を足し続ける
 	if (!ladder) {
 		if (upperLimit) {
 			vec.y = 20.0f;
@@ -37,6 +34,7 @@ void Player::update()
 		PlayerPos += vec;
 	}
 
+	//梯子を登り終わったとき、さらに登ろうとしないようにするためのやつ
 	if (Pad::isPress(PAD_INPUT_UP)) {
 		if (!ladder) {
 			upperLimit = true;
@@ -59,7 +57,6 @@ void Player::update()
 			}
 		}
 	}
-	
 	if (!hit) {
 		if (Pad::isPress(PAD_INPUT_DOWN)) {
 			PlayerPos.y += 10;
@@ -81,11 +78,10 @@ void Player::update()
 	if (!flyingObject->isEnable()) {
 		if (repair == 1) {
 			if (Pad::isPress(PAD_INPUT_1)) {
-				limit->update();
-				timeDisplay = true;
+				spaceHpDisplay = true;
 			}
 			else {
-				timeDisplay = false;
+				spaceHpDisplay = false;
 			}
 		}
 	}
@@ -126,8 +122,6 @@ void Player::update()
 			hpDisplayTime = 120;
 		}
 	}
-	
-	limit->playerGetPos(PlayerPos);
 
 	repair = 0;
 
@@ -161,13 +155,6 @@ void Player::draw()
 	
 	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
 	DrawString(PlayerPos.x, PlayerPos.y + 30, "プレイヤー", 0xff00ff);
-
-	//タイマー
-	if (!flyingObject->isEnable()) {
-		if (timeDisplay) {
-			limit->draw();
-		}
-	}
 
 	//飛び道具
 	if (flyingObject->isEnable()) {
@@ -279,7 +266,7 @@ bool Player::repairSpace(const Vec2& pos)
 
 }
 
-void Player::setRepair(/*bool temporaryRepair*/int num)
+void Player::setRepair(int num)
 {
 	
 	repair = num;
