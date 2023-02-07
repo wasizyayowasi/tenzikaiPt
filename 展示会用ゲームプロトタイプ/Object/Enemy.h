@@ -4,6 +4,7 @@
 
 class Player;
 class ObjectHp;
+class EnemyMotion;
 
 class Enemy
 {
@@ -12,32 +13,44 @@ public:
 	~Enemy() { delete hp; }
 
 	Vec2 getPos()const { return enemyPos; }
-	void setPlayer(Player* dPlayer) { player = dPlayer; }
+	void setPlayer(Player* dPlayer,int setHandle) { player = dPlayer,handle = setHandle; }
 
 	void dispatch(const Vec2& pos);
 	void update();
 	void draw();
 
 	bool isEnable()const;
-
-	void hitFlyingObject();
 private:
+	int handle = -1;
+
+	int motionNum = 0;
+
 	int enemyHp = 9;
 	int hpDisplayTime = 120;
 
-	bool hit = false;
-	bool chase = false;
+	bool inversion = false;
+
 	bool hpDisplay = false;
 	bool stop = false;
+
+	bool landing = false;
 
 	bool isEnabled = false;
 
 	bool hidden = false;
 
+	bool lock = false;
+
 	Vec2 enemyPos = {800.0f,600.0f};
-	Vec2 vec = {5.0f,1.0f};
+	Vec2 vec = {3.0f,1.0f};
+
+	Vec2 targetPlayer = { 0.0f,0.0f };
+	Vec2 targetPlayer2 = { 0.0f,0.0f };
+
+	Vec2 territoryPos = { 0.0f,0.0f };
 
 	Player* player;
 	ObjectHp* hp;
+	EnemyMotion* motion;
 };
 

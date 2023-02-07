@@ -3,11 +3,14 @@
 #include "../game.h"
 #include "Player.h"
 #include "ObjectHp.h"
+#include "../DrawFunctions.h"
+#include "../EnemyMotion.h"
 
 
 Enemy::Enemy()
 {
 	hp = new ObjectHp;
+	motion = new EnemyMotion;
 	hp->setObjectMaxHp(enemyHp);
 }
 
@@ -22,86 +25,128 @@ void Enemy::dispatch(const Vec2& pos)
 
 void Enemy::update()
 {
+	//現状のHPを設定する
 	hp->setObjectHp(enemyHp);
 
-	Vec2 targetPlayer{ 0,0 };
-
-	targetPlayer.x = player->getPos().x - enemyPos.x;
-	targetPlayer.y = player->getPos().y - enemyPos.y;
-
-	
-	//右の壁反射
-	if (enemyPos.x + 30 > Game::kScreenWidth) {
-		hit = true;
-		vec.x = -vec.x;
-	}
-
-	//左の壁反射
-	if (enemyPos.x < 0) {
-		hit = false;
-		vec.x = -vec.x;
-	}
-
-	//追いかけない場合
-	if (enemyPos.y + 30 >= 700) {
-		if (!chase) {
-			if (!stop) {
-				enemyPos += vec;
-			}
-		}
-	}
-	else {
-		enemyPos.y += vec.y * 2;
-	}
-	
-	//地面に並行して動く
-	if (enemyPos.y + 30 > 700) {
-		enemyPos.y = 670;
-	}
+	motionNum = 0;
 
 	//プレイヤーが隠れているか
 	hidden = player->beHidden();
 
-	//追いかけるか追いかけないか
+	//ターゲットの座標を見つける
+	targetPlayer = { 0.0f,0.0f };
+	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
+	targetPlayer.y = player->getPos().y + 32 - enemyPos.y;
+
+	
+
+	//追いかけない場合
+	if (enemyPos.y + 30 >= 700) {
+		enemyPos.y = 700 - 30;
+		landing = true;
+	}
+	if(!landing){
+		enemyPos.y += vec.y * 4;
+	}
+
+
+	//検知範囲内だった場合
 	if (!hidden) {
-		if (targetPlayer.length() < 64) {
-			stop = true;
-			player->damege();
-		}
-		else if (targetPlayer.length() < 500) {
-			float playerX = player->getPos().x;
-			float playerY = player->getPos().y;
+		if (landing) {
+			if (targetPlayer.length() < 400) {
 
-			Vec2 targetPlayer2{ 0.0f,0.0f };
-			targetPlayer2.x = playerX - enemyPos.x;
-			//targetPlayer2.y = playerY - enemyPos.y;
+				targetPlayer2 = { 0.0f,0.0f };
+				targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
+				targetPlayer2.y = player->getPos().y + 32 - enemyPos.y;
 
-			targetPlayer2 = targetPlayer2.normalize();
+				targetPlayer2 = targetPlayer2.normalize() * 3;
 
-			enemyPos += targetPlayer2 * 4;
-			chase = true;
-		}
-		else {
-			chase = false;
-			stop = false;
+				stop = true;
+
+				motionNum = 1;
+				//画像の向き
+				if (targetPlayer.x > 0) {
+					inversion = false;
+				}
+				else {
+					inversion = true;
+
+				}
+
+				if (targetPlayer.length() < 50) {
+					motionNum = 2;
+				}
+				else {
+					enemyPos += targetPlayer2;
+				}
+			}
+			else {
+
+				//画像の向き
+				if (vec.x > 0) {
+					inversion = false;
+				}
+				else {
+					inversion = true;
+
+				}
+				stop = false;
+			}
 		}
 	}
 	else {
-		chase = false;
-		hidden = false;
+		stop = false;
+		//画像の向き
+		if (vec.x > 0) {
+			inversion = false;
+		}
+		else {
+			inversion = true;
+
+		}
 		stop = false;
 	}
+	
+	
+	//右の壁反射
+	if (enemyPos.x + 30 > Game::kScreenWidth) {
+		vec.x = -vec.x;
+		inversion = true;
+	}
+	//左の壁反射
+	if (enemyPos.x < 0) {
+		vec.x = -vec.x;
+		inversion = false;
+	}
 
+	//移動
+	if (!stop) {
+		if (landing) {
+			enemyPos += vec;
+		}
+	}
+	
+
+	//攻撃
+	if (motionNum == 2) {
+		player->damege();
+	}
+
+	//投擲が当たった場合の処理
 	if (player->enemyAttack(enemyPos)) {
 		enemyHp = 0;
 		isEnabled = false;
 	}
 
-	if (player->proximityAttackCollision(enemyPos)) {
-		enemyHp -= 3;
-		hpDisplay = true;
+	//プレイヤーの近接攻撃との当たり判定
+	if (enemyHp > 0) {
+		if (player->proximityAttackCollision(enemyPos)) {
+			enemyHp -= 3;
+			hpDisplay = true;
+		}
 	}
 
+	//HPを描画する際の条件
 	if (hpDisplay) {
 		if (--hpDisplayTime < 0) {
 			hpDisplay = false;
@@ -109,15 +154,29 @@ void Enemy::update()
 		}
 	}
 
-	if (enemyHp <= 0) {
+	//HPがなくなり死亡した場合
+	if (enemyHp == 0) {
+		motionNum = 3;
+	}
+	
+	if (motion->dead()) {
 		isEnabled = false;
+	}
+
+	//エネミーの動きを更新
+	if (landing) {
+		motion->update(motionNum);
 	}
 }
 
 void Enemy::draw()
 {
-	DrawBox(enemyPos.x - 70, enemyPos.y - 70, enemyPos.x + 100, enemyPos.y + 100, GetColor(255, 0, 0), false);
-	DrawBox(enemyPos.x, enemyPos.y, enemyPos.x + 30, enemyPos.y + 30, GetColor(0, 0, 255), true);
+	DrawCircle(enemyPos.x, enemyPos.y, 400, 0xff0000, false);
+	DrawString(enemyPos.x, enemyPos.y - 15, "敵", 0xffffff);
+
+	DrawFormatString(0, 15, 0xffffff, "%d", enemyHp);
+
+	motion->draw(enemyPos,handle,inversion);
 
 	if (hpDisplay) {
 		hp->draw(enemyPos);
@@ -129,10 +188,6 @@ bool Enemy::isEnable() const
 	return isEnabled;
 }
 
-void Enemy::hitFlyingObject()
-{
-
-}
 
 
 

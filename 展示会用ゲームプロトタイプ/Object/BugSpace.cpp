@@ -15,6 +15,19 @@ BugSpace::BugSpace(int spaceNum):num(spaceNum)
 	}
 }
 
+void BugSpace::init()
+{
+	if (num == 0) {
+		spacePos = { 200.0f,600.0f };
+	}
+	else if (num == 1) {
+		spacePos = { 200.0f,100.0f };
+	}
+	else {
+		spacePos = { 800.0f,600.0f };
+	}
+}
+
 //バグスペースの更新
 void BugSpace::update()
 {
@@ -58,7 +71,7 @@ void BugSpace::update()
 void BugSpace::draw()
 {
 	DrawBox(spacePos.x, spacePos.y, spacePos.x + 50, spacePos.y + 60, GetColor(255, 0, 0), true);
-	DrawString(spacePos.x, spacePos.y, "空間", 0xffffff);
+	DrawFormatString(spacePos.x, spacePos.y, 0xffffff, "空間:%d", num);
 	
 
 	if (player->repairSpace(spacePos)) {
@@ -74,10 +87,10 @@ void BugSpace::draw()
 	}
 }
 
-void BugSpace::enemySetPlayer()
+void BugSpace::enemySetPlayer(int handle)
 {
 	for (auto& enemy : enemy_) {
-		enemy->setPlayer(player);
+		enemy->setPlayer(player, handle);
 	}
 }
 

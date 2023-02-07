@@ -7,6 +7,8 @@
 
 GameMain::GameMain()
 {
+	enemyHandle = LoadGraph("data/enemy.png");
+
 	player = new Player;
 	//空間のデータを作る
 	for (int i = 0; i < 3;i++) {
@@ -17,8 +19,14 @@ GameMain::GameMain()
 		space->setPlayer(player);
 	}
 	for (auto& space : space) {
-		space->enemySetPlayer();
+		space->enemySetPlayer(enemyHandle);
 	}
+}
+
+GameMain::~GameMain()
+{
+	delete player;
+	DeleteGraph(enemyHandle);
 }
 
 
@@ -26,7 +34,8 @@ void GameMain::init()
 {
 	//空間の場所をランダムで設定
 	for (auto& space : space) {
-		space->setPos({static_cast<float>(GetRand(Game::kScreenWidth - 50)), 600.0f});
+		//space->setPos({static_cast<float>(GetRand(Game::kScreenWidth - 50)), 600.0f});
+		space->init();
 	}
 }
 
@@ -136,13 +145,10 @@ bool GameMain::ladderCollision()
 
 	for (ColData data : ladderColData) {
 		if (playerRight < data.left)continue;
-		DrawString(300, 0, "aiu1", 0xffffff);
 		if (playerLeft > data.right)continue;
-		DrawString(300, 15, "aiu1", 0xffffff);
 		if (playerBottom < data.top)continue;
-		DrawString(300, 30, "aiu1", 0xffffff);
 		if (playerTop > data.bottom)continue;
-		DrawString(300, 45, "aiu1", 0xffffff);
+
 		return true;
 	}
 	return false;

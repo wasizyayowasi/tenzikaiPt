@@ -31,7 +31,7 @@ void Player::update()
 		else {
 			vec.y = 10.0f;
 		}
-		PlayerPos += vec;
+		playerPos += vec;
 	}
 
 	//’òŽq‚ð“o‚èI‚í‚Á‚½‚Æ‚«A‚³‚ç‚É“o‚ë‚¤‚Æ‚µ‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß‚Ì‚â‚Â
@@ -42,30 +42,33 @@ void Player::update()
 	}
 
 	//ˆÚ“®
-	if (Pad::isPress(PAD_INPUT_LEFT)) {
-		PlayerPos.x -= 10;
-		playerDirections = 1;
-	}
-	if (Pad::isPress(PAD_INPUT_RIGHT)) {
-		PlayerPos.x += 10;
-		playerDirections = 2;
-	}
-	if (ladder) {
-		if (!upperLimit) {
-			if (Pad::isPress(PAD_INPUT_UP)) {
-				PlayerPos.y -= 10;
+	if (!push) {
+		if (Pad::isPress(PAD_INPUT_LEFT)) {
+			playerPos.x -= 10;
+			playerDirections = 1;
+		}
+		if (Pad::isPress(PAD_INPUT_RIGHT)) {
+			playerPos.x += 10;
+			playerDirections = 2;
+		}
+		if (ladder) {
+			if (!upperLimit) {
+				if (Pad::isPress(PAD_INPUT_UP)) {
+					playerPos.y -= 10;
+				}
+			}
+		}
+		if (!hit) {
+			if (Pad::isPress(PAD_INPUT_DOWN)) {
+				playerPos.y += 10;
 			}
 		}
 	}
-	if (!hit) {
-		if (Pad::isPress(PAD_INPUT_DOWN)) {
-			PlayerPos.y += 10;
-		}
-	}
+
 
 	//’n–Ê‚Æ‚Ì”»’è
-	if (PlayerPos.y + playerSizeY > groundY) {
-		PlayerPos.y = groundY - playerSizeY;
+	if (playerPos.y + playerSizeY > groundY) {
+		playerPos.y = groundY - playerSizeY;
 		hit = true;
 		upperLimit = false;
 	}
@@ -91,14 +94,14 @@ void Player::update()
 	//“Š±
 	if (Pad::isTrigger(PAD_INPUT_3)) {
 		if (!flyingObject->isEnable()) {
-			flyingObject->attack(PlayerPos,playerDirections);
+			flyingObject->attack(playerPos,playerDirections);
 		}
 	}
 	if (flyingObject->isEnable()) {
 		flyingObject->update();
 	}
 	if (flyingObject->landing()) {
-		if (flyingObject->playerCollision(PlayerPos)) {
+		if (flyingObject->playerCollision(playerPos)) {
 			flyingObject->deadFlyingObject();
 		}
 	}
@@ -133,28 +136,30 @@ void Player::draw()
 	//‹ßÚUŒ‚
 	if (proximityAttack) {
 		if (playerDirections == 1) {
-			DrawBox(PlayerPos.x - 65, PlayerPos.y + 10, PlayerPos.x - 5, PlayerPos.y + 50, 0xff00ff, true);
-			DrawString(PlayerPos.x - 65, PlayerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
+			DrawBox(playerPos.x - 65, playerPos.y + 10, playerPos.x  + 50, playerPos.y + 50, 0xff00ff, true);
+			DrawString(playerPos.x - 65, playerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
 		}
 		else {
-			DrawBox(PlayerPos.x + 55, PlayerPos.y + 10, PlayerPos.x + 115, PlayerPos.y + 50, 0xff00ff, true);
-			DrawString(PlayerPos.x + 55, PlayerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
+			DrawBox(playerPos.x , playerPos.y + 10, playerPos.x + 115, playerPos.y + 50, 0xff00ff, true);
+			DrawString(playerPos.x + 55, playerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
 		}
 	}
 	
 	if (!push) {
 		if (playerDirections == 1) {
-			DrawBox(PlayerPos.x - 20, PlayerPos.y, PlayerPos.x, PlayerPos.y + 10, GetColor(255, 0, 0), true);
-			DrawString(PlayerPos.x - 20, PlayerPos.y - 15, "Œü‚«", 0xffffff);
+			DrawBox(playerPos.x - 20, playerPos.y, playerPos.x, playerPos.y + 10, GetColor(255, 0, 0), true);
+			DrawString(playerPos.x - 20, playerPos.y - 15, "Œü‚«", 0xffffff);
 		}
 		else if (playerDirections == 2) {
-			DrawBox(PlayerPos.x + 50, PlayerPos.y, PlayerPos.x + 70, PlayerPos.y + 10, GetColor(255, 0, 0), true);
-			DrawString(PlayerPos.x + 50, PlayerPos.y - 15, "Œü‚«", 0xffffff);
+			DrawBox(playerPos.x + 50, playerPos.y, playerPos.x + 70, playerPos.y + 10, GetColor(255, 0, 0), true);
+			DrawString(playerPos.x + 50, playerPos.y - 15, "Œü‚«", 0xffffff);
 		}
 	}
 	
-	DrawBox(PlayerPos.x, PlayerPos.y, PlayerPos.x + playerSizeX, PlayerPos.y + playerSizeY, GetColor(255, 255, 255), true);
-	DrawString(PlayerPos.x, PlayerPos.y + 30, "ƒvƒŒƒCƒ„[", 0xff00ff);
+
+	DrawBox(playerPos.x, playerPos.y, playerPos.x + playerSizeX, playerPos.y + playerSizeY, GetColor(255, 255, 255), true);
+	DrawString(playerPos.x, playerPos.y + 30, "ƒvƒŒƒCƒ„[", 0xff00ff);
+	DrawBox(playerPos.x+25, playerPos.y+32, playerPos.x + 27, playerPos.y + 34, 0x000000,true);
 
 	//”ò‚Ñ“¹‹ï
 	if (flyingObject->isEnable()) {
@@ -162,7 +167,7 @@ void Player::draw()
 	}
 
 	if (hpDisplay) {
-		hp->draw(PlayerPos);
+		hp->draw(playerPos);
 	}
 }
 
@@ -221,24 +226,16 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 
 	if (proximityAttack) {
 		if (playerDirections == 1) {
-			if (enemyLeft > PlayerPos.x - 5)			return false;
-			DrawString(600, 0, "aiu1", 0xffffff);
-			if (enemyRight < PlayerPos.x - 65)			return false;
-			DrawString(600, 15, "aiu1", 0xffffff);
-			if (enemyTop <= PlayerPos.y + 10)			return false;
-			DrawString(600, 30, "aiu1", 0xffffff);
-			if (enemyBottom <= PlayerPos.y + 50)		return false;
-			DrawString(600, 45, "aiu1", 0xffffff);
+			if (enemyLeft > playerPos.x + 50)			return false;
+			if (enemyRight < playerPos.x - 65)			return false;
+			if (enemyTop <= playerPos.y + 10)			return false;
+			if (enemyBottom <= playerPos.y + 50)		return false;
 		}
 		else if (playerDirections == 2) {
-			if (enemyLeft > PlayerPos.x + 115)			return false;
-			DrawString(600, 0, "aiu1", 0xffffff);
-			if (enemyRight < PlayerPos.x + 55)			return false;
-			DrawString(600, 15, "aiu1", 0xffffff);
-			if (enemyTop <= PlayerPos.y + 10)			return false;
-			DrawString(600, 30, "aiu1", 0xffffff);
-			if (enemyBottom <= PlayerPos.y + 50)		return false;
-			DrawString(600, 45, "aiu1", 0xffffff);
+			if (enemyLeft > playerPos.x  + 115)			return false;
+			if (enemyRight < playerPos.x)				return false;
+			if (enemyTop <= playerPos.y + 10)			return false;
+			if (enemyBottom <= playerPos.y + 50)		return false;
 		}
 		return true;
 	}
@@ -253,13 +250,13 @@ bool Player::repairSpace(const Vec2& pos)
 	float spaceRight = pos.x + 50;
 	float spaceBottom = pos.y + 60;
 
-	if (spaceLeft > PlayerPos.x + 50)				return false;
+	if (spaceLeft > playerPos.x + 50)				return false;
 	DrawString(600, 0, "aiu1", 0xffffff);
-	if (spaceRight < PlayerPos.x)					return false;
+	if (spaceRight < playerPos.x)					return false;
 	DrawString(600, 15, "aiu1", 0xffffff);
-	if (spaceTop > PlayerPos.y + 64)				return false;
+	if (spaceTop > playerPos.y + 64)				return false;
 	DrawString(600, 30, "aiu1", 0xffffff);
-	if (spaceBottom < PlayerPos.y)					return false;
+	if (spaceBottom < playerPos.y)					return false;
 	DrawString(600, 45, "aiu1", 0xffffff);
 		
 	return true;

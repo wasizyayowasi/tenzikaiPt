@@ -12,7 +12,7 @@ public:
 	Player();
 	~Player() { delete hp; }
 
-	Vec2 getPos()const { return PlayerPos; }
+	Vec2 getPos()const { return playerPos; }
 
 	void update();
 	void draw();
@@ -64,8 +64,10 @@ private:
 
 	ObjectHp* hp;
 
-	Vec2 PlayerPos = {100.0f,636.0f};
+	Vec2 playerPos = {100.0f,636.0f};
 	Vec2 vec = { 0.0f,10.0f };
+
+	Vec2 jump = { 0.0f,0.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;
 };

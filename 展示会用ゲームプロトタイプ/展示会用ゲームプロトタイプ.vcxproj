@@ -151,10 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DrawFunctions.cpp" />
+    <ClCompile Include="EnemyMotion.cpp" />
     <ClCompile Include="Object\ObjectHp.cpp" />
     <ClCompile Include="Object\BugSpace.cpp" />
     <ClCompile Include="Object\Enemy.cpp" />
     <ClCompile Include="Object\PlayerThrowinAttack.cpp" />
+    <ClCompile Include="PlayerMotion.cpp" />
     <ClCompile Include="Scene\GameMain.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Pad.cpp" />
@@ -163,11 +166,14 @@
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DrawFunctions.h" />
+    <ClInclude Include="EnemyMotion.h" />
     <ClInclude Include="Object\ObjectHp.h" />
     <ClInclude Include="Object\BugSpace.h" />
     <ClInclude Include="Object\Enemy.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Object\PlayerThrowinAttack.h" />
+    <ClInclude Include="PlayerMotion.h" />
     <ClInclude Include="Scene\GameMain.h" />
     <ClInclude Include="Pad.h" />
     <ClInclude Include="Object\Player.h" />

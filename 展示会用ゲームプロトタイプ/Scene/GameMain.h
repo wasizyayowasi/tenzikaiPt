@@ -10,7 +10,7 @@ class GameMain
 {
 public:
 	GameMain();
-	~GameMain() { delete player; }
+	~GameMain();
 
 	void init();
 
@@ -21,6 +21,8 @@ public:
 
 	bool ladderCollision();
 private:
+	int enemyHandle = -1;
+
 	bool hidden = false;
 
 	int hiddenBlockX = 600;

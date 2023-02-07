@@ -13,17 +13,21 @@ public:
 	BugSpace(int spaceNum);
 	~BugSpace() {}
 
+	void init();
+
 	void update();
 	void draw();
 
 	void setPlayer(Player* dPlayer) { player = dPlayer; }
 
-	void enemySetPlayer();
+	void enemySetPlayer(int setHandle);
 
 	void setPos(Vec2 pos) { spacePos = pos; }
 
 	bool isEnable()const;
 private:
+	int handle = -1;
+
 	int maxHp = 10;
 
 	int num = 0;
