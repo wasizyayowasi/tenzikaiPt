@@ -8,7 +8,7 @@ public:
 	PlayerThrowinAttack();
 	~PlayerThrowinAttack(){}
 
-	void attack(const Vec2& pos,int directions);
+	void attack(const Vec2& pos,bool directions);
 	bool isEnable()const;
 
 	void init();
@@ -24,7 +24,7 @@ public:
 	bool landing() { return landingObject; }
 private:
 	int time = 50;
-	int playerDirections = 0;
+	bool playerDirections = false;
 	float angle = 0.0f;
 
 	float x = 0.0f;

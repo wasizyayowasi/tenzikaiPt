@@ -3,10 +3,11 @@
 #include "DxLib.h"
 #include "PlayerThrowinAttack.h"
 #include "ObjectHp.h"
+#include "../PlayerMotion.h"
 
 namespace {
-	constexpr int playerSizeX = 50;
-	constexpr int playerSizeY = 64;
+	constexpr int playerSizeX = 115;
+	constexpr int playerSizeY = 74;
 
 	constexpr int groundY = 700;
 }
@@ -14,6 +15,7 @@ namespace {
 Player::Player()
 {
 	hp = new ObjectHp;
+	motion = new PlayerMotion;
 	flyingObject = std::make_shared<PlayerThrowinAttack>();
 	hp->setObjectMaxHp(playerHp);
 }
@@ -22,6 +24,11 @@ void Player::update()
 {
 	//毎フレーム、プレイヤーのHPを確認する
 	hp->setObjectHp(playerHp);
+
+	if (!ladder) {
+		motionNum = 0;
+		motion->update(motionNum);
+	}
 
 	//重力を足し続ける
 	if (!ladder) {
@@ -44,23 +51,31 @@ void Player::update()
 	//移動
 	if (!push) {
 		if (Pad::isPress(PAD_INPUT_LEFT)) {
-			playerPos.x -= 10;
-			playerDirections = 1;
+			motionNum = 1;
+			playerPos.x -= 5;
+			playerDirections = true;
+			motion->update(motionNum);
 		}
-		if (Pad::isPress(PAD_INPUT_RIGHT)) {
-			playerPos.x += 10;
-			playerDirections = 2;
+		else if (Pad::isPress(PAD_INPUT_RIGHT)) {
+			motionNum = 1;
+			playerPos.x += 5;
+			playerDirections = false;
+			motion->update(motionNum);
 		}
 		if (ladder) {
 			if (!upperLimit) {
 				if (Pad::isPress(PAD_INPUT_UP)) {
-					playerPos.y -= 10;
+					motionNum = 2;
+					playerPos.y -= 5;
+					motion->update(motionNum);
 				}
 			}
 		}
 		if (!hit) {
 			if (Pad::isPress(PAD_INPUT_DOWN)) {
-				playerPos.y += 10;
+				motionNum = 2;
+				playerPos.y += 5;
+				motion->update(motionNum);
 			}
 		}
 	}
@@ -72,7 +87,8 @@ void Player::update()
 		hit = true;
 		upperLimit = false;
 	}
-	else {
+	
+	if (playerPos.y + playerSizeY < groundY) {
 		hit = false;
 	}
 
@@ -128,14 +144,16 @@ void Player::update()
 
 	repair = 0;
 
+	
+
 }
 
 //描画
-void Player::draw()
+void Player::draw(int handle)
 {
 	//近接攻撃
 	if (proximityAttack) {
-		if (playerDirections == 1) {
+		if (playerDirections) {
 			DrawBox(playerPos.x - 65, playerPos.y + 10, playerPos.x  + 50, playerPos.y + 50, 0xff00ff, true);
 			DrawString(playerPos.x - 65, playerPos.y + 10, "近接攻撃", 0x000000);
 		}
@@ -146,11 +164,11 @@ void Player::draw()
 	}
 	
 	if (!push) {
-		if (playerDirections == 1) {
+		if (playerDirections) {
 			DrawBox(playerPos.x - 20, playerPos.y, playerPos.x, playerPos.y + 10, GetColor(255, 0, 0), true);
 			DrawString(playerPos.x - 20, playerPos.y - 15, "向き", 0xffffff);
 		}
-		else if (playerDirections == 2) {
+		else if (!playerDirections) {
 			DrawBox(playerPos.x + 50, playerPos.y, playerPos.x + 70, playerPos.y + 10, GetColor(255, 0, 0), true);
 			DrawString(playerPos.x + 50, playerPos.y - 15, "向き", 0xffffff);
 		}
@@ -169,6 +187,8 @@ void Player::draw()
 	if (hpDisplay) {
 		hp->draw(playerPos);
 	}
+
+	motion->draw(playerPos,handle, playerDirections);
 }
 
 //隠れる

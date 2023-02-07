@@ -7,7 +7,7 @@ PlayerThrowinAttack::PlayerThrowinAttack()
 {
 }
 
-void PlayerThrowinAttack::attack(const Vec2& playerPos, int directions)
+void PlayerThrowinAttack::attack(const Vec2& playerPos, bool directions)
 {
 	pos = playerPos;
 	isEnabled = true;
@@ -55,11 +55,11 @@ void PlayerThrowinAttack::update()
 	}
 
 	//ƒvƒŒƒCƒ„[‚ÌŒü‚­•ûŒü‚É‚æ‚Á‚Äobject‚ğ”ò‚Î‚·•ûŒü‚ğ•Ï‰»‚³‚¹‚é
-	if (playerDirections == 1) {
+	if (playerDirections) {
 		pos.x -= vec.x;
 		pos.y += vec.y;
 	}
-	else if (playerDirections == 2) {
+	else if (!playerDirections) {
 		pos += vec;
 	}
 

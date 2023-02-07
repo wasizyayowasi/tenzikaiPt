@@ -22,6 +22,7 @@ public:
 	bool ladderCollision();
 private:
 	int enemyHandle = -1;
+	int playerHandle = -1;
 
 	bool hidden = false;
 

@@ -1,6 +1,5 @@
 #include "EnemyMotion.h"
 #include "DrawFunctions.h"
-#include <cassert>
 
 EnemyMotion::EnemyMotion()
 {

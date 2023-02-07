@@ -8,6 +8,7 @@
 GameMain::GameMain()
 {
 	enemyHandle = LoadGraph("data/enemy.png");
+	playerHandle = LoadGraph("data/player.png");
 
 	player = new Player;
 	//空間のデータを作る
@@ -96,7 +97,7 @@ void GameMain::draw()
 	}
 
 	//プレイヤーの描画
-	player->draw();
+	player->draw(playerHandle);
 
 }
 
@@ -141,7 +142,7 @@ bool GameMain::ladderCollision()
 	float playerLeft = player->getPos().x + 25;
 	float playerRight = player->getPos().x + 26;
 	float playerTop = player->getPos().y;
-	float playerBottom = player->getPos().y + 64;
+	float playerBottom = player->getPos().y + 74;
 
 	for (ColData data : ladderColData) {
 		if (playerRight < data.left)continue;

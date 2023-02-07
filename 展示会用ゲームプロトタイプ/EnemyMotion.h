@@ -18,7 +18,6 @@ public:
 
 	int dead() { return isEnable; }
 private:
-	int enemyHandle = -1;
 
 	int imgX = 0;
 	int imgY = 6;

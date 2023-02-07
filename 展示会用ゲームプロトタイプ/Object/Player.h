@@ -2,6 +2,7 @@
 #include "../Vec2.h"
 #include <memory>
 #include <array>
+#include "../PlayerMotion.h"
 
 class PlayerThrowinAttack;
 class ObjectHp;
@@ -15,7 +16,7 @@ public:
 	Vec2 getPos()const { return playerPos; }
 
 	void update();
-	void draw();
+	void draw(int handle);
 
 	bool beHidden();
 
@@ -34,7 +35,8 @@ public:
 
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
 private:
-	int playerDirections = 1;
+	bool playerDirections = false;
+	int motionNum = 0;
 
 	int playerHp = 10;
 	int hpDisplayTime = 120;
@@ -63,8 +65,9 @@ private:
 	int time = 0;
 
 	ObjectHp* hp;
+	PlayerMotion* motion;
 
-	Vec2 playerPos = {100.0f,636.0f};
+	Vec2 playerPos = {115.0f,616.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	Vec2 jump = { 0.0f,0.0f };
