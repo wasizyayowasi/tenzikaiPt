@@ -13,6 +13,8 @@ public:
 	BugSpace(int spaceNum);
 	~BugSpace() {}
 
+	std::array<std::shared_ptr<Enemy>, 16>& getEnemy();
+
 	void init();
 
 	void update();
@@ -32,7 +34,6 @@ private:
 
 	int num = 0;
 
-	bool pushKey = false;
 	bool isEnabled = false;
 
 	Vec2 spacePos = { 0.0f,0.0f };
@@ -40,6 +41,6 @@ private:
 	Player* player;
 	ObjectHp* hp;
 
-	std::array<std::shared_ptr<Enemy>, 16>enemy_;
+	std::array<std::shared_ptr<Enemy>, 16>enemy;
 };
 

@@ -2,6 +2,7 @@
 #include "../game.h"
 #include "../Pad.h"
 #include <math.h>
+#include "../field.h"
 
 PlayerThrowinAttack::PlayerThrowinAttack()
 {
@@ -32,13 +33,27 @@ void PlayerThrowinAttack::update()
 {
 	flyingObjectPos = pos;
 
-	//飛翔物が地面に着地したときor飛翔中の時
-	if (pos.y >= 680) {
-		vec = { 0.0f,0.0f };
-		landingObject = true;
-		pos.y = 680;
+	for (int x = 0; x < Field::bgNumX; x++) {
+		for (int y = 0; y < Field::bgNumY; y++) {
+
+			const int chipNo = Field::field[y][x];
+
+			if (chipNo == 1) {
+				if (filedCollision(y)) {
+					landingObject = true;
+				}
+			}
+		}
 	}
-	else {
+
+	//飛翔物が地面に着地したときor飛翔中の時
+	/*if (pos.y >= 680) {
+		vec = { 0.0f,0.0f };
+		
+		pos.y = 680;
+	}*/
+	
+	if (!landingObject) {
 		x = pos.y + r + cos(45);
 		y = pos.y + r + sin(45);
 
@@ -55,12 +70,14 @@ void PlayerThrowinAttack::update()
 	}
 
 	//プレイヤーの向く方向によってobjectを飛ばす方向を変化させる
-	if (playerDirections) {
-		pos.x -= vec.x;
-		pos.y += vec.y;
-	}
-	else if (!playerDirections) {
-		pos += vec;
+	if (!landingObject) {
+		if (playerDirections) {
+			pos.x -= vec.x;
+			pos.y += vec.y;
+		}
+		else if (!playerDirections) {
+			pos += vec;
+		}
 	}
 
 	//範囲外で消える
@@ -92,7 +109,7 @@ bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
 	float playerLeft = pos.x;
 	float playerTop = pos.y;
 	float playerRight = pos.x + 50;
-	float playerBottom = pos.y + 64;
+	float playerBottom = pos.y + 74;
 
 	if (playerLeft > flyingObjectPos.x + 20)	return false;
 	if (playerRight < flyingObjectPos.x)		return false;
@@ -135,4 +152,18 @@ bool PlayerThrowinAttack::enemyCollision(const Vec2& pos)
 void PlayerThrowinAttack::deadFlyingObject()
 {
 	init();
+}
+
+bool PlayerThrowinAttack::filedCollision(int y)
+{
+	float flyingObjectTop = flyingObjectPos.y;
+	float flyingObjectBottom = flyingObjectPos.y + 24;
+
+	float filedTop = y * Field::chipSize;
+	float filedBottom = y * Field::chipSize + Field::chipSize;
+
+	if (flyingObjectBottom < filedTop)return false;
+	if (flyingObjectTop > filedBottom)return false;
+
+	return true;
 }

@@ -7,6 +7,8 @@ public:
 	EnemyMotion();
 	~EnemyMotion();
 
+	void init();
+
 	void update(int num);
 	void walk();
 	void rolling();
@@ -16,7 +18,7 @@ public:
 
 	void draw(Vec2 enemyPos,int handle,bool trun);
 
-	int dead() { return isEnable; }
+	int dead() { return isEnabled; }
 private:
 
 	int imgX = 0;
@@ -26,7 +28,7 @@ private:
 
 	int updateTime = 4;
 
-	bool isEnable = false;
+	bool isEnabled = false;
 private:
 	void(EnemyMotion::* func)();
 };

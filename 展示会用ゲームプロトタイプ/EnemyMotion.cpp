@@ -3,11 +3,18 @@
 
 EnemyMotion::EnemyMotion()
 {
-	func = &EnemyMotion::walk;
 }
 
 EnemyMotion::~EnemyMotion()
 {
+}
+
+void EnemyMotion::init()
+{
+	func = &EnemyMotion::walk;
+	imgY = 6;
+	imgX = 0;
+	isEnabled = false;
 }
 
 void EnemyMotion::update(int num)
@@ -118,7 +125,7 @@ void EnemyMotion::death()
 		imgY++;
 	}
 	if (imgY == 1 && imgX > maxImgX - 1 ) {
-		isEnable = true;
+		isEnabled = true;
 	}
 }
 

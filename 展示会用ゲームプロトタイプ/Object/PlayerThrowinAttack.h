@@ -22,6 +22,8 @@ public:
 	void deadFlyingObject();
 
 	bool landing() { return landingObject; }
+
+	bool filedCollision(int y);
 private:
 	int time = 50;
 	bool playerDirections = false;

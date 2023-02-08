@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="DrawFunctions.cpp" />
     <ClCompile Include="EnemyMotion.cpp" />
+    <ClCompile Include="field.cpp" />
     <ClCompile Include="Object\ObjectHp.cpp" />
     <ClCompile Include="Object\BugSpace.cpp" />
     <ClCompile Include="Object\Enemy.cpp" />
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="DrawFunctions.h" />
     <ClInclude Include="EnemyMotion.h" />
+    <ClInclude Include="field.h" />
     <ClInclude Include="Object\ObjectHp.h" />
     <ClInclude Include="Object\BugSpace.h" />
     <ClInclude Include="Object\Enemy.h" />

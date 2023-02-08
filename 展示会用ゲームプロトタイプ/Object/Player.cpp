@@ -3,6 +3,7 @@
 #include "DxLib.h"
 #include "PlayerThrowinAttack.h"
 #include "ObjectHp.h"
+#include "../field.h"
 #include "../PlayerMotion.h"
 
 namespace {
@@ -22,12 +23,27 @@ Player::Player()
 
 void Player::update()
 {
+
+	for (int x = 0; x < Field::bgNumX; x++) {
+		for (int y = 0; y < Field::bgNumY; y++) {
+
+			const int chipNo = Field::field[y][x];
+
+			if (chipNo == 1) {
+				if (playerFiledCollision(y)) {
+					hit = true;
+				}
+			}
+		}
+	}
+
 	//毎フレーム、プレイヤーのHPを確認する
 	hp->setObjectHp(playerHp);
 
 	if (!ladder) {
-		motionNum = 0;
-		motion->update(motionNum);
+		if (--proximityAttackTime < 0) {
+			motionNum = 0;
+		}
 	}
 
 	//重力を足し続ける
@@ -38,7 +54,9 @@ void Player::update()
 		else {
 			vec.y = 10.0f;
 		}
-		playerPos += vec;
+		if (!hit) {
+			playerPos += vec;
+		}
 	}
 
 	//梯子を登り終わったとき、さらに登ろうとしないようにするためのやつ
@@ -51,13 +69,17 @@ void Player::update()
 	//移動
 	if (!push) {
 		if (Pad::isPress(PAD_INPUT_LEFT)) {
-			motionNum = 1;
+			if (!(motionNum == 3)) {
+				motionNum = 1;
+			}
 			playerPos.x -= 5;
 			playerDirections = true;
 			motion->update(motionNum);
 		}
 		else if (Pad::isPress(PAD_INPUT_RIGHT)) {
-			motionNum = 1;
+			if (!(motionNum == 3)) {
+				motionNum = 1;
+			}
 			playerPos.x += 5;
 			playerDirections = false;
 			motion->update(motionNum);
@@ -82,11 +104,11 @@ void Player::update()
 
 
 	//地面との判定
-	if (playerPos.y + playerSizeY > groundY) {
+	/*if (playerPos.y + playerSizeY > groundY) {
 		playerPos.y = groundY - playerSizeY;
 		hit = true;
 		upperLimit = false;
-	}
+	}*/
 	
 	if (playerPos.y + playerSizeY < groundY) {
 		hit = false;
@@ -127,6 +149,9 @@ void Player::update()
 	if (!flyingObject->isEnable()) {
 		if (Pad::isTrigger(PAD_INPUT_2)) {
 			proximityAttack = true;
+			motionNum = 3;
+			motion->attack();
+			proximityAttackTime = 10;
 		}
 		else {
 			proximityAttack = false;
@@ -144,8 +169,10 @@ void Player::update()
 
 	repair = 0;
 
-	
+	motion->update(motionNum);
 
+
+	
 }
 
 //描画
@@ -163,20 +190,8 @@ void Player::draw(int handle)
 		}
 	}
 	
-	if (!push) {
-		if (playerDirections) {
-			DrawBox(playerPos.x - 20, playerPos.y, playerPos.x, playerPos.y + 10, GetColor(255, 0, 0), true);
-			DrawString(playerPos.x - 20, playerPos.y - 15, "向き", 0xffffff);
-		}
-		else if (!playerDirections) {
-			DrawBox(playerPos.x + 50, playerPos.y, playerPos.x + 70, playerPos.y + 10, GetColor(255, 0, 0), true);
-			DrawString(playerPos.x + 50, playerPos.y - 15, "向き", 0xffffff);
-		}
-	}
-	
 
-	DrawBox(playerPos.x, playerPos.y, playerPos.x + playerSizeX, playerPos.y + playerSizeY, GetColor(255, 255, 255), true);
-	DrawString(playerPos.x, playerPos.y + 30, "プレイヤー", 0xff00ff);
+	DrawString(playerPos.x, playerPos.y - 30, "プレイヤー", 0xff00ff);
 	DrawBox(playerPos.x+25, playerPos.y+32, playerPos.x + 27, playerPos.y + 34, 0x000000,true);
 
 	//飛び道具
@@ -245,13 +260,13 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 	float enemyBottom = pos.y + 30;
 
 	if (proximityAttack) {
-		if (playerDirections == 1) {
+		if (playerDirections) {
 			if (enemyLeft > playerPos.x + 50)			return false;
 			if (enemyRight < playerPos.x - 65)			return false;
 			if (enemyTop <= playerPos.y + 10)			return false;
 			if (enemyBottom <= playerPos.y + 50)		return false;
 		}
-		else if (playerDirections == 2) {
+		else if (!playerDirections) {
 			if (enemyLeft > playerPos.x  + 115)			return false;
 			if (enemyRight < playerPos.x)				return false;
 			if (enemyTop <= playerPos.y + 10)			return false;
@@ -271,13 +286,9 @@ bool Player::repairSpace(const Vec2& pos)
 	float spaceBottom = pos.y + 60;
 
 	if (spaceLeft > playerPos.x + 50)				return false;
-	DrawString(600, 0, "aiu1", 0xffffff);
 	if (spaceRight < playerPos.x)					return false;
-	DrawString(600, 15, "aiu1", 0xffffff);
 	if (spaceTop > playerPos.y + 64)				return false;
-	DrawString(600, 30, "aiu1", 0xffffff);
 	if (spaceBottom < playerPos.y)					return false;
-	DrawString(600, 45, "aiu1", 0xffffff);
 		
 	return true;
 
@@ -293,4 +304,18 @@ void Player::setRepair(int num)
 	else {
 		DrawString(700, 15, "直せないよ", 0xffffff);
 	}
+}
+
+bool Player::playerFiledCollision(int y)
+{
+	float playerTop = playerPos.y;
+	float playerBottom = playerPos.y + 78;
+
+	float filedTop = y * Field::chipSize;
+	float filedBottom = y * Field::chipSize + Field::chipSize;
+
+	if (playerBottom < filedTop)return false;
+	if (playerTop > filedBottom)return false;
+
+	return true;
 }

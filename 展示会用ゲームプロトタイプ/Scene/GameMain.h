@@ -4,7 +4,6 @@
 
 class Player;
 class BugSpace;
-class TimeLimit;
 
 class GameMain
 {
@@ -20,6 +19,8 @@ public:
 	bool hiddenPlayer();
 
 	bool ladderCollision();
+
+	bool playerFiledCollision(int x,int y);
 private:
 	int enemyHandle = -1;
 	int playerHandle = -1;
@@ -35,7 +36,6 @@ private:
 	float fieldX = 0.0f, fieldY = 700.0f;
 
 	Player* player;
-	TimeLimit* limit;
 
 	std::array<std::shared_ptr<BugSpace>, 3>space;
 };

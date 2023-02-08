@@ -13,6 +13,7 @@ public:
 	void walk();
 	void ascend();
 	void getOff();
+	void attack();
 
 	void draw(Vec2 playerPos,int handle,bool trun);
 

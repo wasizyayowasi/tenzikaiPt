@@ -5,6 +5,7 @@
 #include "ObjectHp.h"
 #include "../DrawFunctions.h"
 #include "../EnemyMotion.h"
+#include "../field.h"
 
 
 Enemy::Enemy()
@@ -16,19 +17,43 @@ Enemy::Enemy()
 
 void Enemy::dispatch(const Vec2& pos)
 {
-	enemyPos = pos;
 	isEnabled = true;
-	enemyHp = 9;
 	hpDisplay = false;
+	landing = false;
+	enemyPos = pos;
+	enemyHp = 9;
 	hpDisplayTime = 120;
+	motionNum = 0;
+	motion->init();
+	vec = { 3.0f,1.0f };
 }
 
 void Enemy::update()
 {
+
+	for (int x = 0; x < Field::bgNumX; x++) {
+		for (int y = 0; y < Field::bgNumY; y++) {
+
+			const int chipNo = Field::field[y][x];
+
+			if (chipNo == 1) {
+				if (filedCollision(y)) {
+					landing = true;
+					vec.y = 0.0f;
+				}
+			}
+		}
+	}
+
 	//現状のHPを設定する
 	hp->setObjectHp(enemyHp);
 
 	motionNum = 0;
+
+	//HPがなくなり死亡した場合
+	if (enemyHp == 0) {
+		motionNum = 3;
+	}
 
 	//プレイヤーが隠れているか
 	hidden = player->beHidden();
@@ -36,75 +61,73 @@ void Enemy::update()
 	//ターゲットの座標を見つける
 	targetPlayer = { 0.0f,0.0f };
 	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
-	targetPlayer.y = player->getPos().y + 32 - enemyPos.y;
+	targetPlayer.y = player->getPos().y + 44 - enemyPos.y;
 
 	
 
 	//追いかけない場合
-	if (enemyPos.y + 30 >= 700) {
-		enemyPos.y = 700 - 30;
-		landing = true;
-	}
 	if(!landing){
 		enemyPos.y += vec.y * 4;
 	}
 
 
 	//検知範囲内だった場合
-	if (!hidden) {
-		if (landing) {
-			if (targetPlayer.length() < 400) {
+	if (motionNum != 3) {
+		if (!hidden) {
+			if (landing) {
+				if (targetPlayer.length() < 400) {
 
-				targetPlayer2 = { 0.0f,0.0f };
-				targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
-				targetPlayer2.y = player->getPos().y + 32 - enemyPos.y;
+					targetPlayer2 = { 0.0f,0.0f };
+					targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
+					targetPlayer2.y = player->getPos().y + 44 - enemyPos.y;
 
-				targetPlayer2 = targetPlayer2.normalize() * 3;
+					targetPlayer2 = targetPlayer2.normalize() * 3;
 
-				stop = true;
+					stop = true;
 
-				motionNum = 1;
-				//画像の向き
-				if (targetPlayer.x > 0) {
-					inversion = false;
+					motionNum = 1;
+					//画像の向き
+					if (targetPlayer.x > 0) {
+						inversion = false;
+					}
+					else {
+						inversion = true;
+
+					}
+
+					if (targetPlayer.length() < 50) {
+						motionNum = 2;
+					}
+					else {
+						enemyPos += targetPlayer2;
+					}
 				}
 				else {
-					inversion = true;
 
-				}
+					//画像の向き
+					if (vec.x > 0) {
+						inversion = false;
+					}
+					else {
+						inversion = true;
 
-				if (targetPlayer.length() < 50) {
-					motionNum = 2;
-				}
-				else {
-					enemyPos += targetPlayer2;
+					}
+					stop = false;
 				}
 			}
-			else {
-
-				//画像の向き
-				if (vec.x > 0) {
-					inversion = false;
-				}
-				else {
-					inversion = true;
-
-				}
-				stop = false;
-			}
-		}
-	}
-	else {
-		stop = false;
-		//画像の向き
-		if (vec.x > 0) {
-			inversion = false;
 		}
 		else {
-			inversion = true;
+			stop = false;
+			//画像の向き
+			if (vec.x > 0) {
+				inversion = false;
+			}
+			else {
+				inversion = true;
 
+			}
+			stop = false;
 		}
-		stop = false;
 	}
 	
 	
@@ -120,9 +143,11 @@ void Enemy::update()
 	}
 
 	//移動
-	if (!stop) {
-		if (landing) {
-			enemyPos += vec;
+	if (motionNum != 3) {
+		if (!stop) {
+			if (landing) {
+				enemyPos += vec;
+			}
 		}
 	}
 	
@@ -153,11 +178,6 @@ void Enemy::update()
 			hpDisplayTime = 120;
 		}
 	}
-
-	//HPがなくなり死亡した場合
-	if (enemyHp == 0) {
-		motionNum = 3;
-	}
 	
 	if (motion->dead()) {
 		isEnabled = false;
@@ -174,7 +194,7 @@ void Enemy::draw()
 	DrawCircle(enemyPos.x, enemyPos.y, 400, 0xff0000, false);
 	DrawString(enemyPos.x, enemyPos.y - 15, "敵", 0xffffff);
 
-	DrawFormatString(0, 15, 0xffffff, "%d", enemyHp);
+	DrawFormatString(0, 15, 0xffffff, "%d", motionNum);
 
 	motion->draw(enemyPos,handle,inversion);
 
@@ -188,6 +208,19 @@ bool Enemy::isEnable() const
 	return isEnabled;
 }
 
+bool Enemy::filedCollision(int y)
+{
+	float playerTop = enemyPos.y;
+	float playerBottom = enemyPos.y + 34;
+
+	float filedTop = y * Field::chipSize;
+	float filedBottom = y * Field::chipSize + Field::chipSize;
+
+	if (playerBottom < filedTop)return false;
+	if (playerTop > filedBottom)return false;
+
+	return true;
+}
 
 
 

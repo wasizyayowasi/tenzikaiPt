@@ -10,9 +10,15 @@ BugSpace::BugSpace(int spaceNum):num(spaceNum)
 	hp = new ObjectHp;
 	hp->setObjectMaxHp(maxHp);
 	isEnabled = true;
-	for (auto& enemy : enemy_) {
+	for (auto& enemy : enemy) {
 		enemy = std::make_shared<Enemy>();
 	}
+}
+
+std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
+{
+	// TODO: return ステートメントをここに挿入します
+	return enemy;
 }
 
 void BugSpace::init()
@@ -33,23 +39,23 @@ void BugSpace::update()
 {
 	hp->setObjectHp(maxHp);
 
-	if (Pad::isPress(PAD_INPUT_5)) {
-		if (!pushKey) {
-			pushKey = true;
-			for (auto& enemy : enemy_) {
-				if (!enemy->isEnable()) {
-					enemy->dispatch(spacePos);
-					break;
-				}
+	if (Pad::isTrigger(PAD_INPUT_5)) {
+		for (auto& enemy : enemy) {
+			if (!enemy->isEnable()) {
+				enemy->dispatch(spacePos);
+				break;
 			}
 		}
 	}
-	else {
-		pushKey = false;
-	}
-	
 
-	for (auto& enemy : enemy_) {
+	//デバッグ用
+	for (auto& enemy : enemy) {
+		if (enemy->isEnable()) {
+			DrawString(0, 0, "aiu", 0xffffff);
+		}
+	}
+
+	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {
 			enemy->update();
 		}
@@ -65,7 +71,6 @@ void BugSpace::update()
 	if (maxHp < 0) {
 		isEnabled = false;
 	}
-	
 }
 
 void BugSpace::draw()
@@ -73,6 +78,9 @@ void BugSpace::draw()
 	DrawBox(spacePos.x, spacePos.y, spacePos.x + 50, spacePos.y + 60, GetColor(255, 0, 0), true);
 	DrawFormatString(spacePos.x, spacePos.y, 0xffffff, "空間:%d", num);
 	
+	for (auto& enemy : enemy) {
+		DrawFormatString(0, 45, 0xffffff, "%d", enemy->motionaiu());
+	}
 
 	if (player->repairSpace(spacePos)) {
 		if (player->returnSpaceHpDisplay()) {
@@ -80,7 +88,7 @@ void BugSpace::draw()
 		}
 	}
 
-	for (auto& enemy : enemy_) {
+	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {
 			enemy->draw();
 		}
@@ -89,7 +97,7 @@ void BugSpace::draw()
 
 void BugSpace::enemySetPlayer(int handle)
 {
-	for (auto& enemy : enemy_) {
+	for (auto& enemy : enemy) {
 		enemy->setPlayer(player, handle);
 	}
 }

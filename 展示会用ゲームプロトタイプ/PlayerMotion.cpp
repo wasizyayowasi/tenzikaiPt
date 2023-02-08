@@ -16,19 +16,27 @@ void PlayerMotion::update(int num)
 	case 0:
 		func = &PlayerMotion::idle;
 		imgY = 0;
+		maxImgX = 7;
 		break;
 	case 1:
 		func = &PlayerMotion::walk;
 		imgY = 1;
+		maxImgX = 7;
 		break;
 	case 2:
 		func = &PlayerMotion::ascend;
 		imgY = 16;
+		maxImgX = 7;
+		break;
+	case 3:
+		func = &PlayerMotion::attack;
+		maxImgX = 3;
 		break;
 	}
 	(this->*func)();
 }
 
+//ë“ã@
 void PlayerMotion::idle()
 {
 	if (--motionTime < 0) {
@@ -40,6 +48,7 @@ void PlayerMotion::idle()
 	}
 }
 
+//ï‡Ç≠
 void PlayerMotion::walk()
 {
 	if (--motionTime < 0) {
@@ -51,6 +60,7 @@ void PlayerMotion::walk()
 	}
 }
 
+//ìoÇÈ
 void PlayerMotion::ascend()
 {
 	if (--motionTime < 0) {
@@ -62,6 +72,7 @@ void PlayerMotion::ascend()
 	}
 }
 
+//â∫ÇÈ
 void PlayerMotion::getOff()
 {
 	if (--motionTime < 0) {
@@ -70,6 +81,26 @@ void PlayerMotion::getOff()
 	}
 	if (imgX > maxImgX) {
 		imgX = maxImgX;
+	}
+}
+
+//ãﬂê⁄çUåÇ
+void PlayerMotion::attack()
+{
+
+	if (!(imgY == 8 || imgY == 9 || imgY == 10)) {
+		imgY = 8;
+	}
+	if (--motionTime < 0) {
+		imgX++;
+		motionTime = 4;
+	}
+	if (imgX > maxImgX) {
+		imgX = 0;
+		imgY++;
+	}
+	if (imgY > 10) {
+		imgY = 8;
 	}
 }
 

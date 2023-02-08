@@ -4,6 +4,9 @@
 #include "../game.h"
 #include "../Object/Player.h"
 #include "../Object/BugSpace.h"
+#include"../field.h"
+
+
 
 GameMain::GameMain()
 {
@@ -74,8 +77,19 @@ void GameMain::update()
 
 void GameMain::draw()
 {
+	for (int x = 0; x < Field::bgNumX; x++) {
+		for (int y = 0; y < Field::bgNumY; y++) {
+
+			const int chipNo = Field::field[y][x];
+
+			if (chipNo == 1) {
+				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0xffff00, true);
+			}
+		}
+	}
+
 	//’n–Ê
-	DrawBox(0, 700, Game::kScreenWidth, Game::kScreenHeight, GetColor(255, 255, 0), true);
+	//DrawBox(0, 700, Game::kScreenWidth, Game::kScreenHeight, GetColor(255, 255, 0), true);
 	DrawString(0, 700, "’n–Ê", 0x000000);
 
 	DrawBox(100, ladderBlockY, ladderBlockX, ladderBlockY + 50, GetColor(255, 255, 0), true);

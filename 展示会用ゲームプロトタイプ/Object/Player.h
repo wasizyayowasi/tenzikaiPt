@@ -34,9 +34,13 @@ public:
 	void setRepair(int num);
 
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
+
+	bool playerFiledCollision(int y);
 private:
 	bool playerDirections = false;
 	int motionNum = 0;
+
+	int proximityAttackTime = 0;
 
 	int playerHp = 10;
 	int hpDisplayTime = 120;
@@ -69,8 +73,6 @@ private:
 
 	Vec2 playerPos = {115.0f,616.0f};
 	Vec2 vec = { 0.0f,10.0f };
-
-	Vec2 jump = { 0.0f,0.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;
 };

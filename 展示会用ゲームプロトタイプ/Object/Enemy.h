@@ -20,6 +20,10 @@ public:
 	void draw();
 
 	bool isEnable()const;
+
+	bool filedCollision(int y);
+
+	int motionaiu() { return motionNum; }
 private:
 	int handle = -1;
 
