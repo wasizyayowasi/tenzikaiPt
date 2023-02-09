@@ -12,6 +12,8 @@ namespace Pad {
 	bool isTrigger(int button);
 	//—£‚µ‚½”»’è
 	bool isRelase(int button);
+
+	bool pressButton();
 }
 
 

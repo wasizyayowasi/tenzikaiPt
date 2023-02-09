@@ -16,11 +16,6 @@ public:
 	void update();
 	void draw();
 
-	bool hiddenPlayer();
-
-	bool ladderCollision();
-
-	bool playerFiledCollision(int x,int y);
 private:
 	int enemyHandle = -1;
 	int playerHandle = -1;

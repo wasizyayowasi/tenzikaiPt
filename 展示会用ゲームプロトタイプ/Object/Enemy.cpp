@@ -20,6 +20,7 @@ void Enemy::dispatch(const Vec2& pos)
 	isEnabled = true;
 	hpDisplay = false;
 	landing = false;
+	stop = false;
 	enemyPos = pos;
 	enemyHp = 9;
 	hpDisplayTime = 120;
@@ -30,14 +31,13 @@ void Enemy::dispatch(const Vec2& pos)
 
 void Enemy::update()
 {
-
 	for (int x = 0; x < Field::bgNumX; x++) {
 		for (int y = 0; y < Field::bgNumY; y++) {
 
 			const int chipNo = Field::field[y][x];
 
 			if (chipNo == 1) {
-				if (filedCollision(y)) {
+				if (filedCollision(x, y)) {
 					landing = true;
 					vec.y = 0.0f;
 				}
@@ -63,23 +63,16 @@ void Enemy::update()
 	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
 	targetPlayer.y = player->getPos().y + 44 - enemyPos.y;
 
-	
-
-	//í«Ç¢Ç©ÇØÇ»Ç¢èÍçá
-	if(!landing){
-		enemyPos.y += vec.y * 4;
-	}
-
 
 	//åüímîÕàÕì‡ÇæÇ¡ÇΩèÍçá
 	if (motionNum != 3) {
 		if (!hidden) {
 			if (landing) {
-				if (targetPlayer.length() < 400) {
+				if (targetPlayer.length() < 300) {
 
 					targetPlayer2 = { 0.0f,0.0f };
 					targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
-					targetPlayer2.y = player->getPos().y + 44 - enemyPos.y;
+					//targetPlayer2.y = player->getPos().y + 44 - enemyPos.y;
 
 					targetPlayer2 = targetPlayer2.normalize() * 3;
 
@@ -130,14 +123,13 @@ void Enemy::update()
 		}
 	}
 	
-	
 	//âEÇÃï«îΩéÀ
-	if (enemyPos.x + 30 > Game::kScreenWidth) {
+	if (moveCount > 130) {
 		vec.x = -vec.x;
 		inversion = true;
 	}
 	//ç∂ÇÃï«îΩéÀ
-	if (enemyPos.x < 0) {
+	if (moveCount < 0) {
 		vec.x = -vec.x;
 		inversion = false;
 	}
@@ -147,9 +139,20 @@ void Enemy::update()
 		if (!stop) {
 			if (landing) {
 				enemyPos += vec;
+				if (vec.x > 0) {
+					moveCount++;
+				}
+				else {
+					moveCount--;
+				}
+			}
+			else {
+				//ç~â∫
+				enemyPos.y += vec.y * 4;
 			}
 		}
 	}
+	
 	
 
 	//çUåÇ
@@ -160,14 +163,16 @@ void Enemy::update()
 	//ìäù±Ç™ìñÇΩÇ¡ÇΩèÍçáÇÃèàóù
 	if (player->enemyAttack(enemyPos)) {
 		enemyHp = 0;
-		isEnabled = false;
 	}
 
 	//ÉvÉåÉCÉÑÅ[ÇÃãﬂê⁄çUåÇÇ∆ÇÃìñÇΩÇËîªíË
 	if (enemyHp > 0) {
-		if (player->proximityAttackCollision(enemyPos)) {
-			enemyHp -= 3;
-			hpDisplay = true;
+		if (--coolTime < 0) {
+			if (player->proximityAttackCollision(enemyPos)) {
+				enemyHp -= 3;
+				hpDisplay = true;
+				coolTime = 23;
+			}
 		}
 	}
 
@@ -180,6 +185,7 @@ void Enemy::update()
 	}
 	
 	if (motion->dead()) {
+		//motion->init();
 		isEnabled = false;
 	}
 
@@ -191,7 +197,7 @@ void Enemy::update()
 
 void Enemy::draw()
 {
-	DrawCircle(enemyPos.x, enemyPos.y, 400, 0xff0000, false);
+	DrawCircle(enemyPos.x, enemyPos.y, 300, 0xff0000, false);
 	DrawString(enemyPos.x, enemyPos.y - 15, "ìG", 0xffffff);
 
 	DrawFormatString(0, 15, 0xffffff, "%d", motionNum);
@@ -208,16 +214,18 @@ bool Enemy::isEnable() const
 	return isEnabled;
 }
 
-bool Enemy::filedCollision(int y)
+bool Enemy::filedCollision(int x,int y)
 {
-	float playerTop = enemyPos.y;
-	float playerBottom = enemyPos.y + 34;
 
+	float filedLeft = x * Field::chipSize;
+	float filedRight = x * Field::chipSize + Field::chipSize;
 	float filedTop = y * Field::chipSize;
 	float filedBottom = y * Field::chipSize + Field::chipSize;
 
-	if (playerBottom < filedTop)return false;
-	if (playerTop > filedBottom)return false;
+	if (enemyPos.x + 15< filedLeft)		return false;
+	if (enemyPos.x > filedRight)		return false;
+	if (enemyPos.y + 34 < filedTop)		return false;
+	if (enemyPos.y > filedBottom)		return false;
 
 	return true;
 }

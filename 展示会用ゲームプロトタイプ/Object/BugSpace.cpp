@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "ObjectHp.h"
 #include "../Pad.h"
+#include "../field.h"
 
 BugSpace::BugSpace(int spaceNum):num(spaceNum)
 {
@@ -24,19 +25,41 @@ std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
 void BugSpace::init()
 {
 	if (num == 0) {
-		spacePos = { 200.0f,600.0f };
+		spacePos.x = 24 * Field::chipSize;
+		spacePos.y = 22 * Field::chipSize;
 	}
-	else if (num == 1) {
-		spacePos = { 200.0f,100.0f };
+	else if(num == 1) {
+		spacePos.x = 6 * Field::chipSize;
+		spacePos.y = 22 * Field::chipSize;
 	}
-	else {
-		spacePos = { 800.0f,600.0f };
+	else if (num == 2) {
+		spacePos.x = 20 * Field::chipSize;
+		spacePos.y = 6 * Field::chipSize;
 	}
 }
 
 //バグスペースの更新
 void BugSpace::update()
 {
+	for (int x = 0; x < Field::bgNumX; x++) {
+		for (int y = 0; y < Field::bgNumY; y++) {
+
+			const int chipNo = Field::field[y][x];
+
+			if (chipNo == 4) {
+				if (player->repairSpace(spacePos)) {
+					player->setRepair(1);
+					if (player->returnSpaceHpDisplay()) {
+						if (--time < 0) {
+							maxHp--;
+							time = 180;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	hp->setObjectHp(maxHp);
 
 	if (Pad::isTrigger(PAD_INPUT_5)) {
@@ -61,30 +84,21 @@ void BugSpace::update()
 		}
 	}
 
-	if (player->repairSpace(spacePos)) {
-		player->setRepair(1);
-		if (player->returnSpaceHpDisplay()) {
-			maxHp--;
-		}
-	}
-
-	if (maxHp < 0) {
+	if (maxHp < 1) {
 		isEnabled = false;
 	}
 }
 
 void BugSpace::draw()
 {
-	DrawBox(spacePos.x, spacePos.y, spacePos.x + 50, spacePos.y + 60, GetColor(255, 0, 0), true);
 	DrawFormatString(spacePos.x, spacePos.y, 0xffffff, "空間:%d", num);
-	
-	for (auto& enemy : enemy) {
-		DrawFormatString(0, 45, 0xffffff, "%d", enemy->motionaiu());
-	}
+	DrawFormatString(0, 15, 0xffffff, "%d", time);
+
+	DrawBox(spacePos.x, spacePos.y, spacePos.x + Field::chipSize * 3, spacePos.y + Field::chipSize * 3, 0xff0000, true);
 
 	if (player->repairSpace(spacePos)) {
 		if (player->returnSpaceHpDisplay()) {
-			hp->draw(spacePos);
+			hp->draw({ spacePos.x,spacePos.y - 30 });
 		}
 	}
 

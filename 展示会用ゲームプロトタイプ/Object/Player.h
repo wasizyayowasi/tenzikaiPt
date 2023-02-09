@@ -20,9 +20,6 @@ public:
 
 	bool beHidden();
 
-	void setHidden(bool temporaryHidden) { hidden = temporaryHidden; }
-	void setLadder(bool temporaryLadder) { ladder = temporaryLadder; }
-
 	void damege();
 
 	int enemyAttack(Vec2 enemyPos);
@@ -35,7 +32,9 @@ public:
 
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
 
-	bool playerFiledCollision(int y);
+	bool playerFiledCollision(int x,int y);
+
+	bool objectCollision(int x,int y);
 private:
 	bool playerDirections = false;
 	int motionNum = 0;
@@ -71,7 +70,7 @@ private:
 	ObjectHp* hp;
 	PlayerMotion* motion;
 
-	Vec2 playerPos = {115.0f,616.0f};
+	Vec2 playerPos = {600.0f,200.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;

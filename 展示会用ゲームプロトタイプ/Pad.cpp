@@ -43,4 +43,10 @@ namespace Pad {
 		bool isLast = (padLog[1] & button);	//1ƒtƒŒ[ƒ€‘O‚Ìó‘Ô
 		return (!isNow && isLast);
 	}
+
+	bool pressButton() {
+		
+		bool isPress = (padLog[0] & padLog[1]);
+		return (isPress);
+	}
 }

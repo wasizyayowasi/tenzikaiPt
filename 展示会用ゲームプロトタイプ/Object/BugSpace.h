@@ -29,6 +29,7 @@ public:
 	bool isEnable()const;
 private:
 	int handle = -1;
+	int time = 0;
 
 	int maxHp = 10;
 

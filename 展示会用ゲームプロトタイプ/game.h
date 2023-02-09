@@ -3,8 +3,12 @@
 
 //ゲーム全般の設定
 namespace Game {
+#ifdef _DEBUG
 	//windowモード
 	constexpr bool kWindowMode = true;
+#else
+	constexpr bool kWindowMode = false;
+#endif
 	//window名
 	const char* const kTitleText = " ";
 	//windowサイズ

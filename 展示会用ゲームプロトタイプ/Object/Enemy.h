@@ -21,11 +21,17 @@ public:
 
 	bool isEnable()const;
 
-	bool filedCollision(int y);
+	bool filedCollision(int x, int y);
 
 	int motionaiu() { return motionNum; }
 private:
+	int coolTime = 0;
+
 	int handle = -1;
+
+	int moveCount = 0;
+
+	int count = 0;
 
 	int motionNum = 0;
 

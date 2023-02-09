@@ -23,6 +23,11 @@ Player::Player()
 
 void Player::update()
 {
+	ladder = false;
+	hidden = false;
+	if (motionNum != 3) {
+		hit = false;
+	}
 
 	for (int x = 0; x < Field::bgNumX; x++) {
 		for (int y = 0; y < Field::bgNumY; y++) {
@@ -30,8 +35,18 @@ void Player::update()
 			const int chipNo = Field::field[y][x];
 
 			if (chipNo == 1) {
-				if (playerFiledCollision(y)) {
+				if (playerFiledCollision(x,y)) {
 					hit = true;
+				}
+			}
+			else if (chipNo == 2) {
+				if (objectCollision(x, y)) {
+					ladder = true;
+				}
+			}
+			else if (chipNo == 3) {
+				if (objectCollision(x, y)) {
+					hidden = true;
 				}
 			}
 		}
@@ -40,57 +55,65 @@ void Player::update()
 	//–ˆƒtƒŒ[ƒ€AƒvƒŒƒCƒ„[‚ÌHP‚ðŠm”F‚·‚é
 	hp->setObjectHp(playerHp);
 
-	if (!ladder) {
+	if (hit) {
 		if (--proximityAttackTime < 0) {
 			motionNum = 0;
+			proximityAttackTime = 0;
 		}
 	}
 
-	//d—Í‚ð‘«‚µ‘±‚¯‚é
-	if (!ladder) {
-		if (upperLimit) {
-			vec.y = 20.0f;
-		}
-		else {
-			vec.y = 10.0f;
-		}
-		if (!hit) {
-			playerPos += vec;
-		}
+	if (hit) {
+		DrawString(0, 60, "aiu", 0xffffff);
+		//upperLimit = true;
 	}
 
 	//’òŽq‚ð“o‚èI‚í‚Á‚½‚Æ‚«A‚³‚ç‚É“o‚ë‚¤‚Æ‚µ‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß‚Ì‚â‚Â
-	if (Pad::isPress(PAD_INPUT_UP)) {
-		if (!ladder) {
-			upperLimit = true;
+
+
+	//‹ßÚUŒ‚
+	if (!push) {
+		if (hit) {
+			if (!flyingObject->isEnable()) {
+				if (Pad::isPress(PAD_INPUT_2)) {
+					proximityAttack = true;
+					motionNum = 3;
+					motion->update(motionNum);
+					proximityAttackTime = 10;
+				}
+				else {
+					proximityAttack = false;
+				}
+			}
 		}
 	}
 
+
+
 	//ˆÚ“®
 	if (!push) {
-		if (Pad::isPress(PAD_INPUT_LEFT)) {
-			if (!(motionNum == 3)) {
-				motionNum = 1;
+		if (motionNum != 2) {
+			if (Pad::isPress(PAD_INPUT_LEFT)) {
+				if (!(motionNum == 3)) {
+					motionNum = 1;
+				}
+				playerPos.x -= 5;
+				playerDirections = true;
+				motion->update(motionNum);
 			}
-			playerPos.x -= 5;
-			playerDirections = true;
-			motion->update(motionNum);
-		}
-		else if (Pad::isPress(PAD_INPUT_RIGHT)) {
-			if (!(motionNum == 3)) {
-				motionNum = 1;
+			else if (Pad::isPress(PAD_INPUT_RIGHT)) {
+				if (!(motionNum == 3)) {
+					motionNum = 1;
+				}
+				playerPos.x += 5;
+				playerDirections = false;
+				motion->update(motionNum);
 			}
-			playerPos.x += 5;
-			playerDirections = false;
-			motion->update(motionNum);
 		}
 		if (ladder) {
-			if (!upperLimit) {
-				if (Pad::isPress(PAD_INPUT_UP)) {
-					motionNum = 2;
-					playerPos.y -= 5;
-					motion->update(motionNum);
-				}
+			if (Pad::isPress(PAD_INPUT_UP)) {
+				motionNum = 2;
+				playerPos.y -= 5;
+				motion->update(motionNum);
 			}
 		}
 		if (!hit) {
@@ -102,16 +125,13 @@ void Player::update()
 		}
 	}
 
-
-	//’n–Ê‚Æ‚Ì”»’è
-	/*if (playerPos.y + playerSizeY > groundY) {
-		playerPos.y = groundY - playerSizeY;
-		hit = true;
-		upperLimit = false;
-	}*/
 	
-	if (playerPos.y + playerSizeY < groundY) {
-		hit = false;
+	//d—Í‚ð‘«‚µ‘±‚¯‚é
+	if (!ladder) {
+		vec.y = 8.0f;
+		if (!hit) {
+			playerPos += vec;
+		}
 	}
 
 
@@ -130,33 +150,26 @@ void Player::update()
 
 	//ˆÈ‰ºUŒ‚Žè’iŽÀ‘•—\’è 
 	//“Š±
-	if (Pad::isTrigger(PAD_INPUT_3)) {
-		if (!flyingObject->isEnable()) {
-			flyingObject->attack(playerPos,playerDirections);
-		}
-	}
-	if (flyingObject->isEnable()) {
-		flyingObject->update();
-	}
-	if (flyingObject->landing()) {
-		if (flyingObject->playerCollision(playerPos)) {
-			flyingObject->deadFlyingObject();
+	if (!push) {
+		if (hit) {
+			if (Pad::isTrigger(PAD_INPUT_3)) {
+				if (!flyingObject->isEnable()) {
+					flyingObject->attack(playerPos, playerDirections);
+				}
+			}
+			if (flyingObject->isEnable()) {
+				flyingObject->update();
+			}
+			if (flyingObject->landing()) {
+				if (flyingObject->playerCollision(playerPos)) {
+					flyingObject->deadFlyingObject();
+				}
+			}
 		}
 	}
 
 
-	//‹ßÚUŒ‚
-	if (!flyingObject->isEnable()) {
-		if (Pad::isTrigger(PAD_INPUT_2)) {
-			proximityAttack = true;
-			motionNum = 3;
-			motion->attack();
-			proximityAttackTime = 10;
-		}
-		else {
-			proximityAttack = false;
-		}
-	}
+	
 
 	
 	//HP‚Ì•\Ž¦
@@ -168,9 +181,17 @@ void Player::update()
 	}
 
 	repair = 0;
+	if (motionNum == 3) {
+	}
+	else if(!Pad::pressButton()) {
+		if (hit||upperLimit) {
+			motionNum = 0;
+		}
+	}
 
-	motion->update(motionNum);
-
+	if (motionNum == 0) {
+		motion->update(motionNum);
+	}
 
 	
 }
@@ -179,20 +200,21 @@ void Player::update()
 void Player::draw(int handle)
 {
 	//‹ßÚUŒ‚
-	if (proximityAttack) {
+	/*if (proximityAttack) {
 		if (playerDirections) {
-			DrawBox(playerPos.x - 65, playerPos.y + 10, playerPos.x  + 50, playerPos.y + 50, 0xff00ff, true);
+			DrawBox(playerPos.x - 50, playerPos.y + 10, playerPos.x  + 20, playerPos.y + 50, 0xff00ff, true);
 			DrawString(playerPos.x - 65, playerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
 		}
 		else {
-			DrawBox(playerPos.x , playerPos.y + 10, playerPos.x + 115, playerPos.y + 50, 0xff00ff, true);
+			DrawBox(playerPos.x + 20, playerPos.y + 10, playerPos.x + 80, playerPos.y + 50, 0xff00ff, true);
 			DrawString(playerPos.x + 55, playerPos.y + 10, "‹ßÚUŒ‚", 0x000000);
 		}
-	}
+	}*/
 	
 
 	DrawString(playerPos.x, playerPos.y - 30, "ƒvƒŒƒCƒ„[", 0xff00ff);
 	DrawBox(playerPos.x+25, playerPos.y+32, playerPos.x + 27, playerPos.y + 34, 0x000000,true);
+	DrawFormatString(0, 75, 0xffffff, "%d", proximityAttackTime);
 
 	//”ò‚Ñ“¹‹ï
 	if (flyingObject->isEnable()) {
@@ -261,14 +283,14 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 
 	if (proximityAttack) {
 		if (playerDirections) {
-			if (enemyLeft > playerPos.x + 50)			return false;
-			if (enemyRight < playerPos.x - 65)			return false;
+			if (enemyLeft > playerPos.x + 20)			return false;
+			if (enemyRight < playerPos.x - 50)			return false;
 			if (enemyTop <= playerPos.y + 10)			return false;
 			if (enemyBottom <= playerPos.y + 50)		return false;
 		}
 		else if (!playerDirections) {
-			if (enemyLeft > playerPos.x  + 115)			return false;
-			if (enemyRight < playerPos.x)				return false;
+			if (enemyLeft > playerPos.x  + 80)			return false;
+			if (enemyRight < playerPos.x + 20)				return false;
 			if (enemyTop <= playerPos.y + 10)			return false;
 			if (enemyBottom <= playerPos.y + 50)		return false;
 		}
@@ -277,18 +299,20 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 	return false;
 }
 
-
+//‹óŠÔ‚ðC•œ‚·‚é
 bool Player::repairSpace(const Vec2& pos)
 {
 	float spaceLeft = pos.x;
 	float spaceTop = pos.y;
-	float spaceRight = pos.x + 50;
-	float spaceBottom = pos.y + 60;
+	float spaceRight = pos.x + Field::chipSize * 3;
+	float spaceBottom = pos.y + Field::chipSize * 3;
 
-	if (spaceLeft > playerPos.x + 50)				return false;
-	if (spaceRight < playerPos.x)					return false;
-	if (spaceTop > playerPos.y + 64)				return false;
-	if (spaceBottom < playerPos.y)					return false;
+	DrawBox(spaceLeft, spaceTop, spaceRight, spaceBottom, 0xff0000, false);
+
+	if (playerPos.x + 25 < spaceLeft)				return false;
+	if (playerPos.x > spaceRight)					return false;
+	if (playerPos.y + 74 < spaceTop)				return false;
+	if (playerPos.y > spaceBottom)					return false;
 		
 	return true;
 
@@ -299,23 +323,40 @@ void Player::setRepair(int num)
 	
 	repair = num;
 	if (repair) {
-		DrawString(700, 0, "’¼‚¹‚é‚æ", 0xffffff);
+		DrawString(0, 0, "’¼‚¹‚é‚æ", 0xffffff);
 	}
 	else {
-		DrawString(700, 15, "’¼‚¹‚È‚¢‚æ", 0xffffff);
+		DrawString(0, 15, "’¼‚¹‚È‚¢‚æ", 0xffffff);
 	}
 }
 
-bool Player::playerFiledCollision(int y)
+bool Player::playerFiledCollision(int x,int y)
 {
-	float playerTop = playerPos.y;
-	float playerBottom = playerPos.y + 78;
-
+	float filedLeft = x * Field::chipSize;
+	float filedRight = x * Field::chipSize + Field::chipSize;
 	float filedTop = y * Field::chipSize;
 	float filedBottom = y * Field::chipSize + Field::chipSize;
 
-	if (playerBottom < filedTop)return false;
-	if (playerTop > filedBottom)return false;
+	if (playerPos.x + 25 < filedLeft)	return false;
+	if (playerPos.x > filedRight)		return false;
+	if (playerPos.y + 74 < filedTop)	return false;
+	if (playerPos.y > filedBottom)		return false;
+
+	return true;
+}
+
+bool Player::objectCollision(int x,int y)
+{
+	
+	float objectLeft = x * Field::chipSize;
+	float objectRight = x * Field::chipSize  + Field::chipSize;
+	float objectTop = y * Field::chipSize;
+	float objectBottom = y * Field::chipSize + Field::chipSize;
+
+	if (playerPos.x + 26 < objectLeft)		return false;
+	if (playerPos.x + 25 > objectRight)		return false;
+	if (playerPos.y + 74 < objectTop)		return false;
+	if (playerPos.y > objectBottom)			return false;
 
 	return true;
 }
