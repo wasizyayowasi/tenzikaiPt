@@ -14,13 +14,17 @@ public:
 	void ascend();
 	void getOff();
 	void attack();
+	void damege();
+	void death();
 
 	void draw(Vec2 playerPos,int handle,bool trun);
 
-	
+	int setDead() { return isEnabled; }
 private:
 	int imgX = 0;
 	int imgY = 0;
+
+	bool isEnabled = false;
 
 	int maxImgX = 7;
 

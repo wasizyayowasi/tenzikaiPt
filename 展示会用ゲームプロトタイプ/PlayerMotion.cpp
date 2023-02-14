@@ -32,6 +32,15 @@ void PlayerMotion::update(int num)
 		func = &PlayerMotion::attack;
 		maxImgX = 3;
 		break;
+	case 4:
+		func = &PlayerMotion::death;
+		maxImgX = 11;
+		break;
+	case 5:
+		func = &PlayerMotion::damege;
+		imgY = 3;
+		maxImgX = 3;
+		break;
 	}
 	(this->*func)();
 }
@@ -101,6 +110,30 @@ void PlayerMotion::attack()
 	}
 	if (imgY > 10) {
 		imgY = 8;
+	}
+
+}
+
+void PlayerMotion::damege()
+{
+	if (--motionTime < 0) {
+		imgX++;
+		motionTime = 4;
+	}
+	if (imgX > maxImgX) {
+		imgX = 0;
+	}
+}
+
+void PlayerMotion::death()
+{
+	imgY = 4;
+	if (--motionTime < 0) {
+		imgX++;
+		motionTime = 4;
+	}
+	if (imgX > maxImgX) {
+		isEnabled = true;
 	}
 }
 

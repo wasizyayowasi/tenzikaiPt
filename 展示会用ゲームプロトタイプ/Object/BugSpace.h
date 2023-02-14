@@ -20,6 +20,8 @@ public:
 	void update();
 	void draw();
 
+	void move(int scrollX);
+
 	void setPlayer(Player* dPlayer) { player = dPlayer; }
 
 	void enemySetPlayer(int setHandle);

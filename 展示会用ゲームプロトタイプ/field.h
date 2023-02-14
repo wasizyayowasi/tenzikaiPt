@@ -3,13 +3,13 @@
 
 namespace Field{
 
-	constexpr int chipSize = 32;
-	constexpr int graphChipSize = 16;
-	constexpr int backGroundGraphChipSize = 48;
+	constexpr float chipSize = 32.0f;
+	constexpr float graphChipSize = 16.0f;
+	constexpr float backGroundGraphChipSize = 48.0f;
 
 	//É`ÉbÉvÇÃêî
 	constexpr int bgNumX = Game::kScreenWidth / chipSize;
-	constexpr int bgNumY = Game::kScreenHeight / chipSize;
+	constexpr int  bgNumY = Game::kScreenHeight / chipSize;
 
 	constexpr int field[bgNumY][bgNumX] = {
 		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},

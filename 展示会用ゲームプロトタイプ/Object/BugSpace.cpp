@@ -41,6 +41,7 @@ void BugSpace::init()
 //バグスペースの更新
 void BugSpace::update()
 {
+
 	for (int x = 0; x < Field::bgNumX; x++) {
 		for (int y = 0; y < Field::bgNumY; y++) {
 
@@ -48,7 +49,6 @@ void BugSpace::update()
 
 			if (chipNo == 4) {
 				if (player->repairSpace(spacePos)) {
-					player->setRepair(1);
 					if (player->returnSpaceHpDisplay()) {
 						if (--time < 0) {
 							maxHp--;
@@ -107,6 +107,11 @@ void BugSpace::draw()
 			enemy->draw();
 		}
 	}
+}
+
+void BugSpace::move(int scrollX)
+{
+	spacePos.x += scrollX;
 }
 
 void BugSpace::enemySetPlayer(int handle)

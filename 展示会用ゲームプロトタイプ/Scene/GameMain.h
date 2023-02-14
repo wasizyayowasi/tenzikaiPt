@@ -16,9 +16,17 @@ public:
 	void update();
 	void draw();
 
+	void drawMap(int offsetX);
+
 private:
 	int enemyHandle = -1;
 	int playerHandle = -1;
+
+	int scrollX = 0;
+
+	int dataX = 0;
+	int maxDataX = 0;
+	int dataY = 0;
 
 	bool hidden = false;
 

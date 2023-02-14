@@ -28,21 +28,39 @@ public:
 
 	bool repairSpace(const Vec2& pos);
 
-	void setRepair(int num);
-
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
 
 	bool playerFiledCollision(int x,int y);
 
 	bool objectCollision(int x,int y);
+
+	bool ladderCollision(int x, int y);
+
+	void updateField();
+
+	void updateDescent();
+
+	void updateLadder();
+
+	void updateDeath();
+
+	int isEnable() { return isEnabled; }
+
+	void  playerMove(bool temporaryMove) { move = temporaryMove; }
+	void playerMotionUpdate(int num, bool directions);
 private:
+
+	bool collision = false;
+
 	bool playerDirections = false;
 	int motionNum = 0;
 
-	int proximityAttackTime = 0;
-
 	int playerHp = 10;
 	int hpDisplayTime = 120;
+
+	bool move = true;
+
+	bool isEnabled = true;
 
 	//hp表示
 	bool hpDisplay = false;
@@ -50,29 +68,27 @@ private:
 	bool spaceHpDisplay = false;
 	//オブジェクトに隠れているか
 	bool hidden = false;
-	bool ladder = false;
-	bool upperLimit = false;
 
 	bool hit = false;
 	//隠れるボタンを押したか
 	bool push = false;
-	bool push2 = false;
 	//敵に当たっているか
 	bool enemyHit = false;
 	//近接攻撃
 	bool proximityAttack = false;
 
-	int repair = 0;
-	//bool repair = false;
-
 	int time = 0;
+
+	int chipNo3 = 0;
 
 	ObjectHp* hp;
 	PlayerMotion* motion;
 
-	Vec2 playerPos = {600.0f,200.0f};
+	Vec2 playerPos = {600.0f,248.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;
+
+	void (Player::* updateFunc)();
 };
 

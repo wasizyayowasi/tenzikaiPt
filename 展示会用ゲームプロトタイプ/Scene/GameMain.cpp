@@ -45,42 +45,57 @@ void GameMain::init()
 
 void GameMain::update()
 {
-	//入力装置の情報を読み取る
-	Pad::update();
-
 	//プレイヤーの更新
-	player->update();
-
-	//空間の更新
-	for (auto& space : space) {
-		if (space->isEnable()) {
-			space->update();
-		}
+	if (player->isEnable()) {
+		player->update();
+		//入力装置の情報を読み取る
+		Pad::update();
+	}
+	else {
+		player->updateDeath();
 	}
 
+	/*if (Pad::isPress(PAD_INPUT_LEFT)) {
+		player->playerMotionUpdate(1,true);
+		scrollX += 10.0f;
+	}
+	if (Pad::isPress(PAD_INPUT_RIGHT)) {
+		player->playerMotionUpdate(1,false);
+		scrollX -= 10.0f;
+	}*/
+
+	if (player->isEnable()) {
+		//空間の更新
+		for (auto& space : space) {
+			if (space->isEnable()) {
+				space->update();
+			}
+		}
+	}
 }
 
 void GameMain::draw()
 {
+	int offsetX = scrollX;
+	if (offsetX > 1) { 
+		offsetX = 0; 
+		player->playerMove(true);
+	}
+	if (offsetX < -Game::kScreenWidth * 2) { 
+		offsetX = -Game::kScreenWidth * 2;
+		player->playerMove(true);
+	}
+
+	drawMap(offsetX);
+
 	for (int x = 0; x < Field::bgNumX; x++) {
 		for (int y = 0; y < Field::bgNumY; y++) {
-
-			const int chipNo = Field::field[y][x];
-
-			if (chipNo == 1) {
-				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0xffff00, true);
-			}
-			else if (chipNo == 2) {
-				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0x444444, true);
-			}
-			else if (chipNo == 3) {
-				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0x44ff44, true);
-			}
+			DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0x224422, false);
 		}
 	}
 
 	//地面
-	DrawString(0, 700, "地面", 0x000000);
+	DrawString(fieldX, fieldY, "地面", 0x000000);
 	DrawString(100, ladderBlockY, "地面", 0x000000);
 
 	//隠れ場所
@@ -99,4 +114,26 @@ void GameMain::draw()
 	//プレイヤーの描画
 	player->draw(playerHandle);
 
+}
+
+void GameMain::drawMap(int offsetX)
+{
+	dataX = offsetX / 32;
+
+	for (int x = 0; x < Field::bgNumX; x++) {
+		for (int y = 0; y < Field::bgNumY; y++) {
+
+			const int chipNo = Field::field[y][x];
+
+			if (chipNo == 1) {
+				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0xffff00, true);
+			}
+			else if (chipNo == 2) {
+				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0x444444, true);
+			}
+			else if (chipNo == 3) {
+				DrawBox(x * Field::chipSize, y * Field::chipSize, x * Field::chipSize + Field::chipSize, y * Field::chipSize + Field::chipSize, 0x44ff44, true);
+			}
+		}
+	}
 }
