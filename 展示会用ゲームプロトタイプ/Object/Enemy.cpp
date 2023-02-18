@@ -4,7 +4,7 @@
 #include "Player.h"
 #include "ObjectHp.h"
 #include "../DrawFunctions.h"
-#include "../EnemyMotion.h"
+#include "EnemyMotion.h"
 #include "../field.h"
 
 
@@ -13,28 +13,16 @@ Enemy::Enemy()
 	hp = new ObjectHp;
 	motion = new EnemyMotion;
 	hp->setObjectMaxHp(enemyHp);
+	updateFunc = &Enemy::normalUpdate;
+	drawFunc = &Enemy::normalDraw;
 }
 
-void Enemy::dispatch(const Vec2& pos)
+void Enemy::normalUpdate(Vec2 offset)
 {
-	isEnabled = true;
-	hpDisplay = false;
-	landing = false;
-	stop = false;
-	enemyPos = pos;
-	enemyHp = 9;
-	hpDisplayTime = 120;
-	motionNum = 0;
-	motion->init();
-	vec = { 3.0f,1.0f };
-}
+	for (int x = 0; x < FieldData::bgNumX; x++) {
+		for (int y = 0; y < FieldData::bgNumY; y++) {
 
-void Enemy::update()
-{
-	for (int x = 0; x < Field::bgNumX; x++) {
-		for (int y = 0; y < Field::bgNumY; y++) {
-
-			const int chipNo = Field::field[y][x];
+			const int chipNo = FieldData::field[y][x];
 
 			if (chipNo == 1) {
 				if (filedCollision(x, y)) {
@@ -122,7 +110,7 @@ void Enemy::update()
 			stop = false;
 		}
 	}
-	
+
 	//右の壁反射
 	if (moveCount > 130) {
 		vec.x = -vec.x;
@@ -152,8 +140,8 @@ void Enemy::update()
 			}
 		}
 	}
-	
-	
+
+
 
 	//攻撃
 	if (motionNum == 2) {
@@ -161,7 +149,7 @@ void Enemy::update()
 	}
 
 	//投擲が当たった場合の処理
-	if (player->enemyAttack(enemyPos)) {
+	if (player->enemyAttack(enemyPos, offset)) {
 		enemyHp = 0;
 	}
 
@@ -183,10 +171,12 @@ void Enemy::update()
 			hpDisplayTime = 120;
 		}
 	}
-	
+
 	if (motion->dead()) {
 		//motion->init();
-		isEnabled = false;
+		//isEnabled = false;
+		updateFunc = &Enemy::coinUpdate;
+		drawFunc = &Enemy::coinDraw;
 	}
 
 	//エネミーの動きを更新
@@ -195,18 +185,58 @@ void Enemy::update()
 	}
 }
 
-void Enemy::draw()
+void Enemy::normalDraw(Vec2 offset)
 {
-	DrawCircle(enemyPos.x, enemyPos.y, 300, 0xff0000, false);
-	DrawString(enemyPos.x, enemyPos.y - 15, "敵", 0xffffff);
+	Vec2 pos = enemyPos + offset;
+
+	DrawCircle(pos.x, pos.y, 300, 0xff0000, false);
+	DrawString(pos.x, pos.y - 15, "敵", 0xffffff);
 
 	DrawFormatString(0, 15, 0xffffff, "%d", motionNum);
 
-	motion->draw(enemyPos,handle,inversion);
+	motion->draw(enemyPos, handle, inversion, offset);
 
 	if (hpDisplay) {
-		hp->draw(enemyPos);
+		hp->draw(enemyPos, offset);
 	}
+}
+
+void Enemy::coinUpdate(Vec2 offset)
+{
+	if (player->coinCollision(enemyPos,offset)) {
+		isEnabled = false;
+	}
+}
+
+void Enemy::coinDraw(Vec2 offset)
+{
+	DrawBox(enemyPos.x + offset.x, enemyPos.y + offset.y, enemyPos.x + 30 + offset.x, enemyPos.y + 30 + offset.y, 0xffffff, true);
+}
+
+void Enemy::dispatch(const Vec2& pos)
+{
+	isEnabled = true;
+	hpDisplay = false;
+	landing = false;
+	stop = false;
+	enemyPos = pos;
+	enemyHp = 9;
+	hpDisplayTime = 120;
+	motionNum = 0;
+	motion->init();
+	vec = { 3.0f,1.0f };
+	updateFunc = &Enemy::normalUpdate;
+	drawFunc = &Enemy::normalDraw;
+}
+
+void Enemy::update(Vec2 offset)
+{
+	(this->*updateFunc)(offset);
+}
+
+void Enemy::draw(Vec2 offset)
+{
+	(this->*drawFunc)(offset);
 }
 
 bool Enemy::isEnable() const
@@ -217,10 +247,10 @@ bool Enemy::isEnable() const
 bool Enemy::filedCollision(int x,int y)
 {
 
-	float filedLeft = x * Field::chipSize;
-	float filedRight = x * Field::chipSize + Field::chipSize;
-	float filedTop = y * Field::chipSize;
-	float filedBottom = y * Field::chipSize + Field::chipSize;
+	float filedLeft = x * FieldData::chipSize;
+	float filedRight = x * FieldData::chipSize + FieldData::chipSize;
+	float filedTop = y * FieldData::chipSize;
+	float filedBottom = y * FieldData::chipSize + FieldData::chipSize;
 
 	if (enemyPos.x + 15< filedLeft)		return false;
 	if (enemyPos.x > filedRight)		return false;
@@ -228,6 +258,11 @@ bool Enemy::filedCollision(int x,int y)
 	if (enemyPos.y > filedBottom)		return false;
 
 	return true;
+}
+
+Vec2 Enemy::deadPos()
+{
+	return deathPos;
 }
 
 

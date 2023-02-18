@@ -49,6 +49,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
 	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 3) / FieldData::chipSize;
 
+	DrawFormatString(0, 30, 0xffffff, "%d:%d", underfootChipNoX, underfootChipNoY);
 
 	int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
 	//íÚéq
@@ -57,6 +58,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 			playerPos.y += 3.0f;
 		}
 		if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
+			DrawString(0, 60, "aiu", 0xffffff);
 			updateFunc = &Player::updateLadder;
 		}
 	}
@@ -69,12 +71,15 @@ void Player::updateField(Vec2 offset, const InputState& input)
 					collision = ladderCollision(underfootChipNoX - x, underfootChipNoY - 1);
 				}
 				if (collision) {
+					DrawString(0, 60, "aiu", 0xffffff);
 					updateFunc = &Player::updateLadder;
 					return;
 				}
 			}
 		}
 	}
+
+	DrawBox(underfootChipNoX * FieldData::chipSize, underfootChipNoY * FieldData::chipSize, underfootChipNoX * FieldData::chipSize + FieldData::chipSize, underfootChipNoY * FieldData::chipSize + FieldData::chipSize, 0xff0000, true);
 
 	//ç~â∫
 	int DescentChipNo3 = FieldData::field[underfootChipNoY][underfootChipNoX];
@@ -158,6 +163,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	//íÚéq
 	if (objectChipNo == 3) {
 		if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
+			DrawString(0, 60, "aiu", 0xffffff);
 			hidden = true;
 		}
 	}
@@ -198,6 +204,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 		//ínñ 
 		if (chipNo == 2) {
 			if (objectCollision(underfootChipNoX + x, underfootChipNoY)) {
+				DrawString(0, 60, "aiu", 0xffffff);
 				updateFunc = &Player::updateLadder;
 				return;
 			}
@@ -213,6 +220,8 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 
 	bool noLeftEntry = false;
 	bool noRightEntry = false;
+
+	DrawFormatString(0, 30, 0xffffff, "%d:%d", underfootChipNoX, underfootChipNoY);
 
 	for (int y = -2; y < 1; y++) {
 		int chipNo9 = FieldData::field[underfootChipNoY + y][underfootChipNoX + 1];
@@ -370,7 +379,6 @@ void Player::draw(int handle, Vec2 offset)
 
 	motion->draw(playerPos, handle, playerDirections, offset);
 
-	DrawFormatString(0, 0, 0xffffff, "Ç®ã‡ : %d", money);
 }
 
 
@@ -387,6 +395,7 @@ bool Player::beHidden()
 		}
 		else {
 			if (Pad::isRelase(PAD_INPUT_4)) {
+				DrawString(0, 75, "aiu", 0xffffff);
 				push = false;
 			}
 		}
@@ -465,10 +474,17 @@ bool Player::repairSpace(const Vec2& pos,Vec2 offset)
 	float playerRight = playerPos.x + 15 + offset.x;
 	float playerBottom = playerPos.y + 74 + offset.y;
 
+
+	DrawBox(spaceLeft, spaceTop, spaceRight, spaceBottom, 0xff0000, false);
+
 	if (playerRight < spaceLeft)				return false;
+	DrawString(500, 15, "aiu1", 0xffffff);
 	if (playerLeft > spaceRight)				return false;
+	DrawString(500, 30, "aiu2", 0xffffff);
 	if (playerBottom < spaceTop)				return false;
+	DrawString(500, 45, "aiu3", 0xffffff);
 	if (playerTop > spaceBottom)				return false;
+	DrawString(500, 60, "aiu4", 0xffffff);
 		
 	return true;
 
@@ -519,40 +535,6 @@ bool Player::ladderCollision(int x, int y)
 
 	return true;
 }
-
-bool Player::coinCollision(Vec2 pos, Vec2 offset)
-{
-	float objectLeft =pos.x + offset.x;
-	float objectRight = pos.x + 30 + offset.x;
-	float objectTop = pos.y + offset.y;
-	float objectBottom = pos.y + 30 + offset.y;
-
-	if (playerPos.x + 15.0f + offset.x < objectLeft)				return false;
-	if (playerPos.x + correctionSizeX + offset.x > objectRight)		return false;
-	if (playerPos.y + correctionSizeY + offset.y < objectTop)		return false;
-	if (playerPos.y + offset.y > objectBottom)						return false;
-
-	money += 100;
-
-	return true;
-}
-
-bool Player::shopCollision(int x, int y, Vec2 offset)
-{
-	float objectLeft = x * FieldData::chipSize;
-	float objectRight = x * FieldData::chipSize + FieldData::chipSize;
-	float objectTop = y * FieldData::chipSize;
-	float objectBottom = y * FieldData::chipSize + FieldData::chipSize * 3;
-
-	if (playerPos.x + 15.0f < objectLeft)				return false;
-	if (playerPos.x + correctionSizeX > objectRight)	return false;
-	if (playerPos.y + correctionSizeY < objectTop)		return false;
-	if (playerPos.y > objectBottom)						return false;
-
-	return true;
-}
-
-
 
 
 

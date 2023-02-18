@@ -13,11 +13,11 @@ public:
 
 	void init();
 
-	void update();
+	void update(Vec2 offset);
 	void draw();
 
-	bool playerCollision(const Vec2& pos);
-	bool enemyCollision(const Vec2& pos);
+	bool playerCollision(const Vec2& pos,Vec2 offset);
+	bool enemyCollision(const Vec2& pos, Vec2 offset);
 
 	void deadFlyingObject();
 

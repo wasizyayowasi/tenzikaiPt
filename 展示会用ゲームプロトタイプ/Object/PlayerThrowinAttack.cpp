@@ -29,14 +29,14 @@ void PlayerThrowinAttack::init()
 	up = 0;
 }
 
-void PlayerThrowinAttack::update()
+void PlayerThrowinAttack::update(Vec2 offset)
 {
-	flyingObjectPos = pos;
+	flyingObjectPos = pos + offset;
 
-	for (int x = 0; x < Field::bgNumX; x++) {
-		for (int y = 0; y < Field::bgNumY; y++) {
+	for (int x = 0; x < FieldData::bgNumX; x++) {
+		for (int y = 0; y < FieldData::bgNumY; y++) {
 
-			const int chipNo = Field::field[y][x];
+			const int chipNo = FieldData::field[y][x];
 
 			if (chipNo == 1) {
 				if (filedCollision(y)) {
@@ -84,7 +84,7 @@ void PlayerThrowinAttack::update()
 	if (pos.x < -30) {
 		init();
 	}
-	if (pos.x - 20 > Game::kScreenWidth) {
+	if (pos.x - 20 > Game::kScreenWidth * 2) {
 		init();
 	}
 	if (pos.y < 0) {
@@ -104,12 +104,12 @@ void PlayerThrowinAttack::draw()
 
 
 //ƒvƒŒƒCƒ„[‚Æ‚Ì“–‚½‚è”»’è
-bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
+bool PlayerThrowinAttack::playerCollision(const Vec2& pos, Vec2 offset)
 {
-	float playerLeft = pos.x;
-	float playerTop = pos.y;
-	float playerRight = pos.x + 50;
-	float playerBottom = pos.y + 74;
+	float playerLeft = pos.x + offset.x;
+	float playerTop = pos.y + offset.y;
+	float playerRight = pos.x + 50 + offset.x;
+	float playerBottom = pos.y + 74 + offset.y;
 
 	if (playerLeft > flyingObjectPos.x + 20)	return false;
 	if (playerRight < flyingObjectPos.x)		return false;
@@ -121,15 +121,15 @@ bool PlayerThrowinAttack::playerCollision(const Vec2& pos)
 
 
 //“Š±•¨‚Æ‚Ì“–‚½‚è”»’è
-bool PlayerThrowinAttack::enemyCollision(const Vec2& pos)
+bool PlayerThrowinAttack::enemyCollision(const Vec2& pos, Vec2 offset)
 {
 	
 	if (isEnabled) {
 		if (!landingObject) {
-			float enemyLeft = pos.x;
-			float enemyTop = pos.y;
-			float enemyRight = pos.x + 30;
-			float enemyBottom = pos.y + 30;
+			float enemyLeft = pos.x + offset.x;
+			float enemyTop = pos.y + offset.y;
+			float enemyRight = pos.x + 30 + offset.x;
+			float enemyBottom = pos.y + 30 + offset.y;
 
 			if (enemyLeft > flyingObjectPos.x + 20)		return false;
 			if (enemyRight < flyingObjectPos.x)			return false;
@@ -159,8 +159,8 @@ bool PlayerThrowinAttack::filedCollision(int y)
 	float flyingObjectTop = flyingObjectPos.y;
 	float flyingObjectBottom = flyingObjectPos.y + 24;
 
-	float filedTop = y * Field::chipSize;
-	float filedBottom = y * Field::chipSize + Field::chipSize;
+	float filedTop = y * FieldData::chipSize;
+	float filedBottom = y * FieldData::chipSize + FieldData::chipSize;
 
 	if (flyingObjectBottom < filedTop)return false;
 	if (flyingObjectTop > filedBottom)return false;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Vec2.h"
+#include "../Vec2.h"
 
 class EnemyMotion
 {
@@ -16,7 +16,7 @@ public:
 	void death();
 	void attack();
 
-	void draw(Vec2 enemyPos,int handle,bool trun);
+	void draw(Vec2 enemyPos,int handle,bool trun,Vec2 offset);
 
 	int dead() { return isEnabled; }
 private:

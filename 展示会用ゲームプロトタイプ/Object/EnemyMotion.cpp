@@ -1,5 +1,5 @@
 #include "EnemyMotion.h"
-#include "DrawFunctions.h"
+#include "../DrawFunctions.h"
 
 EnemyMotion::EnemyMotion()
 {
@@ -147,7 +147,9 @@ void EnemyMotion::attack()
 	}
 }
 
-void EnemyMotion::draw(Vec2 enemyPos,int handle, bool trun)
+void EnemyMotion::draw(Vec2 enemyPos,int handle, bool trun, Vec2 offset)
 {
-	my::myDrawRectRotaGraph(enemyPos.x + 15, enemyPos.y + 15, imgX * 40, imgY * 40, 40, 40, 2.0f, 0.0f, handle, true, trun);
+	Vec2 pos = enemyPos + offset;
+
+	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, imgX * 40, imgY * 40, 40, 40, 2.0f, 0.0f, handle, true, trun);
 }

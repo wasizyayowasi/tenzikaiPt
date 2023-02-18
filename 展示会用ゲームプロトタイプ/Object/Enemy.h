@@ -15,16 +15,28 @@ public:
 	Vec2 getPos()const { return enemyPos; }
 	void setPlayer(Player* dPlayer,int setHandle) { player = dPlayer,handle = setHandle; }
 
+	void normalUpdate(Vec2 offset);
+	void normalDraw(Vec2 offset);
+
+	void coinUpdate(Vec2 offset);
+	void coinDraw(Vec2 offset);
+
 	void dispatch(const Vec2& pos);
-	void update();
-	void draw();
+	void update(Vec2 offset);
+	void draw(Vec2 offset);
 
 	bool isEnable()const;
 
 	bool filedCollision(int x, int y);
 
 	int motionaiu() { return motionNum; }
+
+	Vec2 deadPos();
+
+	int returnDeath() { return death; }
 private:
+	bool death = false;
+
 	int coolTime = 0;
 
 	int handle = -1;
@@ -52,6 +64,7 @@ private:
 	bool lock = false;
 
 	Vec2 enemyPos = {800.0f,600.0f};
+	Vec2 deathPos = { 0.0f,0.0f };
 	Vec2 vec = {3.0f,1.0f};
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
@@ -62,5 +75,8 @@ private:
 	Player* player;
 	ObjectHp* hp;
 	EnemyMotion* motion;
+
+	void (Enemy::* updateFunc)(Vec2 offset);
+	void (Enemy::* drawFunc)(Vec2 offset);
 };
 

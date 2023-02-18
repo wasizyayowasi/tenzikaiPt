@@ -10,7 +10,7 @@ public:
 	void setObjectHp(int obJectHp) { hp = obJectHp; }
 	void setObjectMaxHp(int obJectMaxHp) { maxHp = obJectMaxHp; }
 
-	void draw(Vec2 pos);
+	void draw(Vec2 pos,Vec2 offset);
 private:
 	int hp = 0;
 	int maxHp = 0;

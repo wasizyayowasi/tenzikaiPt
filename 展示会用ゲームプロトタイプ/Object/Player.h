@@ -2,10 +2,11 @@
 #include "../Vec2.h"
 #include <memory>
 #include <array>
-#include "../PlayerMotion.h"
 
 class PlayerThrowinAttack;
 class ObjectHp;
+class PlayerMotion;
+class InputState;
 
 class Player
 {
@@ -15,42 +16,45 @@ public:
 
 	Vec2 getPos()const { return playerPos; }
 
-	void update();
-	void draw(int handle);
+	void update(Vec2 offset,const InputState& input);
+	void draw(int handle,Vec2 offset);
 
-	bool beHidden();
 
 	void damege();
 
-	int enemyAttack(Vec2 enemyPos);
+	int enemyAttack(Vec2 enemyPos, Vec2 offset);
+
+
+	bool beHidden();
+	bool repairSpace(const Vec2& pos,Vec2 offset);
+
 
 	bool proximityAttackCollision(const Vec2& pos);
+	bool playerFiledCollision(int x,int y);
+	bool objectCollision(int x,int y);
+	bool ladderCollision(int x, int y);
+	bool coinCollision(Vec2 pos, Vec2 offset);
+	bool shopCollision(int x,int y, Vec2 offset);
 
-	bool repairSpace(const Vec2& pos);
+	void updateField(Vec2 offset, const InputState& input);
+	void updateDescent(Vec2 offset, const InputState& input);
+	void updateLadder(Vec2 offset, const InputState& input);
+	void updateDeath(Vec2 offset, const InputState& input);
 
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
-
-	bool playerFiledCollision(int x,int y);
-
-	bool objectCollision(int x,int y);
-
-	bool ladderCollision(int x, int y);
-
-	void updateField();
-
-	void updateDescent();
-
-	void updateLadder();
-
-	void updateDeath();
-
 	int isEnable() { return isEnabled; }
 
 	void  playerMove(bool temporaryMove) { move = temporaryMove; }
 	void playerMotionUpdate(int num, bool directions);
+	int nextScene() { return gameoverScene; }
 private:
+	int money = 0;
+
+	int imgX = 0;
 
 	bool collision = false;
+
+	bool gameoverScene = false;
 
 	bool playerDirections = false;
 	int motionNum = 0;
@@ -84,11 +88,11 @@ private:
 	ObjectHp* hp;
 	PlayerMotion* motion;
 
-	Vec2 playerPos = {600.0f,248.0f};
+	Vec2 playerPos = {400.0f,600.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;
 
-	void (Player::* updateFunc)();
+	void (Player::* updateFunc)(Vec2 offset,const InputState& input);
 };
 

@@ -18,47 +18,39 @@ BugSpace::BugSpace(int spaceNum):num(spaceNum)
 
 std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
 {
-	// TODO: return ステートメントをここに挿入します
 	return enemy;
 }
 
-void BugSpace::init()
+void BugSpace::init(int setX, int setY)
 {
 	if (num == 0) {
-		spacePos.x = 24 * Field::chipSize;
-		spacePos.y = 22 * Field::chipSize;
+		spacePos.x = setX * FieldData::chipSize;
+		spacePos.y = setY * FieldData::chipSize;
 	}
-	else if(num == 1) {
-		spacePos.x = 6 * Field::chipSize;
-		spacePos.y = 22 * Field::chipSize;
+	else if (num == 1) {
+		spacePos.x = setX * FieldData::chipSize;
+		spacePos.y = setY * FieldData::chipSize;
 	}
 	else if (num == 2) {
-		spacePos.x = 20 * Field::chipSize;
-		spacePos.y = 6 * Field::chipSize;
+		spacePos.x = setX * FieldData::chipSize;
+		spacePos.y = setY * FieldData::chipSize;
 	}
 }
 
 //バグスペースの更新
-void BugSpace::update()
+void BugSpace::update(Vec2 offset)
 {
 
-	for (int x = 0; x < Field::bgNumX; x++) {
-		for (int y = 0; y < Field::bgNumY; y++) {
-
-			const int chipNo = Field::field[y][x];
-
-			if (chipNo == 4) {
-				if (player->repairSpace(spacePos)) {
-					if (player->returnSpaceHpDisplay()) {
-						if (--time < 0) {
-							maxHp--;
-							time = 180;
-						}
-					}
-				}
+	if (player->repairSpace(spacePos, offset)) {
+		DrawString(600, 0, "siu", 0xffffff);
+		if (player->returnSpaceHpDisplay()) {
+			if (--time < 0) {
+				maxHp--;
+				time = 10;
 			}
 		}
 	}
+	
 
 	hp->setObjectHp(maxHp);
 
@@ -80,7 +72,7 @@ void BugSpace::update()
 
 	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {
-			enemy->update();
+			enemy->update(offset);
 		}
 	}
 
@@ -89,24 +81,25 @@ void BugSpace::update()
 	}
 }
 
-void BugSpace::draw()
+void BugSpace::draw(Vec2 offset)
 {
-	DrawFormatString(spacePos.x, spacePos.y, 0xffffff, "空間:%d", num);
-	DrawFormatString(0, 15, 0xffffff, "%d", time);
-
-	DrawBox(spacePos.x, spacePos.y, spacePos.x + Field::chipSize * 3, spacePos.y + Field::chipSize * 3, 0xff0000, true);
-
-	if (player->repairSpace(spacePos)) {
+	
+	DrawBox(spacePos.x + offset.x, spacePos.y + offset.y, spacePos.x + FieldData::chipSize * 3 + offset.x, spacePos.y + FieldData::chipSize * 3 + offset.y, 0xff0000, true);
+	DrawFormatString(200, 0, 0xffffff, "%f : %f", enemyDeathPos.x, enemyDeathPos.y);
+	if (player->repairSpace(spacePos,offset)) {
 		if (player->returnSpaceHpDisplay()) {
-			hp->draw({ spacePos.x,spacePos.y - 30 });
+			hp->draw({ spacePos.x,spacePos.y - 30 },offset);
 		}
 	}
 
 	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {
-			enemy->draw();
+			enemy->draw(offset);
 		}
 	}
+
+	DrawFormatString(500, 0, 0xffffff, "%d", maxHp);
+	
 }
 
 void BugSpace::move(int scrollX)
@@ -124,4 +117,15 @@ void BugSpace::enemySetPlayer(int handle)
 bool BugSpace::isEnable() const
 {
 	return isEnabled;
+}
+
+Vec2 BugSpace::setCoinPos()
+{
+	for (auto& enemy : enemy) {
+		if (enemy->returnDeath()) {
+			enemyDeathPos = enemy->deadPos();
+			break;
+		}
+	}
+	return enemyDeathPos;
 }

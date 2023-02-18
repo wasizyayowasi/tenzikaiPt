@@ -1,5 +1,5 @@
 #pragma once
-#include "Vec2.h"
+#include "../Vec2.h"
 
 class PlayerMotion
 {
@@ -17,10 +17,12 @@ public:
 	void damege();
 	void death();
 
-	void draw(Vec2 playerPos,int handle,bool trun);
+	void draw(Vec2 playerPos,int handle,bool trun,Vec2 offset);
 
 	int setDead() { return isEnabled; }
 private:
+	int newImgX = 0;
+
 	int imgX = 0;
 	int imgY = 0;
 
@@ -32,8 +34,6 @@ private:
 
 	int updateTime = 4;
 
-	int assetSizeX = 115;
-	int assetSizeY = 84;
 private:
 	void(PlayerMotion::* func)();
 };

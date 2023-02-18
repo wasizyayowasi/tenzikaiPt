@@ -1,5 +1,8 @@
 #include "DxLib.h"
 #include "game.h"
+#include "Scene/SceneManager.h"
+#include "Scene/TitleScene.h"
+#include "InputState.h"
 #include "Scene/GameMain.h"
 
 // プログラムは WinMain から始まります
@@ -25,9 +28,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetDrawScreen(DX_SCREEN_BACK);
 
 
-	GameMain main;
-
-	main.init();
+	InputState input;
+	SceneManager sceneManager;
+	sceneManager.changeScene(new GameMain(sceneManager));
 
 	while (ProcessMessage() == 0) {
 
@@ -35,8 +38,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//画面のクリア
 		ClearDrawScreen();
 
-		main.update();
-		main.draw();
+		input.update();
+
+		sceneManager.update(input);
+		sceneManager.draw();
 
 		//裏画面を表画面に切り替える
 		ScreenFlip();
