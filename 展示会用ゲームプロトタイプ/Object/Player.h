@@ -7,12 +7,13 @@ class PlayerThrowinAttack;
 class ObjectHp;
 class PlayerMotion;
 class InputState;
+class Inventory;
 
 class Player
 {
 public:
 	Player();
-	~Player() { delete hp; }
+	virtual~Player() { delete hp,delete motion,delete inventory; }
 
 	Vec2 getPos()const { return playerPos; }
 
@@ -26,6 +27,7 @@ public:
 
 
 	bool beHidden();
+	bool setPush() { return push; }
 	bool repairSpace(const Vec2& pos,Vec2 offset);
 
 
@@ -44,11 +46,19 @@ public:
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
 	int isEnable() { return isEnabled; }
 
+	int setMoneyPossessed() { return money; }
+
 	void  playerMove(bool temporaryMove) { move = temporaryMove; }
-	void playerMotionUpdate(int num, bool directions);
 	int nextScene() { return gameoverScene; }
+
+	void setItemControl(int num);
+	void setMoney(int amount);
+
+	void consumption();
 private:
-	int money = 0;
+	int money = 2000;
+	int repairBlock = 0;
+	int recoveryItem = 0;
 
 	int imgX = 0;
 
@@ -87,6 +97,7 @@ private:
 
 	ObjectHp* hp;
 	PlayerMotion* motion;
+	Inventory* inventory;
 
 	Vec2 playerPos = {400.0f,600.0f};
 	Vec2 vec = { 0.0f,10.0f };

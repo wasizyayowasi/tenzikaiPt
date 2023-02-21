@@ -74,9 +74,9 @@ void GameMain::update(const InputState& input)
 
 void GameMain::draw()
 {
-
 	//ƒtƒB[ƒ‹ƒh‚Ì•`‰æ
 	field->draw(offset);
+
 
 	//‹óŠÔ‚Ì•`‰æ
 	for (auto& space : space) {
@@ -86,11 +86,11 @@ void GameMain::draw()
 	}
 
 	//–Ô–Ú‚Ì•`‰æ
-	for (int x = 0; x < FieldData::bgNumX; x++) {
+	/*for (int x = 0; x < FieldData::bgNumX; x++) {
 		for (int y = 0; y < FieldData::bgNumY; y++) {
 			DrawBox(x * FieldData::chipSize, y * FieldData::chipSize, x * FieldData::chipSize + FieldData::chipSize, y * FieldData::chipSize + FieldData::chipSize, 0x224422, false);
 		}
-	}
+	}*/
 
 	//ƒvƒŒƒCƒ„[‚Ì•`‰æ
 	player->draw(playerHandle,offset);
@@ -142,7 +142,7 @@ void GameMain::normalUpdate(const InputState& input)
 				if (player->shopCollision(x, y, offset)) {
 					if (input.isTriggered(InputType::next))
 					{
-						manager_.pushScene(new Shop(manager_,input));
+						manager_.pushScene(new Shop(manager_,input,player));
 					}
 				}
 			}
@@ -179,7 +179,7 @@ void GameMain::normalUpdate(const InputState& input)
 
 	
 	if (input.isTriggered(InputType::pause)) {
-		manager_.pushScene(new Pause(manager_));
+		manager_.pushScene(new Pause(manager_,input));
 	}
 
 }

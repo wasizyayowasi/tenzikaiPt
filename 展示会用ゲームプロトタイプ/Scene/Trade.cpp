@@ -4,8 +4,11 @@
 #include "DxLib.h"
 #include "../game.h"
 #include "Shop.h"
+#include "../Object/Player.h"
 
-Trade::Trade(SceneManager& manager, const InputState& input) : SceneBase(manager),inputState(input)
+constexpr int defaultTime = 120;
+
+Trade::Trade(SceneManager& manager, const InputState& input, Player* dPlayer, int amountOfMoney, int num) : SceneBase(manager),inputState(input), player(dPlayer),amount(amountOfMoney),itemNum(num)
 {
 	purchaseChoiceTable[PurchaseChoice::kau] = "買う";
 	purchaseChoiceTable[PurchaseChoice::yameru] = "やめとく";
@@ -19,21 +22,41 @@ void Trade::update(const InputState& input)
 {
 	const int nameCount = purchaseChoiceTable.size();
 
-	if (input.isTriggered(InputType::left)) {
-		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
-	}
-	else if (input.isTriggered(InputType::right)) {
-		currentInputIndex = (currentInputIndex + 1) % nameCount;
+	if (buy == false) {
+		if (input.isTriggered(InputType::left)) {
+			currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
+		}
+		else if (input.isTriggered(InputType::right)) {
+			currentInputIndex = (currentInputIndex + 1) % nameCount;
+		}
 	}
 
 	if (input.isTriggered(InputType::next)) {
-		manager_.popScene();
-		return;
+		if (currentInputIndex == 0) {
+			if (player->setMoneyPossessed() - amount >= 0) {
+				player->setItemControl(itemNum);
+				player->setMoney(amount);
+				textNum = 0;
+				textDisplayTime = defaultTime;
+				buy = true;
+			}
+			else {
+				textNum = 1;
+				textDisplayTime = defaultTime;
+			}
+		}
+		else {
+			manager_.popScene();
+			return;
+		}
 	}
+
 }
 
 void Trade::draw()
 {
+	//DrawFormatString(500, 500, 0xffffff, "%d:%d", moneyPossessed, amount);
+
 	constexpr int pw_width = Game::kScreenWidth / 2 - 200;						//ポーズ枠の幅
 	constexpr int pw_height = Game::kScreenHeight / 2 - 200;						//ポーズ枠の高さ
 	constexpr int pw_start_x = Game::kScreenWidth / 2 + 200;	//ポーズ枠に左
@@ -76,5 +99,27 @@ void Trade::draw()
 			yOffset = 20;
 		}
 		DrawString(pw_width + 90, y + yOffset, "⇒", 0xff0000);
+	}
+
+	if (textDisplayTime != 0) {
+		if (--textDisplayTime > 0) {
+			textDraw(textNum);
+		}
+		else {
+			manager_.popScene();
+			return;
+		}
+	}
+}
+
+void Trade::textDraw(int num)
+{
+	switch (num) {
+	case 0:
+		DrawString(Game::kScreenWidth / 2 - 50, 270, "毎度あり", 0xffffff);
+		break;
+	case 1:
+		DrawString(Game::kScreenWidth / 2 - 50, 270, "金ねーじゃん", 0xffffff);
+		break;
 	}
 }

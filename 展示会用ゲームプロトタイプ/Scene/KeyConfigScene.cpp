@@ -22,11 +22,11 @@ void KeyConfigScene::update(const InputState& input)
 			manager_.popScene();
 			return;
 		}
-		if (input.isTriggered(InputType::change)) {
+		if (input.isTriggered(InputType::prevItem)) {
 
-			configInput.rewriteInputInfo(InputType::prev, InputCategory::keybd, KEY_INPUT_ESCAPE);
-			configInput.rewriteInputInfo(InputType::prev, InputCategory::pad, PAD_INPUT_A);
-			configInput.rewriteInputInfo(InputType::prev, InputCategory::mouse, MOUSE_INPUT_RIGHT);
+			configInput.rewriteInputInfo(InputType::nextItem, InputCategory::keybd, KEY_INPUT_ESCAPE);
+			configInput.rewriteInputInfo(InputType::nextItem, InputCategory::pad, PAD_INPUT_A);
+			configInput.rewriteInputInfo(InputType::nextItem, InputCategory::mouse, MOUSE_INPUT_RIGHT);
 
 			static int count = 0;
 			++count;

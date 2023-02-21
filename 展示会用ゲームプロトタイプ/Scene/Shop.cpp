@@ -7,7 +7,7 @@
 
 
 
-Shop::Shop(SceneManager& manager, const InputState& input) : SceneBase(manager), inputState(input)
+Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer) : SceneBase(manager), inputState(input), player(dPlayer)
 {
 	shopTable[ProductList::kaki] = "Š`";
 	shopTable[ProductList::susi] = "ŽõŽi";
@@ -48,7 +48,18 @@ void Shop::update(const InputState& input)
 	}
 
 	if (isEditing) {
-		manager_.pushScene(new Trade(manager_, input));
+		switch (currentInputIndex) {
+		case 0:
+			amount = 300;
+			break;
+		case 1:
+			amount = 400;
+			break;
+		case 2:
+			amount = 500;
+			break;
+		}
+		manager_.pushScene(new Trade(manager_, input,player,amount,currentInputIndex));
 		isEditing = false;
 	}
 
@@ -102,26 +113,6 @@ void Shop::draw()
 		int x = shopkeeperWidth + 20 + offset + 10;
 		DrawString(x - 15, y, "E", color);
 		DrawString(x, y, name.second.c_str(), color);
-
-		/*auto type = name.first;
-		auto it = inputState.tempMapTable.find(type);
-
-		x += 64;
-		DrawString(x, y, " : ", color);
-		x += 20;
-		for (const auto elem : it->second) {
-
-			if (elem.cat == InputCategory::keybd) {
-				DrawFormatString(x, y, color, "key = %d", elem.id);
-			}
-			else if (elem.cat == InputCategory::pad) {
-				DrawFormatString(x, y, color, "pad = %d", elem.id);
-			}
-			else if (elem.cat == InputCategory::mouse) {
-				DrawFormatString(x, y, color, "mse = %d", elem.id);
-			}
-			x += 100;
-		}*/
 
 		y += 80;
 		++idx;

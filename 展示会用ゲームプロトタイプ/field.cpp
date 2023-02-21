@@ -1,5 +1,6 @@
 #include "field.h"
 #include "Pad.h"
+#include "DxLib.h"
 
 namespace {
 	constexpr float speed = 8.0f;
@@ -19,12 +20,14 @@ void Field::update()
 
 void Field::draw(Vec2 offset)
 {
+	//DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight,0xffffff, true);
+
 	for (int x = 0; x < FieldData::bgNumX; x++) {
 		for (int y = 0; y < FieldData::bgNumY; y++) {
 
 			const int chipNo = FieldData::field[y][x];
 
-			int posX = x * FieldData::chipSize + offset.x;
+			int posX = x * FieldData::chipSize + static_cast<int>(offset.x);
 			int posY = y * FieldData::chipSize;
 
 			if (chipNo == 1) {
@@ -42,6 +45,7 @@ void Field::draw(Vec2 offset)
 			else if (chipNo == 6) {
 				DrawBox(posX, posY, posX + FieldData::chipSize, posY + FieldData::chipSize, 0x6f4b2c, true);
 			}
+			//DrawFormatString(posX, posY, 0x000000, "%d", posX);
 		}
 	}
 

@@ -4,13 +4,13 @@
 
 namespace FieldData{
 
-	constexpr float chipSize = 32.0f;
+	constexpr int chipSize = 32;
 	constexpr float graphChipSize = 16.0f;
 	constexpr float backGroundGraphChipSize = 48.0f;
 
 	//É`ÉbÉvÇÃêî
 	constexpr int bgNumX = Game::kScreenWidth * 2 / chipSize;
-	constexpr int  bgNumY = Game::kScreenHeight * 2 / chipSize;
+	constexpr int  bgNumY = Game::kScreenHeight / chipSize;
 
 	constexpr int field[bgNumY][bgNumX] = {
 		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},

@@ -54,7 +54,7 @@ void BugSpace::update(Vec2 offset)
 
 	hp->setObjectHp(maxHp);
 
-	if (Pad::isTrigger(PAD_INPUT_5)) {
+	if (Pad::isTrigger(PAD_INPUT_10)) {
 		for (auto& enemy : enemy) {
 			if (!enemy->isEnable()) {
 				enemy->dispatch(spacePos);
@@ -77,6 +77,7 @@ void BugSpace::update(Vec2 offset)
 	}
 
 	if (maxHp < 1) {
+		player->consumption();
 		isEnabled = false;
 	}
 }

@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DrawFunctions.cpp" />
+    <ClCompile Include="Object\Inventory.cpp" />
     <ClCompile Include="Scene\GameClear.cpp" />
     <ClCompile Include="InputState.cpp" />
     <ClCompile Include="Scene\KeyConfigScene.cpp" />
@@ -177,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrawFunctions.h" />
+    <ClInclude Include="Object\Inventory.h" />
     <ClInclude Include="Scene\GameClear.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="Scene\KeyConfigScene.h" />

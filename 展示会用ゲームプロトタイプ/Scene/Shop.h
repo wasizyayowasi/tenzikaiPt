@@ -5,6 +5,7 @@
 
 class InputState;
 class SceneManager;
+class Player;
 
 enum class ProductList
 {
@@ -23,13 +24,15 @@ enum class Price
 class Shop : public SceneBase
 {
 public:
-	Shop(SceneManager& manager, const InputState& input);
+	Shop(SceneManager& manager, const InputState& input,Player* dPlayer);
 	~Shop();
 
 	void update(const InputState& input);
 	void draw();
 private:
 	int timer = 0;
+	int moneyPossessed;
+	int amount = 0;
 
 	int currentInputIndex;//現在選択中のインデックス
 	//入力一時テーブル
@@ -37,6 +40,8 @@ private:
 	bool isEditing = false;//現在特定の入力は編集中です。
 	bool Selecting = false;//現在特定の入力は編集中です。
 	const InputState& inputState;
+
+	Player* player;
 
 	std::map<ProductList, std::string> shopTable;
 	std::map<Price, std::string> priceTable;

@@ -45,13 +45,6 @@ void PlayerThrowinAttack::update(Vec2 offset)
 			}
 		}
 	}
-
-	//”òãÄ•¨‚ª’n–Ê‚É’…’n‚µ‚½‚Æ‚«or”òãÄ’†‚ÌŽž
-	/*if (pos.y >= 680) {
-		vec = { 0.0f,0.0f };
-		
-		pos.y = 680;
-	}*/
 	
 	if (!landingObject) {
 		x = pos.y + r + cos(45);

@@ -17,7 +17,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//画面サイズの設定
 	SetGraphMode(Game::kScreenWidth,Game::kScreenHeight, Game::kScreenDepth);
 
-
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{
 		return -1;			// エラーが起きたら直ちに終了

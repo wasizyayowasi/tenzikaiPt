@@ -8,17 +8,17 @@ InputState::InputState()
 										{InputCategory::pad,PAD_INPUT_R},
 										{InputCategory::mouse,MOUSE_INPUT_LEFT} };//スタートボタン
 	//前へ
-	defaultMapTable[InputType::prev] = { {InputCategory::keybd,KEY_INPUT_SPACE },
-										{InputCategory::pad,PAD_INPUT_B} };
+	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_SPACE },
+										{InputCategory::pad,PAD_INPUT_6} };
+	//変更
+	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_M},
+										  {InputCategory::pad,PAD_INPUT_5} };//右ショルダー
 	//ポーズ
 	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_P},
-										 {InputCategory::pad,PAD_INPUT_L} };//セレクトボタン
+										 {InputCategory::pad,PAD_INPUT_7} };//セレクトボタン
 	//キーコンフィグ
 	defaultMapTable[InputType::keyconf] = { {InputCategory::keybd,KEY_INPUT_K},
 										   {InputCategory::pad,PAD_INPUT_Y} };//左ショルダー
-	//変更
-	defaultMapTable[InputType::change] = { {InputCategory::keybd,KEY_INPUT_M},
-										  {InputCategory::pad,PAD_INPUT_Z} };//右ショルダー
 	//上
 	defaultMapTable[InputType::up] = { {InputCategory::keybd,KEY_INPUT_UP},
 									  {InputCategory::pad,PAD_INPUT_UP} };//上
@@ -31,9 +31,11 @@ InputState::InputState()
 	//右
 	defaultMapTable[InputType::right] = { {InputCategory::keybd,KEY_INPUT_RIGHT},
 									  {InputCategory::pad,PAD_INPUT_RIGHT} };//右
+
 	//弾
 	defaultMapTable[InputType::shot] = { {InputCategory::keybd,KEY_INPUT_C},
 										  {InputCategory::pad,PAD_INPUT_C} };//弾
+
 
 	inputMapTable = defaultMapTable;
 
@@ -44,10 +46,10 @@ InputState::InputState()
 
 	//入力タイプの名前のテーブルを作る
 	inputNameTable[InputType::next] = "next";
-	inputNameTable[InputType::prev] = "prev";
+	inputNameTable[InputType::nextItem] = "nextItem";
+	inputNameTable[InputType::prevItem] = "prevItem";
 	inputNameTable[InputType::pause] = "pause";
 	inputNameTable[InputType::keyconf] = "keyconf";
-	inputNameTable[InputType::change] = "change";
 	inputNameTable[InputType::shot] = "shot";
 
 

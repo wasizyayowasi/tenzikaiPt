@@ -3,7 +3,7 @@
 
 void SceneManager::changeScene(SceneBase* scene)
 {
-	if (!scenes_.empty())
+	while (!scenes_.empty())
 	{
 		delete scenes_.front();
 		scenes_.pop_front();

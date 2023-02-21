@@ -6,6 +6,8 @@
 #include "../field.h"
 #include "PlayerMotion.h"
 #include "../InputState.h"
+#include "Inventory.h"
+#include <algorithm>
 
 
 
@@ -18,6 +20,7 @@ Player::Player()
 {
 	hp = new ObjectHp;
 	motion = new PlayerMotion;
+	inventory = new Inventory;
 	flyingObject = std::make_shared<PlayerThrowinAttack>();
 	hp->setObjectMaxHp(playerHp);
 	updateFunc = &Player::updateField;
@@ -26,6 +29,9 @@ Player::Player()
 void Player::update(Vec2 offset, const InputState& input)
 {
 
+	inventory->update(input);
+	hp->setObjectHp(playerHp);
+
 	(this->*updateFunc)(offset,input);
 
 	if (playerHp < 1) {
@@ -33,7 +39,6 @@ void Player::update(Vec2 offset, const InputState& input)
 		isEnabled = false;
 		updateFunc = &Player::updateDeath;
 	}
-	//playerPos = playerPos + offset;
 }
 
 void Player::updateField(Vec2 offset, const InputState& input)
@@ -43,8 +48,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 
 	motionNum = 0;
 	motion->update(motionNum);
-
-	hp->setObjectHp(playerHp);
 
 	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
 	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 3) / FieldData::chipSize;
@@ -112,16 +115,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		}
 	}
 
-	//修復タイマー
-	if (!flyingObject->isEnable()) {
-		if (Pad::isPress(PAD_INPUT_1)) {
-			spaceHpDisplay = true;
-		}
-		else {
-			spaceHpDisplay = false;
-		}
-	}
-
 	//近接攻撃
 	if (!push) {
 		if (!flyingObject->isEnable()) {
@@ -136,33 +129,87 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		}
 	}
 
-	//投擲
-	if (!push) {
-		if (input.isTriggered(InputType::shot)) {
-			if (!flyingObject->isEnable()) {
-				flyingObject->attack(playerPos, playerDirections);
-			}
-		}
-		if (flyingObject->isEnable()) {
-			flyingObject->update(offset);
-		}
-		if (flyingObject->landing()) {
-			if (flyingObject->playerCollision(playerPos,offset)) {
-				flyingObject->deadFlyingObject();
-			}
-		}
+
+	//デバッグ用
+	{
+		/*if (input.isTriggered(InputType::prev)) {
+		repairBlock++;
 	}
+
+	if (input.isTriggered(InputType::next)) {
+		recoveryItem++;
+	}*/
+	}
+
+	switch (inventory->setCurrentInputIndex()) {
+	case 0:
+		//投擲
+		if (!push) {
+			if (input.isTriggered(InputType::shot)) {
+				if (!flyingObject->isEnable()) {
+					flyingObject->attack(playerPos, playerDirections);
+				}
+			}
+			if (flyingObject->isEnable()) {
+				flyingObject->update(offset);
+			}
+			if (flyingObject->landing()) {
+				if (flyingObject->playerCollision(playerPos, offset)) {
+					flyingObject->deadFlyingObject();
+				}
+			}
+		}
+		break;
+	case 1:
+		//修復タイマー
+		if (!flyingObject->isEnable()) {
+			if (repairBlock > 0) {
+				if (input.isPressed(InputType::shot)) {
+					spaceHpDisplay = true;
+				}
+				else {
+					spaceHpDisplay = false;
+				}
+			}
+			else {
+				spaceHpDisplay = false;
+			}
+		}
+		break;
+	case 2:
+		if (recoveryItem > 0) {
+			if (input.isTriggered(InputType::shot)) {
+				if (playerHp < 10) {
+					playerHp = (std::min)({ playerHp + 5, 10 });
+					hpDisplay = true;
+					hpDisplayTime = 120;
+					recoveryItem--;
+				}
+			}
+		}
+		break;
+	}
+	
+
+	
 
 
 	int objectChipNo = FieldData::field[underfootChipNoY - 1][underfootChipNoX];
-	//梯子
+	
+
 	if (objectChipNo == 3) {
 		if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
-			hidden = true;
+			if (input.isPressed(InputType::next)) {
+				push = true;
+			}
+			else {
+				push = false;
+			}
 		}
 	}
 	else {
 		hidden = false;
+		push = false;
 	}
 }
 
@@ -211,38 +258,40 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
 	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 2) / FieldData::chipSize;
 
-	bool noLeftEntry = false;
-	bool noRightEntry = false;
+	//使うな
+	{
+		//bool noLeftEntry = false;
+		//bool noRightEntry = false;
 
-	for (int y = -2; y < 1; y++) {
-		int chipNo9 = FieldData::field[underfootChipNoY + y][underfootChipNoX + 1];
-		if (chipNo9 == 1) {
-			noLeftEntry = true;
-		}
-	}
+		//for (int y = -2; y < 1; y++) {
+		//	int chipNo9 = FieldData::field[underfootChipNoY + y][underfootChipNoX + 1];
+		//	if (chipNo9 == 1) {
+		//		noLeftEntry = true;
+		//	}
+		//}
 
-	for (int y = -2; y < 1; y++) {
-		int chipNo10 = FieldData::field[underfootChipNoY + y][underfootChipNoX];
-		if (chipNo10 == 1) {
-			noRightEntry = true;
-		}
-	}
+		//for (int y = -2; y < 1; y++) {
+		//	int chipNo10 = FieldData::field[underfootChipNoY + y][underfootChipNoX];
+		//	if (chipNo10 == 1) {
+		//		noRightEntry = true;
+		//	}
+		//}
 
-	//移動
-	if (!noRightEntry) {
-		if (input.isPressed(InputType::left)) {
-			motion->update(motionNum);
-			playerDirections = true;
-		}
+		////移動
+		//if (!noRightEntry) {
+		//	if (input.isPressed(InputType::left)) {
+		//		motion->update(motionNum);
+		//		playerDirections = true;
+		//	}
+		//}
+		//if (!noLeftEntry) {
+		//	if (input.isPressed(InputType::right)) {
+		//		motion->update(motionNum);
+		//		playerPos.x += 5;
+		//		playerDirections = false;
+		//	}
+		//}
 	}
-	if (!noLeftEntry) {
-		if (input.isPressed(InputType::right)) {
-			motion->update(motionNum);
-			playerPos.x += 5;
-			playerDirections = false;
-		}
-	}
-
 
 	if (input.isPressed(InputType::up)) {
 
@@ -294,10 +343,29 @@ void Player::updateDeath(Vec2 offset, const InputState& input)
 	}
 }
 
-void Player::playerMotionUpdate(int num,bool directions)
+void Player::setItemControl(int num)
 {
-	playerDirections = directions;
-	motion->update(num);
+	switch (num) {
+	case 0:
+
+		break;
+	case 1:
+		repairBlock++;
+		break;
+	case 2:
+		recoveryItem++;
+		break;
+	}
+}
+
+void Player::setMoney(int amount)
+{
+	money -= amount;
+}
+
+void Player::consumption()
+{
+	repairBlock--;
 }
 
 //描画
@@ -359,6 +427,8 @@ void Player::draw(int handle, Vec2 offset)
 		DrawBox(playerPos.x + 24.0f, playerPos.y, playerPos.x + 25.0f, playerPos.y + 74, 0x00ff00, true);*/
 	}
 
+	DrawFormatString(400, 50, 0xffffff, "%d", push);
+
 	//飛び道具
 	if (flyingObject->isEnable()) {
 		flyingObject->draw();
@@ -369,6 +439,25 @@ void Player::draw(int handle, Vec2 offset)
 	}
 
 	motion->draw(playerPos, handle, playerDirections, offset);
+
+	inventory->draw();
+
+	//DrawFormatString(312, 948, 0x000000, "x%d", repairBlock);
+
+	if (!flyingObject->isEnable()) {
+		DrawString(200, 845, "マチェッエト", 0x000000);
+		DrawBox(216, 916, 248, 948, 0xff00ff, true);
+	}
+	if (repairBlock > 0) {
+		DrawString(280, 860, "修復ブロック", 0x000000);
+		DrawBox(280, 916, 312, 948, 0x6f4b2c, true);
+		DrawFormatString(312, 948, 0x000000, "x%d", repairBlock);
+	}
+	if (recoveryItem > 0) {
+		DrawString(344, 875, "回復アイテム", 0x000000);
+		DrawBox(344, 916, 376, 948, 0x0000ff, true);
+		DrawFormatString(376, 948, 0x000000, "x%d", recoveryItem);
+	}
 
 	DrawFormatString(0, 0, 0xffffff, "お金 : %d", money);
 }
@@ -394,6 +483,8 @@ bool Player::beHidden()
 
 	return push;
 }
+
+
 
 void Player::damege()
 {
@@ -532,7 +623,7 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 	if (playerPos.y + correctionSizeY + offset.y < objectTop)		return false;
 	if (playerPos.y + offset.y > objectBottom)						return false;
 
-	money += 100;
+	money += 1000;
 
 	return true;
 }
