@@ -21,6 +21,8 @@ public:
 	void coinUpdate(Vec2 offset);
 	void coinDraw(Vec2 offset);
 
+	void updateDescent(Vec2 offset);
+
 	void dispatch(const Vec2& pos);
 	void update(Vec2 offset);
 	void draw(Vec2 offset);
@@ -35,6 +37,8 @@ public:
 
 	int returnDeath() { return death; }
 private:
+	int sleepTime = 0;
+
 	bool death = false;
 
 	int coolTime = 0;
@@ -65,12 +69,10 @@ private:
 
 	Vec2 enemyPos = {800.0f,600.0f};
 	Vec2 deathPos = { 0.0f,0.0f };
-	Vec2 vec = {3.0f,1.0f};
+	Vec2 vec = {1.0f,0.0f};
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
 	Vec2 targetPlayer2 = { 0.0f,0.0f };
-
-	Vec2 territoryPos = { 0.0f,0.0f };
 
 	Player* player;
 	ObjectHp* hp;

@@ -17,8 +17,13 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 {
 	enemyHandle = LoadGraph("data/enemy.png");
 	playerHandle = LoadGraph("data/player.png");
+	portionHandle = LoadGraph("data/portion.png");
+	hacheteHandle = LoadGraph("data/machete.png");
+	guiHandle = LoadGraph("data/GUI.png");
 
 	player = new Player;
+	player->setHandle(portionHandle, hacheteHandle,guiHandle);
+
 	//‹óŠÔ‚Ìƒf[ƒ^‚ğì‚é
 	for (int i = 0; i < 3;i++) {
 		space[i] = std::make_shared<BugSpace>(i);
@@ -33,17 +38,24 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	field = std::make_shared<Field>();
 
 	init();
+	
 }
 
 GameMain::~GameMain()
 {
 	delete player;
 	DeleteGraph(enemyHandle);
+	DeleteGraph(portionHandle);
+	DeleteGraph(playerHandle);
+	DeleteGraph(guiHandle);
+	DeleteGraph(hacheteHandle);
 }
 
 
 void GameMain::init()
 {
+
+	player->init();
 
 	int i = 0;
 	
@@ -139,12 +151,12 @@ void GameMain::normalUpdate(const InputState& input)
 		for (int y = 0; y < FieldData::bgNumY; y++) {
 			const int chipNo = FieldData::field[y][x];
 			if (chipNo == 6) {
-				if (player->shopCollision(x, y, offset)) {
+				//if (player->shopCollision(x, y, offset)) {
 					if (input.isTriggered(InputType::next))
 					{
-						manager_.pushScene(new Shop(manager_,input,player));
+						manager_.pushScene(new Shop(manager_,input,player, hacheteHandle,portionHandle,guiHandle));
 					}
-				}
+				//}
 			}
 		}
 	}

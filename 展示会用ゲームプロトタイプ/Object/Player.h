@@ -13,15 +13,16 @@ class Player
 {
 public:
 	Player();
-	virtual~Player() { delete hp,delete motion,delete inventory; }
+	virtual~Player();
 
 	Vec2 getPos()const { return playerPos; }
 
+	void init();
 	void update(Vec2 offset,const InputState& input);
 	void draw(int handle,Vec2 offset);
 
 
-	void damege();
+	void damege(bool inversion);
 
 	int enemyAttack(Vec2 enemyPos, Vec2 offset);
 
@@ -55,10 +56,16 @@ public:
 	void setMoney(int amount);
 
 	void consumption();
+
+	void setHandle(int pHandle, int mHandle,int gHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle; }
 private:
 	int money = 2000;
-	int repairBlock = 0;
-	int recoveryItem = 0;
+	int repairBlock = 1;
+	int recoveryItem = 1;
+
+	int macheteHandle = -1;
+	int portionHandle = -1;
+	int guiHandle = -1;
 
 	int imgX = 0;
 

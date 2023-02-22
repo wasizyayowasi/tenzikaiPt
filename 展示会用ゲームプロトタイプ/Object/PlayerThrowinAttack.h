@@ -14,7 +14,7 @@ public:
 	void init();
 
 	void update(Vec2 offset);
-	void draw();
+	void draw(int handle);
 
 	bool playerCollision(const Vec2& pos,Vec2 offset);
 	bool enemyCollision(const Vec2& pos, Vec2 offset);
@@ -23,7 +23,7 @@ public:
 
 	bool landing() { return landingObject; }
 
-	bool filedCollision(int y);
+	bool filedCollision(int x,int y);
 private:
 	int time = 50;
 	bool playerDirections = false;

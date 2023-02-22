@@ -36,6 +36,9 @@ private:
 	int handle = -1;
 	int time = 0;
 
+	int enemySpawnTime = 0;
+	int enemySpawnInterval = 600;
+
 	int maxHp = 10;
 
 	int num = 0;

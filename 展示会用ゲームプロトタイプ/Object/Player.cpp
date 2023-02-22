@@ -20,25 +20,41 @@ Player::Player()
 {
 	hp = new ObjectHp;
 	motion = new PlayerMotion;
-	inventory = new Inventory;
+	inventory = new Inventory();
 	flyingObject = std::make_shared<PlayerThrowinAttack>();
 	hp->setObjectMaxHp(playerHp);
 	updateFunc = &Player::updateField;
+	
+}
+
+Player::~Player()
+{
+	delete hp;
+	delete motion;
+	delete inventory;
+
+	DeleteGraph(macheteHandle);
+	
+}
+
+void Player::init()
+{
+	inventory->setHandle(portionHandle, macheteHandle,guiHandle);
 }
 
 void Player::update(Vec2 offset, const InputState& input)
 {
-
+	
 	inventory->update(input);
 	hp->setObjectHp(playerHp);
 
 	(this->*updateFunc)(offset,input);
 
-	if (playerHp < 1) {
+	/*if (playerHp < 1) {
 		motionNum = 4;
 		isEnabled = false;
 		updateFunc = &Player::updateDeath;
-	}
+	}*/
 }
 
 void Player::updateField(Vec2 offset, const InputState& input)
@@ -104,14 +120,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 				playerPos.x += 5;
 				playerDirections = false;
 			}
-		}
-	}
-
-	//HPの表示
-	if (hpDisplay) {
-		if (--hpDisplayTime < 0) {
-			hpDisplay = false;
-			hpDisplayTime = 120;
 		}
 	}
 
@@ -181,8 +189,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 			if (input.isTriggered(InputType::shot)) {
 				if (playerHp < 10) {
 					playerHp = (std::min)({ playerHp + 5, 10 });
-					hpDisplay = true;
-					hpDisplayTime = 120;
 					recoveryItem--;
 				}
 			}
@@ -190,10 +196,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		break;
 	}
 	
-
-	
-
-
 	int objectChipNo = FieldData::field[underfootChipNoY - 1][underfootChipNoX];
 	
 
@@ -431,33 +433,17 @@ void Player::draw(int handle, Vec2 offset)
 
 	//飛び道具
 	if (flyingObject->isEnable()) {
-		flyingObject->draw();
+		flyingObject->draw(macheteHandle);
 	}
 
-	if (hpDisplay) {
-		hp->draw(playerPos,offset);
-	}
+	
+	hp->playerHpDraw();
+	
 
 	motion->draw(playerPos, handle, playerDirections, offset);
 
+	inventory->setNum(repairBlock, recoveryItem);
 	inventory->draw();
-
-	//DrawFormatString(312, 948, 0x000000, "x%d", repairBlock);
-
-	if (!flyingObject->isEnable()) {
-		DrawString(200, 845, "マチェッエト", 0x000000);
-		DrawBox(216, 916, 248, 948, 0xff00ff, true);
-	}
-	if (repairBlock > 0) {
-		DrawString(280, 860, "修復ブロック", 0x000000);
-		DrawBox(280, 916, 312, 948, 0x6f4b2c, true);
-		DrawFormatString(312, 948, 0x000000, "x%d", repairBlock);
-	}
-	if (recoveryItem > 0) {
-		DrawString(344, 875, "回復アイテム", 0x000000);
-		DrawBox(344, 916, 376, 948, 0x0000ff, true);
-		DrawFormatString(376, 948, 0x000000, "x%d", recoveryItem);
-	}
 
 	DrawFormatString(0, 0, 0xffffff, "お金 : %d", money);
 }
@@ -486,21 +472,25 @@ bool Player::beHidden()
 
 
 
-void Player::damege()
+void Player::damege(bool inversion)
 {
-	hpDisplay = true;
+	if (!inversion) {
+		playerPos.x += 50.0f;
+	}
+	else {
+		playerPos.x -= 50.0f;
+	}
+
+	if (motionNum != 3) {
+		motionNum = 5;
+	}
 	
-	motionNum = 5;
 	for (int time = 0; time < 120; time++) {
 		motion->update(motionNum);
 	}
 
-	if (--time < 0) {
-		if (playerHp > 0) {
-			playerHp--;
-			time = 20;
-			hpDisplayTime = 120;
-		}
+	if (playerHp > 0) {
+		playerHp--;
 	}
 }
 

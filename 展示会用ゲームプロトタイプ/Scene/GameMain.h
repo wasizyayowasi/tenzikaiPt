@@ -26,6 +26,9 @@ private:
 
 	int enemyHandle = -1;
 	int playerHandle = -1;
+	int portionHandle = -1;
+	int hacheteHandle = -1;
+	int guiHandle = -1;
 
 	int scrollX = 0;
 

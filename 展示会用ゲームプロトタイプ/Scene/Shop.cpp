@@ -7,15 +7,15 @@
 
 
 
-Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer) : SceneBase(manager), inputState(input), player(dPlayer)
+Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int mHandle, int pHandle, int gHandle) : SceneBase(manager), inputState(input), player(dPlayer),hacheteHandle(mHandle),portionHandle(pHandle),guiHandle(gHandle)
 {
 	shopTable[ProductList::kaki] = "柿";
-	shopTable[ProductList::susi] = "寿司";
-	shopTable[ProductList::niku] = "肉";
+	shopTable[ProductList::susi] = "修復ブロック";
+	shopTable[ProductList::niku] = "回復アイテム";
 
 	priceTable[Price::kaki] = "300円";
-	priceTable[Price::susi] = "400円";
-	priceTable[Price::niku] = "500円";
+	priceTable[Price::susi] = "500円";
+	priceTable[Price::niku] = "1500円";
 }
 
 Shop::~Shop()
@@ -43,7 +43,7 @@ void Shop::update(const InputState& input)
 
 	if (input.isTriggered(InputType::next)) {
 		isEditing = !isEditing;
-		Selecting = true;
+		selecting = true;
 		return;
 	}
 
@@ -53,10 +53,10 @@ void Shop::update(const InputState& input)
 			amount = 300;
 			break;
 		case 1:
-			amount = 400;
+			amount = 500;
 			break;
 		case 2:
-			amount = 500;
+			amount = 1500;
 			break;
 		}
 		manager_.pushScene(new Trade(manager_, input,player,amount,currentInputIndex));
@@ -86,11 +86,14 @@ void Shop::draw()
 	//ポーズウィンドウセロファン(黒い)
 	//店主セリフ部分
 	DrawBox(shopkeeperWidth, shopkeeperHeight, shopkeeperX, shopkeeperY, 0x000000, true);
-	DrawBox(goodsWidth, goodsHeight, goodsX, goodsY, 0x000000, true);
+	//商品
+	DrawBox(goodsWidth, goodsHeight, goodsX + 50, goodsY, 0x000000, true);
+	//商品紹介ウィンドウ
 	DrawBox(goodsWidth + 300, goodsHeight, shopkeeperX, goodsY, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
 
 
+	//商品の描画
 	auto y = 520;
 	int idx = 0;
 	bool isInputtypeSelected = false;
@@ -102,11 +105,25 @@ void Shop::draw()
 		if (currentInputIndex == idx) {
 			offset = 10;
 			isInputtypeSelected = true;
-			if (Selecting) {
+			if (selecting) {
 				color = 0xffff00;
 			}
 			DrawString(shopkeeperWidth + 10, y, "⇒", 0xff0000);
 			DrawString(shopkeeperWidth + 20 + offset + 320, shopkeeperWidth, name.second.c_str(), 0xffffff);
+			DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 0.0f, guiHandle, true, false);
+			switch (currentInputIndex) {
+			case 0:
+				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 5.6f, hacheteHandle, true, false);
+				break;
+			case 1:
+				//DrawRotaGraph(234, 931, 2.0f, 5.6f, hacheteHandle, true, false);
+				break;
+			case 2:
+				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 0.0f, portionHandle, true, false);
+				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 80, "自身の体力を5回復することができる。", 0xffffff);
+				break;
+			}
+			
 		}
 
 		//各キーの表示
@@ -119,6 +136,7 @@ void Shop::draw()
 	}
 
 
+	//値段の描画
 	y = 520;
 	idx = 0;
 	for (const auto& price : priceTable) {
@@ -132,7 +150,7 @@ void Shop::draw()
 
 		//各キーの表示
 		int x = shopkeeperWidth + 20;
-		DrawString(x + 100, y, price.second.c_str(), color);
+		DrawString(x + 150, y, price.second.c_str(), color);
 
 		y += 80;
 		++idx;
@@ -146,10 +164,10 @@ void Shop::draw()
 		if (currentInputIndex == shopTable.size() + 1) {
 			yOffset = 20;
 		}
-		DrawString(shopkeeperWidth + 100, y - 20, "⇒", 0xff0000);
+		DrawString(shopkeeperWidth + 150, y - 20, "⇒", 0xff0000);
 	}
 
-	DrawString(shopkeeperWidth + 130, y - 20, "退店 ", 0xffffff);
+	DrawString(shopkeeperWidth + 180, y - 20, "退店 ", 0xffffff);
 
 	DrawString(shopkeeperWidth + 10, shopkeeperHeight + 10, "店長", 0xffffff);
 	DrawString(shopkeeperWidth + 200, shopkeeperHeight + 80, "おめぇ何かにくれてやるものなんか何一つね～んだよ。あっち行け。シッシッ", 0xffffff);
@@ -166,6 +184,6 @@ void Shop::draw()
 
 	//ポーズウィンドウ枠線
 	DrawBox(shopkeeperWidth, shopkeeperHeight, shopkeeperX, shopkeeperY, 0xffffff, false);
-	DrawBox(goodsWidth, goodsHeight, goodsX, goodsY, 0xffffff, false);
+	DrawBox(goodsWidth, goodsHeight, goodsX + 50, goodsY, 0xffffff, false);
 	DrawBox(goodsWidth + 300, goodsHeight, shopkeeperX, goodsY, 0xffffff, false);
 }

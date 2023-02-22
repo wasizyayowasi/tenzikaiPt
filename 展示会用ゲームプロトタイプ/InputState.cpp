@@ -8,7 +8,7 @@ InputState::InputState()
 										{InputCategory::pad,PAD_INPUT_R},
 										{InputCategory::mouse,MOUSE_INPUT_LEFT} };//スタートボタン
 	//前へ
-	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_SPACE },
+	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_C },
 										{InputCategory::pad,PAD_INPUT_6} };
 	//変更
 	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_M},

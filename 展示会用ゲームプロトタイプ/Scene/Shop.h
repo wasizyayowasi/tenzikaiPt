@@ -24,7 +24,7 @@ enum class Price
 class Shop : public SceneBase
 {
 public:
-	Shop(SceneManager& manager, const InputState& input,Player* dPlayer);
+	Shop(SceneManager& manager, const InputState& input,Player* dPlayer,int mHandle,int pHandle,int gHandle);
 	~Shop();
 
 	void update(const InputState& input);
@@ -34,11 +34,15 @@ private:
 	int moneyPossessed;
 	int amount = 0;
 
+	int hacheteHandle = -1;
+	int portionHandle = -1;
+	int guiHandle = -1;
+
 	int currentInputIndex;//現在選択中のインデックス
 	//入力一時テーブル
 
 	bool isEditing = false;//現在特定の入力は編集中です。
-	bool Selecting = false;//現在特定の入力は編集中です。
+	bool selecting = false;//現在特定の入力は編集中です。
 	const InputState& inputState;
 
 	Player* player;

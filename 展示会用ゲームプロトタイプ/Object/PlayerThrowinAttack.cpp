@@ -32,14 +32,24 @@ void PlayerThrowinAttack::init()
 void PlayerThrowinAttack::update(Vec2 offset)
 {
 	flyingObjectPos = pos + offset;
-
+	if (!landingObject) {
+		angle += 0.3f;
+	}
+	else {
+		if (!playerDirections){
+			angle = 0.8f;
+		}
+		else {
+			angle = 5.4f;
+		}
+	}
 	for (int x = 0; x < FieldData::bgNumX; x++) {
 		for (int y = 0; y < FieldData::bgNumY; y++) {
 
 			const int chipNo = FieldData::field[y][x];
 
 			if (chipNo == 1) {
-				if (filedCollision(y)) {
+				if (filedCollision(x,y)) {
 					landingObject = true;
 				}
 			}
@@ -89,10 +99,11 @@ void PlayerThrowinAttack::update(Vec2 offset)
 
 }
 
-void PlayerThrowinAttack::draw()
+void PlayerThrowinAttack::draw(int handle)
 {
-	DrawBox(flyingObjectPos.x, flyingObjectPos.y, flyingObjectPos.x + 20, flyingObjectPos.y + 20, GetColor(252, 15, 192), true);
+	//DrawBox(flyingObjectPos.x, flyingObjectPos.y, flyingObjectPos.x + 20, flyingObjectPos.y + 20, GetColor(252, 15, 192), true);
 	DrawString(flyingObjectPos.x, flyingObjectPos.y - 10, "’e", 0xffffff);
+	DrawRotaGraph(flyingObjectPos.x, flyingObjectPos.y,1.5f, angle,handle, true, playerDirections);
 }
 
 
@@ -147,16 +158,23 @@ void PlayerThrowinAttack::deadFlyingObject()
 	init();
 }
 
-bool PlayerThrowinAttack::filedCollision(int y)
+bool PlayerThrowinAttack::filedCollision(int x,int y)
 {
+	
+	float flyingObjectLeft = flyingObjectPos.x;
+	float flyingObjectRight = flyingObjectPos.x + 24;
 	float flyingObjectTop = flyingObjectPos.y;
 	float flyingObjectBottom = flyingObjectPos.y + 24;
 
-	float filedTop = y * FieldData::chipSize;
-	float filedBottom = y * FieldData::chipSize + FieldData::chipSize;
+	float fieldLeft = x * FieldData::chipSize;
+	float fieldRight = x * FieldData::chipSize + FieldData::chipSize;
+	float fieldTop = y * FieldData::chipSize;
+	float fieldBottom = y * FieldData::chipSize + FieldData::chipSize;
 
-	if (flyingObjectBottom < filedTop)return false;
-	if (flyingObjectTop > filedBottom)return false;
+	if (flyingObjectBottom < fieldTop)		return false;
+	if (flyingObjectTop > fieldBottom)		return false;
+	if (flyingObjectRight < fieldLeft)		return false;
+	if (flyingObjectLeft > fieldRight)		return false;
 
 	return true;
 }

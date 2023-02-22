@@ -5,8 +5,7 @@
 #include "ObjectHp.h"
 #include "../DrawFunctions.h"
 #include "EnemyMotion.h"
-#include "../field.h"
-
+#include "../field.h" 
 
 Enemy::Enemy()
 {
@@ -19,19 +18,19 @@ Enemy::Enemy()
 
 void Enemy::normalUpdate(Vec2 offset)
 {
-	for (int x = 0; x < FieldData::bgNumX; x++) {
-		for (int y = 0; y < FieldData::bgNumY; y++) {
+	vec.y = 0.0f;
 
-			const int chipNo = FieldData::field[y][x];
+	int underfootChipNoX = (enemyPos.x + 20) / FieldData::chipSize;
+	int underfootChipNoY = (enemyPos.y + FieldData::chipSize) / FieldData::chipSize;
 
-			if (chipNo == 1) {
-				if (filedCollision(x, y)) {
-					landing = true;
-					vec.y = 0.0f;
-				}
-			}
+	const int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
+
+	if (chipNo == 0) {
+		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
+			updateFunc = &Enemy::updateDescent;
 		}
 	}
+	
 
 	//åªèÛÇÃHPÇê›íËÇ∑ÇÈ
 	hp->setObjectHp(enemyHp);
@@ -51,7 +50,6 @@ void Enemy::normalUpdate(Vec2 offset)
 	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
 	targetPlayer.y = player->getPos().y + 44 - enemyPos.y;
 
-
 	//åüímîÕàÕì‡ÇæÇ¡ÇΩèÍçá
 	if (motionNum != 3) {
 		if (!hidden) {
@@ -67,6 +65,11 @@ void Enemy::normalUpdate(Vec2 offset)
 					stop = true;
 
 					motionNum = 1;
+
+					if (--sleepTime < 0) {
+						enemyPos += targetPlayer2;
+					}
+
 					//âÊëúÇÃå¸Ç´
 					if (targetPlayer.x > 0) {
 						inversion = false;
@@ -74,13 +77,6 @@ void Enemy::normalUpdate(Vec2 offset)
 					else {
 						inversion = true;
 
-					}
-
-					if (targetPlayer.length() < 50) {
-						motionNum = 2;
-					}
-					else {
-						enemyPos += targetPlayer2;
 					}
 				}
 				else {
@@ -134,18 +130,16 @@ void Enemy::normalUpdate(Vec2 offset)
 					moveCount--;
 				}
 			}
-			else {
-				//ç~â∫
-				enemyPos.y += vec.y * 4;
-			}
 		}
 	}
 
-
-
-	//çUåÇ
-	if (motionNum == 2) {
-		player->damege();
+	if (targetPlayer.length() < 50) {
+		motionNum = 2;
+		//çUåÇ
+		if (--sleepTime < 0) {
+			player->damege(inversion);
+			sleepTime = 60;
+		}
 	}
 
 	//ìäù±Ç™ìñÇΩÇ¡ÇΩèÍçáÇÃèàóù
@@ -189,16 +183,28 @@ void Enemy::normalDraw(Vec2 offset)
 {
 	Vec2 pos = enemyPos + offset;
 
+	{
+		/*int underfootChipNoX = (enemyPos.x + 20) / FieldData::chipSize;
+		int underfootChipNoY = (enemyPos.y + 32) / FieldData::chipSize;
+
+		int color = 0x44ff44;
+
+		if (updateFunc == &Enemy::updateDescent) {
+			color = 0x4444ff;
+		}
+		DrawBox(underfootChipNoX * 32, underfootChipNoY * 32, underfootChipNoX * 32 + 32, underfootChipNoY * 32 + 32, color, true);*/
+
+	}
+	
 	DrawCircle(pos.x, pos.y, 300, 0xff0000, false);
 	DrawString(pos.x, pos.y - 15, "ìG", 0xffffff);
-
-	DrawFormatString(0, 15, 0xffffff, "%d", motionNum);
 
 	motion->draw(enemyPos, handle, inversion, offset);
 
 	if (hpDisplay) {
 		hp->draw(enemyPos, offset);
 	}
+
 }
 
 void Enemy::coinUpdate(Vec2 offset)
@@ -213,6 +219,24 @@ void Enemy::coinDraw(Vec2 offset)
 	DrawBox(enemyPos.x + offset.x, enemyPos.y + offset.y, enemyPos.x + 30 + offset.x, enemyPos.y + 30 + offset.y, 0xffffff, true);
 }
 
+void Enemy::updateDescent(Vec2 offset)
+{
+	vec.y = 1.0f;
+	enemyPos.y += vec.y * 4;
+
+	int underfootChipNoX = (enemyPos.x + 20) / FieldData::chipSize;
+	int underfootChipNoY = (enemyPos.y + FieldData::chipSize) / FieldData::chipSize;
+
+	const int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
+
+	if (chipNo == 1) {
+		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
+			landing = true;
+			updateFunc = &Enemy::normalUpdate;
+		}
+	}
+}
+
 void Enemy::dispatch(const Vec2& pos)
 {
 	isEnabled = true;
@@ -224,7 +248,7 @@ void Enemy::dispatch(const Vec2& pos)
 	hpDisplayTime = 120;
 	motionNum = 0;
 	motion->init();
-	vec = { 3.0f,1.0f };
+	vec = { 3.0f,0.0f };
 	updateFunc = &Enemy::normalUpdate;
 	drawFunc = &Enemy::normalDraw;
 }

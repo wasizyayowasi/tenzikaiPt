@@ -54,14 +54,19 @@ void BugSpace::update(Vec2 offset)
 
 	hp->setObjectHp(maxHp);
 
-	if (Pad::isTrigger(PAD_INPUT_10)) {
+	
+	if (--enemySpawnTime < 0) {
 		for (auto& enemy : enemy) {
 			if (!enemy->isEnable()) {
 				enemy->dispatch(spacePos);
+				enemySpawnTime = enemySpawnInterval;
+				enemySpawnInterval -= 10;
 				break;
 			}
 		}
 	}
+	
+	
 
 	//デバッグ用
 	for (auto& enemy : enemy) {

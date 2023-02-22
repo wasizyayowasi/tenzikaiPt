@@ -24,12 +24,12 @@ void PlayerMotion::update(int num)
 	case 0:
 		func = &PlayerMotion::idle;
 		imgY = 0;
-		maxImgX = 7;
+		maxImgX = 8;
 		break;
 	case 1:
 		func = &PlayerMotion::walk;
 		imgY = 1;
-		maxImgX = 7;
+		maxImgX = 8;
 		break;
 	case 2:
 		func = &PlayerMotion::ascend;
@@ -62,13 +62,13 @@ void PlayerMotion::update(int num)
 //‘Ò‹@
 void PlayerMotion::idle()
 {
-	frameSpeed = 5;
+	frameSpeed = 8;
 }
 
 //•à‚­
 void PlayerMotion::walk()
 {
-	frameSpeed = 10;
+	frameSpeed = 8;
 }
 
 //“o‚é
@@ -110,10 +110,11 @@ void PlayerMotion::death()
 void PlayerMotion::draw(Vec2 playerPos, int handle, bool trun, Vec2 offset)
 {
 	Vec2 pos = playerPos + offset;
-	newImgX = (imgX / frameSpeed);
-	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, newImgX * assetSizeX, imgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
-//	DrawFormatString(0, 0, 0xffffff, "newImgX : %d", newImgX);
-//	DrawFormatString(0, 15, 0xffffff, "imgX : %d", imgX);
+	newImgX = (imgX / frameSpeed) * assetSizeX;
+	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, newImgX, imgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
+
+	//DrawFormatString(0, y, 0x44ff44, "%d", imgX);
+
 }
 
 
