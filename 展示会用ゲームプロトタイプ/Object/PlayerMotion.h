@@ -20,6 +20,8 @@ public:
 	void draw(Vec2 playerPos,int handle,bool trun,Vec2 offset);
 
 	int setDead() { return isEnabled; }
+
+	int returnMotionNum() { return imgX; }
 private:
 	int newImgX = 0;
 

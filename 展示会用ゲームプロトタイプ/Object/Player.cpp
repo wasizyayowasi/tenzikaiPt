@@ -14,6 +14,7 @@
 namespace {
 	constexpr float correctionSizeX = 14.0f;
 	constexpr float correctionSizeY = 74.0f;
+	constexpr int ultimate_frames = 120;
 }
 
 Player::Player()
@@ -48,29 +49,38 @@ void Player::update(Vec2 offset, const InputState& input)
 	inventory->update(input);
 	hp->setObjectHp(playerHp);
 
+	ultimateTimer_ = (std::max)(ultimateTimer_ - 1, 0);
+
 	(this->*updateFunc)(offset,input);
 
-	/*if (playerHp < 1) {
+	if (playerPos.x < 0) {
+		playerPos.x = 0;
+	}
+	if (playerPos.x + 50 > Game::kScreenWidth*2) {
+		playerPos.x = Game::kScreenWidth * 2 - 50;
+	}
+
+	if (playerHp < 1) {
 		motionNum = 4;
 		isEnabled = false;
 		updateFunc = &Player::updateDeath;
-	}*/
+	}
 }
 
 void Player::updateField(Vec2 offset, const InputState& input)
 {
-
-	collision = false;
-
+	//モーション関係
 	motionNum = 0;
 	motion->update(motionNum);
 
+	//足元の配列番号を見る
 	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
 	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 3) / FieldData::chipSize;
 
-
+	//配列の中身を見る
 	int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
-	//梯子
+
+	//梯子を降りる
 	if (chipNo == 2) {
 		if (input.isPressed(InputType::down)) {
 			playerPos.y += 3.0f;
@@ -80,14 +90,12 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		}
 	}
 
+	//梯子を上る
 	for (int x = -1; x < 1; x++) {
 		int chipNo = FieldData::field[underfootChipNoY - 1][underfootChipNoX - x];
 		if (chipNo == 2) {
 			if (input.isPressed(InputType::up)) {
-				if (!collision) {
-					collision = ladderCollision(underfootChipNoX - x, underfootChipNoY - 1);
-				}
-				if (collision) {
+				if (ladderCollision(underfootChipNoX - x, underfootChipNoY - 1)) {
 					updateFunc = &Player::updateLadder;
 					return;
 				}
@@ -102,26 +110,25 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	}
 
 	//移動
-	if (move) {
-		if (!push) {
-			if (input.isPressed(InputType::left)) {
-				if (!(motionNum == 3)) {
-					motionNum = 1;
-				}
-				motion->update(motionNum);
-				playerPos.x -= 5;
-				playerDirections = true;
+	if (!push) {
+		if (input.isPressed(InputType::left)) {
+			if (!(motionNum == 3)) {
+				motionNum = 1;
 			}
-			else if (input.isPressed(InputType::right)) {
-				if (!(motionNum == 3)) {
-					motionNum = 1;
-				}
-				motion->update(motionNum);
-				playerPos.x += 5;
-				playerDirections = false;
+			motion->update(motionNum);
+			playerPos.x -= 5;
+			playerDirections = true;
+		}
+		else if (input.isPressed(InputType::right)) {
+			if (!(motionNum == 3)) {
+				motionNum = 1;
 			}
+			motion->update(motionNum);
+			playerPos.x += 5;
+			playerDirections = false;
 		}
 	}
+	
 
 	//近接攻撃
 	if (!push) {
@@ -149,6 +156,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	}*/
 	}
 
+	//アイテムの切り替え
 	switch (inventory->setCurrentInputIndex()) {
 	case 0:
 		//投擲
@@ -196,9 +204,8 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		break;
 	}
 	
+	//隠れる処理
 	int objectChipNo = FieldData::field[underfootChipNoY - 1][underfootChipNoX];
-	
-
 	if (objectChipNo == 3) {
 		if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
 			if (input.isPressed(InputType::next)) {
@@ -217,12 +224,14 @@ void Player::updateField(Vec2 offset, const InputState& input)
 
 void Player::updateDescent(Vec2 offset, const InputState& input)
 {
-
+	//足元の配列番号を見る
 	int underfootChipNoX = (playerPos.x + FieldData::chipSize) / FieldData::chipSize;
 	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 3) / FieldData::chipSize;
 
+	//降下
 	playerPos += vec;
 
+	//地面との判定
 	for (int x = 0; x < FieldData::bgNumX; x++) {
 		for (int y = 0; y < FieldData::bgNumY; y++) {
 
@@ -241,6 +250,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 		}
 	}
 
+	//梯子との判定
 	for (int x = -1; x < 1; x++) {
 
 		const int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX + x];
@@ -257,44 +267,11 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 
 void Player::updateLadder(Vec2 offset, const InputState& input)
 {
+	//足元の配列番号を見る
 	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
 	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 2) / FieldData::chipSize;
 
-	//使うな
-	{
-		//bool noLeftEntry = false;
-		//bool noRightEntry = false;
-
-		//for (int y = -2; y < 1; y++) {
-		//	int chipNo9 = FieldData::field[underfootChipNoY + y][underfootChipNoX + 1];
-		//	if (chipNo9 == 1) {
-		//		noLeftEntry = true;
-		//	}
-		//}
-
-		//for (int y = -2; y < 1; y++) {
-		//	int chipNo10 = FieldData::field[underfootChipNoY + y][underfootChipNoX];
-		//	if (chipNo10 == 1) {
-		//		noRightEntry = true;
-		//	}
-		//}
-
-		////移動
-		//if (!noRightEntry) {
-		//	if (input.isPressed(InputType::left)) {
-		//		motion->update(motionNum);
-		//		playerDirections = true;
-		//	}
-		//}
-		//if (!noLeftEntry) {
-		//	if (input.isPressed(InputType::right)) {
-		//		motion->update(motionNum);
-		//		playerPos.x += 5;
-		//		playerDirections = false;
-		//	}
-		//}
-	}
-
+	//登りきった後
 	if (input.isPressed(InputType::up)) {
 
 		motionNum = 2;
@@ -311,6 +288,8 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 			}
 		}
 	}
+
+	//下ったとき
 	if (input.isPressed(InputType::down)) {
 		motionNum = 2;
 		playerPos.y += 5;
@@ -429,8 +408,6 @@ void Player::draw(int handle, Vec2 offset)
 		DrawBox(playerPos.x + 24.0f, playerPos.y, playerPos.x + 25.0f, playerPos.y + 74, 0x00ff00, true);*/
 	}
 
-	DrawFormatString(400, 50, 0xffffff, "%d", push);
-
 	//飛び道具
 	if (flyingObject->isEnable()) {
 		flyingObject->draw(macheteHandle);
@@ -439,13 +416,19 @@ void Player::draw(int handle, Vec2 offset)
 	
 	hp->playerHpDraw();
 	
-
-	motion->draw(playerPos, handle, playerDirections, offset);
-
-	inventory->setNum(repairBlock, recoveryItem);
+	inventory->setNum(repairBlock, recoveryItem, flyingObject->isEnable());
 	inventory->draw();
 
 	DrawFormatString(0, 0, 0xffffff, "お金 : %d", money);
+
+	if (ultimateTimer_ > 0) {
+		if ((ultimateTimer_ / 10) % 2 == 0) {
+			return;
+		}
+	}
+
+	motion->draw(playerPos, handle, playerDirections, offset);
+
 }
 
 
@@ -474,24 +457,20 @@ bool Player::beHidden()
 
 void Player::damege(bool inversion)
 {
-	if (!inversion) {
-		playerPos.x += 50.0f;
-	}
-	else {
-		playerPos.x -= 50.0f;
+	if (ultimateTimer_ <= 0) {
+		if (!inversion) {
+			playerPos.x += 30.0f;
+		}
+		else {
+			playerPos.x -= 30.0f;
+		}
+
+		if (playerHp > 0) {
+			playerHp--;
+		}
+		ultimateTimer_ = ultimate_frames;
 	}
 
-	if (motionNum != 3) {
-		motionNum = 5;
-	}
-	
-	for (int time = 0; time < 120; time++) {
-		motion->update(motionNum);
-	}
-
-	if (playerHp > 0) {
-		playerHp--;
-	}
 }
 
 int Player::enemyAttack(Vec2 enemyPos, Vec2 offset)

@@ -22,7 +22,7 @@ public:
 
 	void setHandle(int pHandle, int mHandle,int gHandle) { portionHandle = pHandle, hacheteHandle = mHandle,guiHandle = gHandle; }
 
-	void setNum(int repairNum, int recoveryNum) { repairBlock = repairNum, recoveryItem = recoveryNum; }
+	void setNum(int repairNum, int recoveryNum,bool isEnabled) { repairBlock = repairNum, recoveryItem = recoveryNum,hachete = isEnabled; }
 
 	int setCurrentInputIndex() { return currentInputIndex; }
 private:
@@ -30,6 +30,7 @@ private:
 	int hacheteHandle = -1;
 	int portionHandle = -1;
 
+	bool hachete = false;
 	int repairBlock = 1;
 	int recoveryItem = 1;
 

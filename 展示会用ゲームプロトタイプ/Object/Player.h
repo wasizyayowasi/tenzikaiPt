@@ -49,7 +49,6 @@ public:
 
 	int setMoneyPossessed() { return money; }
 
-	void  playerMove(bool temporaryMove) { move = temporaryMove; }
 	int nextScene() { return gameoverScene; }
 
 	void setItemControl(int num);
@@ -59,46 +58,49 @@ public:
 
 	void setHandle(int pHandle, int mHandle,int gHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle; }
 private:
+	//所持アイテム
 	int money = 2000;
 	int repairBlock = 1;
 	int recoveryItem = 1;
 
+	//グラフィックハンドル
 	int macheteHandle = -1;
 	int portionHandle = -1;
 	int guiHandle = -1;
 
-	int imgX = 0;
+	//無敵時間
+	int ultimateTimer_ = 0;
 
-	bool collision = false;
-
+	//次へのシーン切り替え
 	bool gameoverScene = false;
 
+	//プレイヤーが向いている方向
 	bool playerDirections = false;
+
+	//モーションの番号
 	int motionNum = 0;
 
+	//HP関連
 	int playerHp = 10;
 	int hpDisplayTime = 120;
 
-	bool move = true;
-
+	//生死
 	bool isEnabled = true;
 
-	//hp表示
-	bool hpDisplay = false;
 	//hp表示の時間
 	bool spaceHpDisplay = false;
+
 	//オブジェクトに隠れているか
 	bool hidden = false;
 
-	bool hit = false;
 	//隠れるボタンを押したか
 	bool push = false;
+
 	//敵に当たっているか
 	bool enemyHit = false;
+
 	//近接攻撃
 	bool proximityAttack = false;
-
-	int time = 0;
 
 	int chipNo3 = 0;
 

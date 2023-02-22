@@ -73,9 +73,15 @@ void Inventory::draw()
 		break;
 	}
 
-	DrawRotaGraph(InventoryX + 32, InventoryY + 32 + mPosY, 1.3f, 5.6f, hacheteHandle, true, false);
-	DrawRotaGraph(InventoryX + 160, InventoryY + 32 + pPosY, 2.0f, 0.0f, portionHandle, true, false);
-	DrawFormatString(Game::kScreenWidth / 2 + 8, 993 + bPosY, 0x000000, "x%d", repairBlock);
-	DrawFormatString(Game::kScreenWidth / 2 + 74, 993 + pPosY, 0x000000, "x%d", recoveryItem);
+	if(!hachete){
+		DrawRotaGraph(InventoryX + 32, InventoryY + 32 + mPosY, 1.3f, 5.6f, hacheteHandle, true, false);
+	}
+	if (repairBlock > 0) {
+		DrawFormatString(Game::kScreenWidth / 2 + 8, 993 + bPosY, 0x000000, "x%d", repairBlock);
+	}
+	if (recoveryItem > 0) {
+		DrawRotaGraph(InventoryX + 160, InventoryY + 32 + pPosY, 2.0f, 0.0f, portionHandle, true, false);
+		DrawFormatString(Game::kScreenWidth / 2 + 74, 993 + pPosY, 0x000000, "x%d", recoveryItem);
+	}
 	
 }

@@ -133,12 +133,14 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
-	if (targetPlayer.length() < 50) {
-		motionNum = 2;
-		//UŒ‚
-		if (--sleepTime < 0) {
-			player->damege(inversion);
-			sleepTime = 60;
+	if (enemyHp > 0) {
+		if (targetPlayer.length() < 50) {
+			motionNum = 2;
+			//UŒ‚
+			if (--sleepTime < 0) {
+				player->damege(inversion);
+				sleepTime = 60;
+			}
 		}
 	}
 
