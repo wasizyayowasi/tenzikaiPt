@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Scene\BossBattleScene.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
     <ClCompile Include="Object\Inventory.cpp" />
     <ClCompile Include="Scene\GameClear.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scene\BossBattleScene.h" />
     <ClInclude Include="DrawFunctions.h" />
     <ClInclude Include="Object\Inventory.h" />
     <ClInclude Include="Scene\GameClear.h" />

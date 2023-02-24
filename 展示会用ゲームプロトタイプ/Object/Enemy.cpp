@@ -20,10 +20,10 @@ void Enemy::normalUpdate(Vec2 offset)
 {
 	vec.y = 0.0f;
 
-	int underfootChipNoX = (enemyPos.x + 20) / FieldData::chipSize;
-	int underfootChipNoY = (enemyPos.y + FieldData::chipSize) / FieldData::chipSize;
+	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
 
-	const int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
+	const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
 	if (chipNo == 0) {
 		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
@@ -133,13 +133,15 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
-	if (enemyHp > 0) {
-		if (targetPlayer.length() < 50) {
-			motionNum = 2;
-			//UŒ‚
-			if (--sleepTime < 0) {
-				player->damege(inversion);
-				sleepTime = 60;
+	if (!player->beHidden()) {
+		if (enemyHp > 0) {
+			if (targetPlayer.length() < 50) {
+				motionNum = 2;
+				//UŒ‚
+				if (--sleepTime < 0) {
+					player->damege(inversion);
+					sleepTime = 60;
+				}
 			}
 		}
 	}
@@ -186,8 +188,8 @@ void Enemy::normalDraw(Vec2 offset)
 	Vec2 pos = enemyPos + offset;
 
 	{
-		/*int underfootChipNoX = (enemyPos.x + 20) / FieldData::chipSize;
-		int underfootChipNoY = (enemyPos.y + 32) / FieldData::chipSize;
+		/*int underfootChipNoX = (enemyPos.x + 20) / chipSize;
+		int underfootChipNoY = (enemyPos.y + 32) / chipSize;
 
 		int color = 0x44ff44;
 
@@ -226,12 +228,12 @@ void Enemy::updateDescent(Vec2 offset)
 	vec.y = 1.0f;
 	enemyPos.y += vec.y * 4;
 
-	int underfootChipNoX = (enemyPos.x + 20) / FieldData::chipSize;
-	int underfootChipNoY = (enemyPos.y + FieldData::chipSize) / FieldData::chipSize;
+	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
 
-	const int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
+	const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
-	if (chipNo == 1) {
+	if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
 			landing = true;
 			updateFunc = &Enemy::normalUpdate;
@@ -273,10 +275,10 @@ bool Enemy::isEnable() const
 bool Enemy::filedCollision(int x,int y)
 {
 
-	float filedLeft = x * FieldData::chipSize;
-	float filedRight = x * FieldData::chipSize + FieldData::chipSize;
-	float filedTop = y * FieldData::chipSize;
-	float filedBottom = y * FieldData::chipSize + FieldData::chipSize;
+	float filedLeft = x * chipSize;
+	float filedRight = x * chipSize + chipSize;
+	float filedTop = y * chipSize;
+	float filedBottom = y * chipSize + chipSize;
 
 	if (enemyPos.x + 15< filedLeft)		return false;
 	if (enemyPos.x > filedRight)		return false;

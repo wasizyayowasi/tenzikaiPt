@@ -48,7 +48,7 @@ private:
 	Vec2 spacePos = { 0.0f,0.0f };
 	Vec2 enemyDeathPos = { 0.0f,0.0f };
 
-	Player* player;
+	Player* player = nullptr;
 	ObjectHp* hp;
 
 	std::array<std::shared_ptr<Enemy>, 16>enemy;

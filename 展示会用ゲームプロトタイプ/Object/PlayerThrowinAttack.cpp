@@ -43,13 +43,13 @@ void PlayerThrowinAttack::update(Vec2 offset)
 			angle = 5.4f;
 		}
 	}
-	for (int x = 0; x < FieldData::bgNumX; x++) {
-		for (int y = 0; y < FieldData::bgNumY; y++) {
+	for (int x = 0; x < bgNumX; x++) {
+		for (int y = 0; y < bgNumY; y++) {
 
-			const int chipNo = FieldData::field[y][x];
+			const int chipNo = groundData::ground[y][x];
 
-			if (chipNo == 1) {
-				if (filedCollision(x,y)) {
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (filedCollision(x,y,offset)) {
 					landingObject = true;
 				}
 			}
@@ -158,7 +158,7 @@ void PlayerThrowinAttack::deadFlyingObject()
 	init();
 }
 
-bool PlayerThrowinAttack::filedCollision(int x,int y)
+bool PlayerThrowinAttack::filedCollision(int x,int y,Vec2 offset)
 {
 	
 	float flyingObjectLeft = flyingObjectPos.x;
@@ -166,10 +166,10 @@ bool PlayerThrowinAttack::filedCollision(int x,int y)
 	float flyingObjectTop = flyingObjectPos.y;
 	float flyingObjectBottom = flyingObjectPos.y + 24;
 
-	float fieldLeft = x * FieldData::chipSize;
-	float fieldRight = x * FieldData::chipSize + FieldData::chipSize;
-	float fieldTop = y * FieldData::chipSize;
-	float fieldBottom = y * FieldData::chipSize + FieldData::chipSize;
+	float fieldLeft = x * chipSize;
+	float fieldRight = x * chipSize + chipSize;
+	float fieldTop = y * chipSize;
+	float fieldBottom = y * chipSize + chipSize;
 
 	if (flyingObjectBottom < fieldTop)		return false;
 	if (flyingObjectTop > fieldBottom)		return false;

@@ -4,6 +4,7 @@
 #include "Scene/TitleScene.h"
 #include "InputState.h"
 #include "Scene/GameMain.h"
+#include "Scene/BossBattleScene.h"
 
 // ƒvƒƒOƒ‰ƒ€‚Í WinMain ‚©‚çn‚Ü‚è‚Ü‚·
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -29,7 +30,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InputState input;
 	SceneManager sceneManager;
-	sceneManager.changeScene(new GameMain(sceneManager));
+	sceneManager.changeScene(new TitleScene(sceneManager));
 
 	while (ProcessMessage() == 0) {
 

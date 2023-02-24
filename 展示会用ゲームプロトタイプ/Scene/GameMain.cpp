@@ -11,12 +11,13 @@
 #include "GameClear.h"
 #include "Pause.h"
 #include "Shop.h"
+#include "BossBattleScene.h"
 
 
 GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameMain::fadeInUpdate)
 {
 	enemyHandle = LoadGraph("data/enemy.png");
-	playerHandle = LoadGraph("data/player.png");
+	
 	portionHandle = LoadGraph("data/portion.png");
 	hacheteHandle = LoadGraph("data/machete.png");
 	guiHandle = LoadGraph("data/GUI.png");
@@ -46,7 +47,6 @@ GameMain::~GameMain()
 	delete player;
 	DeleteGraph(enemyHandle);
 	DeleteGraph(portionHandle);
-	DeleteGraph(playerHandle);
 	DeleteGraph(guiHandle);
 	DeleteGraph(hacheteHandle);
 }
@@ -59,9 +59,9 @@ void GameMain::init()
 
 	int i = 0;
 	
-	for (int x = 0; x < FieldData::bgNumX; x++) {
-		for (int y = 0; y < FieldData::bgNumY; y++) {
-			const int chipNo = FieldData::field[y][x];
+	for (int x = 0; x < bgNumX; x++) {
+		for (int y = 0; y < bgNumY; y++) {
+			const int chipNo = FieldData::tempField[y][x];
 			if (chipNo == 4) {
 				noLongerUsedX[i] = x;
 				noLongerUsedY[i] = y;
@@ -98,14 +98,14 @@ void GameMain::draw()
 	}
 
 	//–Ô–Ú‚Ì•`‰æ
-	/*for (int x = 0; x < FieldData::bgNumX; x++) {
-		for (int y = 0; y < FieldData::bgNumY; y++) {
-			DrawBox(x * FieldData::chipSize, y * FieldData::chipSize, x * FieldData::chipSize + FieldData::chipSize, y * FieldData::chipSize + FieldData::chipSize, 0x224422, false);
+	for (int x = 0; x < bgNumX; x++) {
+		for (int y = 0; y < bgNumY; y++) {
+			DrawBox(x * chipSize + offset.x, y * chipSize, x * chipSize + chipSize, y * chipSize + chipSize, 0x660000, false);
 		}
-	}*/
+	}
 
 	//ƒvƒŒƒCƒ„[‚Ì•`‰æ
-	player->draw(playerHandle,offset);
+	player->draw(offset);
 
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
@@ -147,9 +147,9 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 	}
 
-	for (int x = 0; x < FieldData::bgNumX; x++) {
-		for (int y = 0; y < FieldData::bgNumY; y++) {
-			const int chipNo = FieldData::field[y][x];
+	for (int x = 0; x < bgNumX; x++) {
+		for (int y = 0; y < bgNumY; y++) {
+			const int chipNo = FieldData::tempField[y][x];
 			if (chipNo == 6) {
 				//if (player->shopCollision(x, y, offset)) {
 					if (input.isTriggered(InputType::next))
@@ -170,7 +170,7 @@ void GameMain::normalUpdate(const InputState& input)
 	}
 
 	if (clearCount == 3) {
-		updateFunc = &GameMain::clearFadeOutUpdate;
+		updateFunc = &GameMain::bossBattleSceneFadeOutUpdate;
 	}
 
 	Vec2 targetOffset{};
@@ -180,13 +180,13 @@ void GameMain::normalUpdate(const InputState& input)
 	{
 		targetOffset.x = 0;
 	}
-	if (targetOffset.x < -field->getWidth() + Game::kScreenWidth)
+	if (targetOffset.x < -field->getWidth() + Game::kScreenWidth + 16)
 	{
-		targetOffset.x = -field->getWidth() + Game::kScreenWidth;
+		targetOffset.x = -field->getWidth() + Game::kScreenWidth + 16;
 	}
 
 
-	offset = targetOffset * 0.2f + offset * 0.8f;
+	offset = targetOffset * 0.5f + offset * 0.5f;
 
 
 	
@@ -205,11 +205,11 @@ void GameMain::gameoverFadeOutUpdate(const InputState& input)
 	}
 }
 
-void GameMain::clearFadeOutUpdate(const InputState& input)
+void GameMain::bossBattleSceneFadeOutUpdate(const InputState& input)
 {
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
-		manager_.changeScene(new GameClear(manager_));
+		manager_.changeScene(new BossBattleScene(manager_));
 		return;
 	}
 }

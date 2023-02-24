@@ -15,7 +15,7 @@ class Inventory
 {
 public:
 	Inventory();
-	~Inventory();
+	virtual ~Inventory();
 
 	void update(const InputState& input);
 	void draw();

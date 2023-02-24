@@ -1,12 +1,14 @@
 #include "Player.h"
-#include "../Pad.h"
-#include "DxLib.h"
 #include "PlayerThrowinAttack.h"
-#include "ObjectHp.h"
-#include "../field.h"
+
 #include "PlayerMotion.h"
-#include "../InputState.h"
+#include "ObjectHp.h"
 #include "Inventory.h"
+#include "../field.h"
+
+#include "../DrawFunctions.h"
+#include "../InputState.h"
+#include "DxLib.h"
 #include <algorithm>
 
 
@@ -19,6 +21,8 @@ namespace {
 
 Player::Player()
 {
+	playerHandle =my::myLoadGraph("data/player.png");
+
 	hp = new ObjectHp;
 	motion = new PlayerMotion;
 	inventory = new Inventory();
@@ -34,8 +38,7 @@ Player::~Player()
 	delete motion;
 	delete inventory;
 
-	DeleteGraph(macheteHandle);
-	
+	DeleteGraph(playerHandle);
 }
 
 void Player::init()
@@ -74,26 +77,27 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	motion->update(motionNum);
 
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
-	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 3) / FieldData::chipSize;
+	int underfootChipNoX = (playerPos.x + correctionSizeX) /chipSize;
+	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
 
 	//配列の中身を見る
-	int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
+	//int chipNo = FieldData::tempField[underfootChipNoY][underfootChipNoX];
+	int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
 
 	//梯子を降りる
-	if (chipNo == 2) {
+	if (chipNo == 119 || chipNo == 121) {
 		if (input.isPressed(InputType::down)) {
 			playerPos.y += 3.0f;
-		}
-		if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
-			updateFunc = &Player::updateLadder;
+			if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
+				updateFunc = &Player::updateLadder;
+			}
 		}
 	}
 
 	//梯子を上る
 	for (int x = -1; x < 1; x++) {
-		int chipNo = FieldData::field[underfootChipNoY - 1][underfootChipNoX - x];
-		if (chipNo == 2) {
+		int chipNo = buildingData::building[underfootChipNoY - 1][underfootChipNoX - x];
+		if (chipNo == 119 || chipNo == 121) {
 			if (input.isPressed(InputType::up)) {
 				if (ladderCollision(underfootChipNoX - x, underfootChipNoY - 1)) {
 					updateFunc = &Player::updateLadder;
@@ -104,8 +108,9 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	}
 
 	//降下
-	int DescentChipNo3 = FieldData::field[underfootChipNoY][underfootChipNoX];
-	if (DescentChipNo3 == 0) {
+	int DescentChipNo3 = groundData::ground[underfootChipNoY][underfootChipNoX];
+	int DescentChipNo4 = buildingData::building[underfootChipNoY][underfootChipNoX];
+	if (DescentChipNo3 == 0 && DescentChipNo4 == 0) {
 		updateFunc = &Player::updateDescent;
 	}
 
@@ -133,7 +138,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	//近接攻撃
 	if (!push) {
 		if (!flyingObject->isEnable()) {
-			if (Pad::isPress(PAD_INPUT_2)) {
+			if (input.isPressed(InputType::attack)) {
 				motionNum = 3;
 				motion->update(motionNum);
 				proximityAttack = true;
@@ -205,10 +210,11 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	}
 	
 	//隠れる処理
-	int objectChipNo = FieldData::field[underfootChipNoY - 1][underfootChipNoX];
-	if (objectChipNo == 3) {
+	int objectChipNo = objectData::object[underfootChipNoY - 1][underfootChipNoX];
+	if (objectChipNo == 36 || objectChipNo == 37) {
 		if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
 			if (input.isPressed(InputType::next)) {
+				DrawString(300, 100, "aiueo", 0xffffff);
 				push = true;
 			}
 			else {
@@ -225,23 +231,23 @@ void Player::updateField(Vec2 offset, const InputState& input)
 void Player::updateDescent(Vec2 offset, const InputState& input)
 {
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + FieldData::chipSize) / FieldData::chipSize;
-	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 3) / FieldData::chipSize;
+	int underfootChipNoX = (playerPos.x + chipSize) / chipSize;
+	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
 
 	//降下
 	playerPos += vec;
 
 	//地面との判定
-	for (int x = 0; x < FieldData::bgNumX; x++) {
-		for (int y = 0; y < FieldData::bgNumY; y++) {
+	for (int x = 0; x < bgNumX; x++) {
+		for (int y = 0; y < bgNumY; y++) {
 
-			const int chipNo = FieldData::field[y][x];
+			const int chipNo = groundData::ground[y][x];
 
 			//地面
-			if (chipNo == 1) {
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 				if (playerFiledCollision(x, y)) {
-					if (playerPos.y + correctionSizeY > y * FieldData::chipSize) {
-						playerPos.y = y * FieldData::chipSize - 74;
+					if (playerPos.y + correctionSizeY > y * chipSize) {
+						playerPos.y = y * chipSize - 74;
 					}
 					updateFunc = &Player::updateField;
 					return;
@@ -253,9 +259,9 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 	//梯子との判定
 	for (int x = -1; x < 1; x++) {
 
-		const int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX + x];
+		const int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX + x];
 		//地面
-		if (chipNo == 2) {
+		if (chipNo == 119 || chipNo == 121) {
 			if (objectCollision(underfootChipNoX + x, underfootChipNoY)) {
 				updateFunc = &Player::updateLadder;
 				return;
@@ -268,8 +274,8 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 void Player::updateLadder(Vec2 offset, const InputState& input)
 {
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + correctionSizeX) / FieldData::chipSize;
-	int underfootChipNoY = (playerPos.y + FieldData::chipSize * 2) / FieldData::chipSize;
+	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
+	int underfootChipNoY = (playerPos.y + chipSize * 2) / chipSize;
 
 	//登りきった後
 	if (input.isPressed(InputType::up)) {
@@ -278,10 +284,9 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 		playerPos.y -= 5;
 		motion->update(motionNum);
 		
-
-		int chipNo = FieldData::field[underfootChipNoY][underfootChipNoX];
+		int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
 		//地面
-		if (chipNo == 0) {
+		if (chipNo == 0 || chipNo == 106|| chipNo == 108) {
 			if (playerFiledCollision(underfootChipNoX, underfootChipNoY)) {
 				updateFunc = &Player::updateField;
 				return;
@@ -295,9 +300,9 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 		playerPos.y += 5;
 		motion->update(motionNum);
 
-		int chipNo = FieldData::field[underfootChipNoY + 1][underfootChipNoX];
+		int chipNo = groundData::ground[underfootChipNoY + 1][underfootChipNoX];
 		//地面
-		if (chipNo == 1) {
+		if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 			if (playerFiledCollision(underfootChipNoX, underfootChipNoY + 1)) {
 				motionNum = 0;
 				updateFunc = &Player::updateField;
@@ -308,12 +313,12 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 
 	
 	//落下
-	chipNo3 = FieldData::field[underfootChipNoY + 1][underfootChipNoX];
-	if (chipNo3 == 0) {
-		motionNum = 0;
-		motion->update(motionNum);
-		updateFunc = &Player::updateDescent;
-	}
+	//chipNo3 = buildingData::building[underfootChipNoY + 1][underfootChipNoX];
+	//if (chipNo3 == 0) {
+	//	motionNum = 0;
+	//	motion->update(motionNum);
+	//	//updateFunc = &Player::updateDescent;
+	//}
 }
 
 void Player::updateDeath(Vec2 offset, const InputState& input)
@@ -350,7 +355,7 @@ void Player::consumption()
 }
 
 //描画
-void Player::draw(int handle, Vec2 offset)
+void Player::draw(Vec2 offset)
 {
 	//デバッグ用
 	{
@@ -427,7 +432,7 @@ void Player::draw(int handle, Vec2 offset)
 		}
 	}
 
-	motion->draw(playerPos, handle, playerDirections, offset);
+	motion->draw(playerPos, playerHandle, playerDirections, offset);
 
 }
 
@@ -437,19 +442,6 @@ void Player::draw(int handle, Vec2 offset)
 //隠れる
 bool Player::beHidden()
 {
-	if (hidden == true) {
-		if (!push) {
-			if (Pad::isTrigger(PAD_INPUT_4)) {
-				push = true;
-			}
-		}
-		else {
-			if (Pad::isRelase(PAD_INPUT_4)) {
-				push = false;
-			}
-		}
-	}
-
 	return push;
 }
 
@@ -517,8 +509,8 @@ bool Player::repairSpace(const Vec2& pos,Vec2 offset)
 {
 	float spaceLeft = pos.x + offset.x;
 	float spaceTop = pos.y + offset.y;
-	float spaceRight = pos.x + FieldData::chipSize * 3 + offset.x;
-	float spaceBottom = pos.y + FieldData::chipSize * 3 + offset.y;
+	float spaceRight = pos.x + chipSize * 3 + offset.x;
+	float spaceBottom = pos.y + chipSize * 3 + offset.y;
 
 	float playerLeft = playerPos.x + 14 + offset.x;
 	float playerTop = playerPos.y + offset.y;
@@ -536,10 +528,10 @@ bool Player::repairSpace(const Vec2& pos,Vec2 offset)
 
 bool Player::playerFiledCollision(int x,int y)
 {
-	float fieldLeft = x * FieldData::chipSize;
-	float fieldRight = x * FieldData::chipSize + FieldData::chipSize;
-	float fieldTop = y * FieldData::chipSize;
-	float fieldBottom = y * FieldData::chipSize + FieldData::chipSize;
+	float fieldLeft = x * chipSize;
+	float fieldRight = x * chipSize + chipSize;
+	float fieldTop = y * chipSize;
+	float fieldBottom = y * chipSize + chipSize;
 
 	if (playerPos.x + 15.0f < fieldLeft)				return false;
 	if (playerPos.x + correctionSizeX > fieldRight)		return false;
@@ -552,10 +544,10 @@ bool Player::playerFiledCollision(int x,int y)
 bool Player::objectCollision(int x,int y)
 {
 
-	float objectLeft = x * FieldData::chipSize;
-	float objectRight = x * FieldData::chipSize  + FieldData::chipSize ;
-	float objectTop = y * FieldData::chipSize;
-	float objectBottom = y * FieldData::chipSize + FieldData::chipSize;
+	float objectLeft = x * chipSize;
+	float objectRight = x * chipSize  + chipSize ;
+	float objectTop = y * chipSize;
+	float objectBottom = y * chipSize + chipSize;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
 	if (playerPos.x + correctionSizeX > objectRight)	return false;
@@ -567,10 +559,10 @@ bool Player::objectCollision(int x,int y)
 
 bool Player::ladderCollision(int x, int y)
 {
-	float objectLeft = x * FieldData::chipSize ;
-	float objectRight = x * FieldData::chipSize + FieldData::chipSize;
-	float objectTop = y * FieldData::chipSize;
-	float objectBottom = y * FieldData::chipSize + FieldData::chipSize;
+	float objectLeft = x * chipSize ;
+	float objectRight = x * chipSize + chipSize;
+	float objectTop = y * chipSize;
+	float objectBottom = y * chipSize + chipSize;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
 	if (playerPos.x + correctionSizeX > objectRight)	return false;
@@ -599,10 +591,10 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 
 bool Player::shopCollision(int x, int y, Vec2 offset)
 {
-	float objectLeft = x * FieldData::chipSize;
-	float objectRight = x * FieldData::chipSize + FieldData::chipSize;
-	float objectTop = y * FieldData::chipSize;
-	float objectBottom = y * FieldData::chipSize + FieldData::chipSize * 3;
+	float objectLeft = x * chipSize;
+	float objectRight = x * chipSize + chipSize;
+	float objectTop = y * chipSize;
+	float objectBottom = y * chipSize + chipSize * 3;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
 	if (playerPos.x + correctionSizeX > objectRight)	return false;

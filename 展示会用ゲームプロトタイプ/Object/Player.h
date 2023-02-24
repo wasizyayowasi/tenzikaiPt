@@ -19,7 +19,7 @@ public:
 
 	void init();
 	void update(Vec2 offset,const InputState& input);
-	void draw(int handle,Vec2 offset);
+	void draw(Vec2 offset);
 
 
 	void damege(bool inversion);
@@ -60,10 +60,11 @@ public:
 private:
 	//所持アイテム
 	int money = 2000;
-	int repairBlock = 1;
+	int repairBlock = 3;
 	int recoveryItem = 1;
 
 	//グラフィックハンドル
+	int playerHandle = -1;
 	int macheteHandle = -1;
 	int portionHandle = -1;
 	int guiHandle = -1;
@@ -108,7 +109,7 @@ private:
 	PlayerMotion* motion;
 	Inventory* inventory;
 
-	Vec2 playerPos = {400.0f,600.0f};
+	Vec2 playerPos = {400.0f,300.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;

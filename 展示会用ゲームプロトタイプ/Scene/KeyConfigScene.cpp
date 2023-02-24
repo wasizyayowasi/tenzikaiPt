@@ -18,7 +18,7 @@ void KeyConfigScene::update(const InputState& input)
 	auto& configInput = const_cast<InputState&>(input);
 
 	if (!isEditing) {
-		if (input.isTriggered(InputType::keyconf)) {
+		if (input.isTriggered(InputType::attack)) {
 			manager_.popScene();
 			return;
 		}
@@ -141,8 +141,9 @@ void KeyConfigScene::draw()
 		auto it = inputState.tempMapTable.find(type);
 
 		x += 64;
+		x += 35;
 		DrawString(x, y, " : ", color);
-		x += 20;
+		x += 40;
 		for (const auto elem : it->second) {
 
 			if (elem.cat == InputCategory::keybd) {

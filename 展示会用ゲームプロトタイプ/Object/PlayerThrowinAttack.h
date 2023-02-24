@@ -23,7 +23,7 @@ public:
 
 	bool landing() { return landingObject; }
 
-	bool filedCollision(int x,int y);
+	bool filedCollision(int x,int y,Vec2 offset);
 private:
 	int time = 50;
 	bool playerDirections = false;

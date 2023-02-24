@@ -31,14 +31,14 @@ public:
 	void draw();
 private:
 	int timer = 0;
-	int moneyPossessed;
+	int moneyPossessed = 0;
 	int amount = 0;
 
 	int hacheteHandle = -1;
 	int portionHandle = -1;
 	int guiHandle = -1;
 
-	int currentInputIndex;//現在選択中のインデックス
+	int currentInputIndex = 0;//現在選択中のインデックス
 	//入力一時テーブル
 
 	bool isEditing = false;//現在特定の入力は編集中です。

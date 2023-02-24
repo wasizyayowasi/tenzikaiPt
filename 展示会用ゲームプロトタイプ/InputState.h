@@ -10,7 +10,7 @@ enum class InputType
 	nextItem,		/// 前に戻るボタン
 	prevItem,		///変更
 	pause,			/// ポーズボタン
-	keyconf,		/// キーコンフィグ
+	attack,		/// キーコンフィグ
 	up,				///上
 	down,			///下
 	left,			///左

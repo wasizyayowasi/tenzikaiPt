@@ -5,7 +5,7 @@ class PlayerMotion
 {
 public:
 	PlayerMotion();
-	~PlayerMotion();
+	virtual ~PlayerMotion();
 
 	void update(int num);
 

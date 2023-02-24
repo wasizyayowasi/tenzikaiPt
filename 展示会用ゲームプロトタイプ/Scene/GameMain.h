@@ -12,7 +12,7 @@ class GameMain : public SceneBase
 {
 public:
 	GameMain(SceneManager& manager);
-	~GameMain();
+	virtual ~GameMain();
 
 	void init();
 
@@ -25,7 +25,7 @@ private:
 	int fadeValue = 255;
 
 	int enemyHandle = -1;
-	int playerHandle = -1;
+	
 	int portionHandle = -1;
 	int hacheteHandle = -1;
 	int guiHandle = -1;
@@ -63,7 +63,7 @@ private:
 	void fadeInUpdate(const InputState& input);
 	void normalUpdate(const InputState& input);
 	void gameoverFadeOutUpdate(const InputState& input);
-	void clearFadeOutUpdate(const InputState& input);
+	void bossBattleSceneFadeOutUpdate(const InputState& input);
 
 	Vec2 offset;
 	Vec2 pos;

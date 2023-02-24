@@ -17,7 +17,7 @@ InputState::InputState()
 	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_P},
 										 {InputCategory::pad,PAD_INPUT_7} };//セレクトボタン
 	//キーコンフィグ
-	defaultMapTable[InputType::keyconf] = { {InputCategory::keybd,KEY_INPUT_K},
+	defaultMapTable[InputType::attack] = { {InputCategory::keybd,KEY_INPUT_K},
 										   {InputCategory::pad,PAD_INPUT_Y} };//左ショルダー
 	//上
 	defaultMapTable[InputType::up] = { {InputCategory::keybd,KEY_INPUT_UP},
@@ -45,12 +45,12 @@ InputState::InputState()
 	tempMapTable = inputMapTable;
 
 	//入力タイプの名前のテーブルを作る
-	inputNameTable[InputType::next] = "next";
-	inputNameTable[InputType::nextItem] = "nextItem";
-	inputNameTable[InputType::prevItem] = "prevItem";
-	inputNameTable[InputType::pause] = "pause";
-	inputNameTable[InputType::keyconf] = "keyconf";
-	inputNameTable[InputType::shot] = "shot";
+	inputNameTable[InputType::next] = "決定";
+	inputNameTable[InputType::nextItem] = "次のアイテム";
+	inputNameTable[InputType::prevItem] = "前のアイテム";
+	inputNameTable[InputType::pause] = "ポーズ";
+	inputNameTable[InputType::attack] = "攻撃";
+	inputNameTable[InputType::shot] = "能力";
 
 
 	currentInput.resize(static_cast<int>(InputType::max));

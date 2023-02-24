@@ -24,16 +24,16 @@ std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
 void BugSpace::init(int setX, int setY)
 {
 	if (num == 0) {
-		spacePos.x = setX * FieldData::chipSize;
-		spacePos.y = setY * FieldData::chipSize;
+		spacePos.x = setX * chipSize;
+		spacePos.y = setY * chipSize;
 	}
 	else if (num == 1) {
-		spacePos.x = setX * FieldData::chipSize;
-		spacePos.y = setY * FieldData::chipSize;
+		spacePos.x = setX * chipSize;
+		spacePos.y = setY * chipSize;
 	}
 	else if (num == 2) {
-		spacePos.x = setX * FieldData::chipSize;
-		spacePos.y = setY * FieldData::chipSize;
+		spacePos.x = setX * chipSize;
+		spacePos.y = setY * chipSize;
 	}
 }
 
@@ -55,7 +55,7 @@ void BugSpace::update(Vec2 offset)
 	hp->setObjectHp(maxHp);
 
 	
-	if (--enemySpawnTime < 0) {
+	/*if (--enemySpawnTime < 0) {
 		for (auto& enemy : enemy) {
 			if (!enemy->isEnable()) {
 				enemy->dispatch(spacePos);
@@ -64,7 +64,7 @@ void BugSpace::update(Vec2 offset)
 				break;
 			}
 		}
-	}
+	}*/
 	
 	
 
@@ -90,7 +90,7 @@ void BugSpace::update(Vec2 offset)
 void BugSpace::draw(Vec2 offset)
 {
 	
-	DrawBox(spacePos.x + offset.x, spacePos.y + offset.y, spacePos.x + FieldData::chipSize * 3 + offset.x, spacePos.y + FieldData::chipSize * 3 + offset.y, 0xff0000, true);
+	DrawBox(spacePos.x + offset.x, spacePos.y + offset.y, spacePos.x + chipSize * 3 + offset.x, spacePos.y + chipSize * 3 + offset.y, 0xff0000, true);
 	DrawFormatString(200, 0, 0xffffff, "%f : %f", enemyDeathPos.x, enemyDeathPos.y);
 	if (player->repairSpace(spacePos,offset)) {
 		if (player->returnSpaceHpDisplay()) {

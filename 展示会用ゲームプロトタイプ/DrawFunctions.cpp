@@ -5,7 +5,7 @@
 namespace my {
 
 
-    int my::mtLoadGraph(const TCHAR* path)
+    int my::myLoadGraph(const TCHAR* path)
     {
         int handle = LoadGraph(path);
         assert(handle >= 0);
