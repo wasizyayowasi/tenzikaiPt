@@ -9,22 +9,22 @@ class Player;
 
 enum class ProductList
 {
-	kaki,			/// 次へ行くボタン
-	susi,			/// 前に戻るボタン
-	niku,			/// ポーズボタン
+	heart,	
+	block,	
+	potion,	
 };
 
 enum class Price
 {
-	kaki,			/// 次へ行くボタン
-	susi,			/// 前に戻るボタン
-	niku,			/// ポーズボタン
+	heart,
+	block,
+	potion,
 };
 
 class Shop : public SceneBase
 {
 public:
-	Shop(SceneManager& manager, const InputState& input,Player* dPlayer,int mHandle,int pHandle,int gHandle);
+	Shop(SceneManager& manager, const InputState& input,Player* dPlayer,int pHandle,int gHandle,int hHandle,int rHandle);
 	~Shop();
 
 	void update(const InputState& input);
@@ -34,9 +34,11 @@ private:
 	int moneyPossessed = 0;
 	int amount = 0;
 
-	int hacheteHandle = -1;
+	int hpHandle = -1;
 	int portionHandle = -1;
 	int guiHandle = -1;
+	int repairHandle = -1;
+	
 
 	int currentInputIndex = 0;//現在選択中のインデックス
 	//入力一時テーブル

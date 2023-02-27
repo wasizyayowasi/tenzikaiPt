@@ -4,18 +4,19 @@
 #include "../InputState.h"
 #include "SceneManager.h"
 #include "Trade.h"
+#include "../Object/Player.h"
 
 
 
-Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int mHandle, int pHandle, int gHandle) : SceneBase(manager), inputState(input), player(dPlayer),hacheteHandle(mHandle),portionHandle(pHandle),guiHandle(gHandle)
+Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int pHandle, int gHandle,int hHandle, int rHandle) : SceneBase(manager), inputState(input), player(dPlayer),portionHandle(pHandle),guiHandle(gHandle), hpHandle(hHandle),repairHandle(rHandle)
 {
-	shopTable[ProductList::kaki] = "Š`";
-	shopTable[ProductList::susi] = "C•œƒuƒƒbƒN";
-	shopTable[ProductList::niku] = "‰ñ•œƒAƒCƒeƒ€";
+	shopTable[ProductList::heart] = "ƒn[ƒg";
+	shopTable[ProductList::block] = "C•œƒAƒCƒeƒ€";
+	shopTable[ProductList::potion] = "‰ñ•œƒAƒCƒeƒ€";
 
-	priceTable[Price::kaki] = "300‰~";
-	priceTable[Price::susi] = "500‰~";
-	priceTable[Price::niku] = "1500‰~";
+	priceTable[Price::heart] = "500‰~";
+	priceTable[Price::block] = "500‰~";
+	priceTable[Price::potion] = "1500‰~";
 }
 
 Shop::~Shop()
@@ -50,7 +51,7 @@ void Shop::update(const InputState& input)
 	if (isEditing) {
 		switch (currentInputIndex) {
 		case 0:
-			amount = 300;
+			amount = 500;
 			break;
 		case 1:
 			amount = 500;
@@ -59,7 +60,9 @@ void Shop::update(const InputState& input)
 			amount = 1500;
 			break;
 		}
-		manager_.pushScene(new Trade(manager_, input,player,amount,currentInputIndex));
+		if (!(currentInputIndex == 0 && player->returnHp() > 9)) {
+			manager_.pushScene(new Trade(manager_, input, player, amount, currentInputIndex));
+		}
 		isEditing = false;
 	}
 
@@ -92,6 +95,7 @@ void Shop::draw()
 	DrawBox(goodsWidth + 300, goodsHeight, shopkeeperX, goodsY, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//’Êí•`‰æ‚É–ß‚·
 
+	
 
 	//¤•i‚Ì•`‰æ
 	auto y = 520;
@@ -113,10 +117,13 @@ void Shop::draw()
 			DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 0.0f, guiHandle, true, false);
 			switch (currentInputIndex) {
 			case 0:
-				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 5.6f, hacheteHandle, true, false);
+				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 0.0f, hpHandle, true, false);
+				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 80, "Å‘å‘Ì—Í‚ð1‘‰Á‚³‚¹‚é‚±‚Æ‚ª‚Å‚«‚éB", 0xffffff);
 				break;
 			case 1:
-				//DrawRotaGraph(234, 931, 2.0f, 5.6f, hacheteHandle, true, false);
+				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 4.0f, 0.0f, repairHandle, true, false);
+				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 80, "‚Ç‚ë‚Ç‚ë‚Æ‚µ‚½‰½‚©B", 0xffffff);
+				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 1000, "ƒQ[ƒg‚ð•Â‚¶‚é‚±‚Æ‚ª‚Å‚«‚»‚¤‚¾", 0xffffff);
 				break;
 			case 2:
 				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 0.0f, portionHandle, true, false);
@@ -134,7 +141,6 @@ void Shop::draw()
 		y += 80;
 		++idx;
 	}
-
 
 	//’l’i‚Ì•`‰æ
 	y = 520;
@@ -156,7 +162,9 @@ void Shop::draw()
 		++idx;
 	}
 
-	
+	if (player->returnHp() > 9) {
+		DrawBox(shopkeeperWidth + 10, 525, shopkeeperWidth + 220, 530, 0xff0000, true);
+	}
 
 	y += 20;
 	if (!isInputtypeSelected) {

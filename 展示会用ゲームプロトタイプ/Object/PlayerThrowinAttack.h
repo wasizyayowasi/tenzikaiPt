@@ -14,7 +14,7 @@ public:
 	void init();
 
 	void update(Vec2 offset);
-	void draw(int handle);
+	void draw(int handle, Vec2 offset);
 
 	bool playerCollision(const Vec2& pos,Vec2 offset);
 	bool enemyCollision(const Vec2& pos, Vec2 offset);
@@ -29,8 +29,8 @@ private:
 	bool playerDirections = false;
 	float angle = 0.0f;
 
-	float x = 0.0f;
-	float y = 0.0f;
+	float tempX = 0.0f;
+	float tempY = 0.0f;
 	float r = 8.0f;
 
 	float up = 0.0f;

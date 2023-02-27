@@ -54,7 +54,7 @@ void Enemy::normalUpdate(Vec2 offset)
 	if (motionNum != 3) {
 		if (!hidden) {
 			if (landing) {
-				if (targetPlayer.length() < 300) {
+				if (targetPlayer.length() < 200) {
 
 					targetPlayer2 = { 0.0f,0.0f };
 					targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
@@ -108,12 +108,12 @@ void Enemy::normalUpdate(Vec2 offset)
 	}
 
 	//âEÇÃï«îΩéÀ
-	if (moveCount > 130) {
+	if (enemyPos.x > Game::kScreenWidth * 2 - 60) {
 		vec.x = -vec.x;
 		inversion = true;
 	}
 	//ç∂ÇÃï«îΩéÀ
-	if (moveCount < 0) {
+	if (enemyPos.x + offset.x < 0) {
 		vec.x = -vec.x;
 		inversion = false;
 	}
@@ -200,7 +200,7 @@ void Enemy::normalDraw(Vec2 offset)
 
 	}
 	
-	DrawCircle(pos.x, pos.y, 300, 0xff0000, false);
+	DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
 	DrawString(pos.x, pos.y - 15, "ìG", 0xffffff);
 
 	motion->draw(enemyPos, handle, inversion, offset);
@@ -220,7 +220,8 @@ void Enemy::coinUpdate(Vec2 offset)
 
 void Enemy::coinDraw(Vec2 offset)
 {
-	DrawBox(enemyPos.x + offset.x, enemyPos.y + offset.y, enemyPos.x + 30 + offset.x, enemyPos.y + 30 + offset.y, 0xffffff, true);
+	DrawGraph(enemyPos.x + offset.x, enemyPos.y + offset.y, coinHandle, true);
+	//DrawBox(enemyPos.x + offset.x, enemyPos.y + offset.y, enemyPos.x + 30 + offset.x, enemyPos.y + 30 + offset.y, 0xffffff, true);
 }
 
 void Enemy::updateDescent(Vec2 offset)

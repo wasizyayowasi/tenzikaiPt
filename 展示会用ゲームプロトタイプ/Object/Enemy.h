@@ -13,7 +13,7 @@ public:
 	virtual ~Enemy() { delete hp; }
 
 	Vec2 getPos()const { return enemyPos; }
-	void setPlayer(Player* dPlayer,int setHandle) { player = dPlayer,handle = setHandle; }
+	void setPlayer(Player* dPlayer,int setHandle,int cHandle) { player = dPlayer,handle = setHandle,coinHandle = cHandle; }
 
 	void normalUpdate(Vec2 offset);
 	void normalDraw(Vec2 offset);
@@ -44,6 +44,7 @@ private:
 	int coolTime = 0;
 
 	int handle = -1;
+	int coinHandle = -1;
 
 	int moveCount = 0;
 

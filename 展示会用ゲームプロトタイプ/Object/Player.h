@@ -39,6 +39,7 @@ public:
 	bool coinCollision(Vec2 pos, Vec2 offset);
 	bool shopCollision(int x,int y, Vec2 offset);
 
+	void tutorialUpdate(Vec2 offset, const InputState& input);
 	void updateField(Vec2 offset, const InputState& input);
 	void updateDescent(Vec2 offset, const InputState& input);
 	void updateLadder(Vec2 offset, const InputState& input);
@@ -56,10 +57,11 @@ public:
 
 	void consumption();
 
-	void setHandle(int pHandle, int mHandle,int gHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle; }
+	void setHandle(int pHandle, int mHandle,int gHandle,int hHandle,int rHandle,int cHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle,hpHandle = hHandle,repairHandle = rHandle,coinHandle = cHandle; }
+	int returnHp() { return playerHp; }
 private:
 	//所持アイテム
-	int money = 2000;
+	int money = 4000;
 	int repairBlock = 3;
 	int recoveryItem = 1;
 
@@ -68,6 +70,9 @@ private:
 	int macheteHandle = -1;
 	int portionHandle = -1;
 	int guiHandle = -1;
+	int hpHandle = -1;
+	int repairHandle = -1;
+	int coinHandle = -1;
 
 	//無敵時間
 	int ultimateTimer_ = 0;
@@ -82,7 +87,7 @@ private:
 	int motionNum = 0;
 
 	//HP関連
-	int playerHp = 10;
+	int playerHp = 3;
 	int hpDisplayTime = 120;
 
 	//生死

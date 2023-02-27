@@ -20,7 +20,7 @@ public:
 	void update(const InputState& input);
 	void draw();
 
-	void setHandle(int pHandle, int mHandle,int gHandle) { portionHandle = pHandle, hacheteHandle = mHandle,guiHandle = gHandle; }
+	void setHandle(int pHandle, int mHandle,int gHandle,int rHandle) { portionHandle = pHandle, hacheteHandle = mHandle,guiHandle = gHandle, repairHandle = rHandle; }
 
 	void setNum(int repairNum, int recoveryNum,bool isEnabled) { repairBlock = repairNum, recoveryItem = recoveryNum,hachete = isEnabled; }
 
@@ -29,6 +29,7 @@ private:
 	int guiHandle = -1;
 	int hacheteHandle = -1;
 	int portionHandle = -1;
+	int repairHandle = -1;
 
 	bool hachete = false;
 	int repairBlock = 1;

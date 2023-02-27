@@ -22,6 +22,7 @@ void Trade::update(const InputState& input)
 {
 	const int nameCount = purchaseChoiceTable.size();
 
+
 	if (buy == false) {
 		if (input.isTriggered(InputType::left)) {
 			currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
@@ -32,30 +33,37 @@ void Trade::update(const InputState& input)
 	}
 
 	if (input.isTriggered(InputType::next)) {
-		if (currentInputIndex == 0) {
-			if (player->setMoneyPossessed() - amount >= 0) {
-				player->setItemControl(itemNum);
-				player->setMoney(amount);
-				textNum = 0;
-				textDisplayTime = defaultTime;
-				buy = true;
+		if (!(itemNum == 0 && player->returnHp() > 9)) {
+			if (currentInputIndex == 0) {
+				if (player->setMoneyPossessed() - amount >= 0) {
+					player->setItemControl(itemNum);
+					player->setMoney(amount);
+					textNum = 0;
+					textDisplayTime = defaultTime;
+					buy = true;
+				}
+				else {
+					textNum = 1;
+					textDisplayTime = defaultTime;
+				}
 			}
 			else {
-				textNum = 1;
-				textDisplayTime = defaultTime;
+				manager_.popScene();
+				return;
 			}
 		}
 		else {
+			textNum = 2;
 			manager_.popScene();
 			return;
 		}
 	}
+	
 
 }
 
 void Trade::draw()
 {
-	//DrawFormatString(500, 500, 0xffffff, "%d:%d", moneyPossessed, amount);
 
 	constexpr int pw_width = Game::kScreenWidth / 2 - 200;						//ポーズ枠の幅
 	constexpr int pw_height = Game::kScreenHeight / 2 - 200;						//ポーズ枠の高さ
@@ -120,6 +128,9 @@ void Trade::textDraw(int num)
 		break;
 	case 1:
 		DrawString(Game::kScreenWidth / 2 - 50, 270, "金ねーじゃん", 0xffffff);
+		break;
+	case 2:
+		DrawString(Game::kScreenWidth / 2 - 50, 270, "品切れだ", 0xffffff);
 		break;
 	}
 }

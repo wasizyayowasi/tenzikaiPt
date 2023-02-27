@@ -102,7 +102,7 @@ void PlayerMotion::damege()
 void PlayerMotion::death()
 {
 	frameSpeed = 10;
-	if (imgY == 4 && newImgX + 1 == maxImgX) {
+	if (imgY == 4 && newImgX == 1150) {
 		isEnabled = true;
 	}
 }
@@ -112,9 +112,6 @@ void PlayerMotion::draw(Vec2 playerPos, int handle, bool trun, Vec2 offset)
 	Vec2 pos = playerPos + offset;
 	newImgX = (imgX / frameSpeed) * assetSizeX;
 	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, newImgX, imgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
-
-	//DrawFormatString(0, y, 0x44ff44, "%d", imgX);
-
 }
 
 

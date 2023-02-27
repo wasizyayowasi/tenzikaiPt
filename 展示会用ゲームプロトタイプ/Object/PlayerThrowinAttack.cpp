@@ -10,7 +10,7 @@ PlayerThrowinAttack::PlayerThrowinAttack()
 
 void PlayerThrowinAttack::attack(const Vec2& playerPos, bool directions)
 {
-	pos = playerPos;
+	flyingObjectPos = playerPos;
 	isEnabled = true;
 	//•ûŒü
 	playerDirections = directions;
@@ -31,7 +31,6 @@ void PlayerThrowinAttack::init()
 
 void PlayerThrowinAttack::update(Vec2 offset)
 {
-	flyingObjectPos = pos + offset;
 	if (!landingObject) {
 		angle += 0.3f;
 	}
@@ -43,25 +42,23 @@ void PlayerThrowinAttack::update(Vec2 offset)
 			angle = 5.4f;
 		}
 	}
-	for (int x = 0; x < bgNumX; x++) {
-		for (int y = 0; y < bgNumY; y++) {
 
-			const int chipNo = groundData::ground[y][x];
+	int underBlockX = (flyingObjectPos.x) / chipSize;
+	int underBlockY = (flyingObjectPos.y + chipSize) / chipSize;
 
-			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-				if (filedCollision(x,y,offset)) {
-					landingObject = true;
-				}
-			}
-		}
+	const int chipNo = groundData::ground[underBlockY][underBlockX];
+
+
+	if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {	
+		landingObject = true;
 	}
 	
 	if (!landingObject) {
-		x = pos.y + r + cos(45);
-		y = pos.y + r + sin(45);
+		tempX = flyingObjectPos.y + r + cos(45);
+		tempY = flyingObjectPos.y + r + sin(45);
 
-		normalize.x = x;
-		normalize.y = -y;
+		normalize.x = tempX;
+		normalize.y = -tempY;
 
 		vec = normalize.normalize() * 2;
 
@@ -75,35 +72,34 @@ void PlayerThrowinAttack::update(Vec2 offset)
 	//ƒvƒŒƒCƒ„[‚ÌŒü‚­•ûŒü‚É‚æ‚Á‚Äobject‚ð”ò‚Î‚·•ûŒü‚ð•Ï‰»‚³‚¹‚é
 	if (!landingObject) {
 		if (playerDirections) {
-			pos.x -= vec.x;
-			pos.y += vec.y;
+			flyingObjectPos.x -= vec.x;
+			flyingObjectPos.y += vec.y;
 		}
 		else if (!playerDirections) {
-			pos += vec;
+			flyingObjectPos += vec;
 		}
 	}
 
 	//”ÍˆÍŠO‚ÅÁ‚¦‚é
-	if (pos.x < -30) {
+	if (flyingObjectPos.x < -30) {
 		init();
 	}
-	if (pos.x - 20 > Game::kScreenWidth * 2) {
+	if (flyingObjectPos.x - 20 > Game::kScreenWidth * 2) {
 		init();
 	}
-	if (pos.y < 0) {
+	if (flyingObjectPos.y < 0) {
 		init();
 	}
-	if (pos.y > Game::kScreenHeight) {
+	if (flyingObjectPos.y > Game::kScreenHeight) {
 		init();
 	}
 
 }
 
-void PlayerThrowinAttack::draw(int handle)
+void PlayerThrowinAttack::draw(int handle, Vec2 offset)
 {
-	//DrawBox(flyingObjectPos.x, flyingObjectPos.y, flyingObjectPos.x + 20, flyingObjectPos.y + 20, GetColor(252, 15, 192), true);
-	DrawString(flyingObjectPos.x, flyingObjectPos.y - 10, "’e", 0xffffff);
-	DrawRotaGraph(flyingObjectPos.x, flyingObjectPos.y,1.5f, angle,handle, true, playerDirections);
+	DrawString(flyingObjectPos.x + offset.x, flyingObjectPos.y - 10, "’e", 0xffffff);
+	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y + 10,1.5f, angle,handle, true, playerDirections);
 }
 
 
@@ -115,8 +111,8 @@ bool PlayerThrowinAttack::playerCollision(const Vec2& pos, Vec2 offset)
 	float playerRight = pos.x + 50 + offset.x;
 	float playerBottom = pos.y + 74 + offset.y;
 
-	if (playerLeft > flyingObjectPos.x + 20)	return false;
-	if (playerRight < flyingObjectPos.x)		return false;
+	if (playerLeft > flyingObjectPos.x + 20 + offset.x)	return false;
+	if (playerRight < flyingObjectPos.x + offset.x)		return false;
 	if (playerTop >= flyingObjectPos.y + 20)	return false;
 	if (playerBottom <= flyingObjectPos.y)		return false;
 
@@ -163,18 +159,20 @@ bool PlayerThrowinAttack::filedCollision(int x,int y,Vec2 offset)
 	
 	float flyingObjectLeft = flyingObjectPos.x;
 	float flyingObjectRight = flyingObjectPos.x + 24;
-	float flyingObjectTop = flyingObjectPos.y;
-	float flyingObjectBottom = flyingObjectPos.y + 24;
+	float flyingObjectTop = flyingObjectPos.y + offset.y;
+	float flyingObjectBottom = flyingObjectPos.y + 24 + offset.y;
 
 	float fieldLeft = x * chipSize;
 	float fieldRight = x * chipSize + chipSize;
-	float fieldTop = y * chipSize;
+	float fieldTop = y * chipSize ;
 	float fieldBottom = y * chipSize + chipSize;
 
-	if (flyingObjectBottom < fieldTop)		return false;
-	if (flyingObjectTop > fieldBottom)		return false;
+	
+
 	if (flyingObjectRight < fieldLeft)		return false;
 	if (flyingObjectLeft > fieldRight)		return false;
+	if (flyingObjectTop > fieldBottom)		return false;
+	if (flyingObjectBottom > fieldTop)		return false;
 
 	return true;
 }

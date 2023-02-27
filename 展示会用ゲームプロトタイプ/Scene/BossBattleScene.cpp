@@ -73,7 +73,7 @@ void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 {
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
-		manager_.changeScene(new Gameover(manager_));
+		manager_.changeScene(new Gameover(manager_,input));
 		return;
 	}
 }

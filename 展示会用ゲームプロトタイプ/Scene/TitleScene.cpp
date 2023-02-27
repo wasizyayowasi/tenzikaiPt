@@ -1,6 +1,7 @@
 #include "TitleScene.h"
 #include "GameMain.h"
 #include "SceneManager.h"
+#include "TutorialScene.h"
 #include "../InputState.h"
 #include "DxLib.h"
 #include "../game.h"
@@ -46,11 +47,12 @@ void TitleScene::choiceScene(const InputState& input)
 
 	if (input.isTriggered(InputType::next)) {
 		if (currentInputIndex == 0) {
-			updateFunc_ = &TitleScene::fadeOutUpdate;
+			updateFunc_ = &TitleScene::fadeOutUpdateGameMain;
 			return;
 		}
 		if (currentInputIndex == 1) {
-
+			updateFunc_ = &TitleScene::fadeOutUpdateTutorial;
+			return;
 		}
 		if (currentInputIndex == 2) {
 
@@ -70,8 +72,8 @@ void TitleScene::choiceSceneDraw()
 	constexpr int pw_start_x = Game::kScreenWidth / 2 + 200;	//ポーズ枠に左
 	constexpr int pw_start_y = Game::kScreenHeight / 2 + 200;	//ポーズ枠上
 
-	auto y = Game::kScreenHeight / 2;
-	int x = pw_width;
+	auto y = Game::kScreenHeight / 2 + 100;
+	int x = Game::kScreenWidth / 2;
 	int idx = 0;
 	bool isInputtypeSelected = false;
 	for (const auto& name : sceneTable) {
@@ -99,6 +101,7 @@ void TitleScene::choiceSceneDraw()
 		y += 50;
 		++idx;
 	}
+
 }
 
 void TitleScene::fadeInUpdate(const InputState& input)
@@ -115,11 +118,20 @@ void TitleScene::normalUpdate(const InputState& input)
 	choiceScene(input);
 }
 
-void TitleScene::fadeOutUpdate(const InputState& input)
+void TitleScene::fadeOutUpdateGameMain(const InputState& input)
 {
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new GameMain(manager_));
+		return;
+	}
+}
+
+void TitleScene::fadeOutUpdateTutorial(const InputState& input)
+{
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+	if (++fadeTimer_ == fade_interval) {
+		manager_.changeScene(new TutorialScene(manager_));
 		return;
 	}
 }

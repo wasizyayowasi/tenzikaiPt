@@ -39,7 +39,8 @@ private:
 	//通常状態のupdate関数
 	void normalUpdate(const InputState& input);
 	//フェードアウト時のupdate関数
-	void fadeOutUpdate(const InputState& input);
+	void fadeOutUpdateGameMain(const InputState& input);
+	void fadeOutUpdateTutorial(const InputState& input);
 
 	std::map<choice, std::string> sceneTable;
 

@@ -30,7 +30,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InputState input;
 	SceneManager sceneManager;
-	sceneManager.changeScene(new TitleScene(sceneManager));
+	//sceneManager.changeScene(new TitleScene(sceneManager));
+	sceneManager.changeScene(new GameMain(sceneManager));
 
 	while (ProcessMessage() == 0) {
 

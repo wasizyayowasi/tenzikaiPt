@@ -43,7 +43,7 @@ Player::~Player()
 
 void Player::init()
 {
-	inventory->setHandle(portionHandle, macheteHandle,guiHandle);
+	inventory->setHandle(portionHandle, macheteHandle,guiHandle,repairHandle);
 }
 
 void Player::update(Vec2 offset, const InputState& input)
@@ -51,6 +51,10 @@ void Player::update(Vec2 offset, const InputState& input)
 	
 	inventory->update(input);
 	hp->setObjectHp(playerHp);
+
+	if (flyingObject->isEnable()) {
+		flyingObject->update(offset);
+	}
 
 	ultimateTimer_ = (std::max)(ultimateTimer_ - 1, 0);
 
@@ -70,6 +74,148 @@ void Player::update(Vec2 offset, const InputState& input)
 	}
 }
 
+void Player::tutorialUpdate(Vec2 offset, const InputState& input)
+{
+	//モーション関係
+	motionNum = 0;
+	motion->update(motionNum);
+
+	//足元の配列番号を見る
+	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
+	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
+
+	//配列の中身を見る
+	int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
+
+	//梯子を降りる
+	if (chipNo == 119 || chipNo == 121) {
+		if (input.isPressed(InputType::down)) {
+			playerPos.y += 3.0f;
+			if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
+				updateFunc = &Player::updateLadder;
+			}
+		}
+	}
+
+	//梯子を上る
+	for (int x = -1; x < 1; x++) {
+		int chipNo = buildingData::building[underfootChipNoY - 1][underfootChipNoX - x];
+		if (chipNo == 119 || chipNo == 121) {
+			if (input.isPressed(InputType::up)) {
+				if (ladderCollision(underfootChipNoX - x, underfootChipNoY - 1)) {
+					updateFunc = &Player::updateLadder;
+					return;
+				}
+			}
+		}
+	}
+
+	//降下
+	int DescentChipNo3 = groundData::ground[underfootChipNoY][underfootChipNoX];
+	int DescentChipNo4 = buildingData::building[underfootChipNoY][underfootChipNoX];
+	if (DescentChipNo3 == 0 && DescentChipNo4 == 0) {
+		updateFunc = &Player::updateDescent;
+	}
+
+	//移動
+	if (!push) {
+		if (input.isPressed(InputType::left)) {
+			if (!(motionNum == 3)) {
+				motionNum = 1;
+			}
+			motion->update(motionNum);
+			playerPos.x -= 5;
+			playerDirections = true;
+		}
+		else if (input.isPressed(InputType::right)) {
+			if (!(motionNum == 3)) {
+				motionNum = 1;
+			}
+			motion->update(motionNum);
+			playerPos.x += 5;
+			playerDirections = false;
+		}
+	}
+
+
+	//近接攻撃
+	if (!push) {
+		if (!flyingObject->isEnable()) {
+			if (input.isPressed(InputType::attack)) {
+				motionNum = 3;
+				motion->update(motionNum);
+				proximityAttack = true;
+			}
+			else {
+				proximityAttack = false;
+			}
+		}
+	}
+
+	//アイテムの切り替え
+	switch (inventory->setCurrentInputIndex()) {
+	case 0:
+		//投擲
+		if (!push) {
+			if (input.isTriggered(InputType::shot)) {
+				if (!flyingObject->isEnable()) {
+					flyingObject->attack(playerPos, playerDirections);
+				}
+			}
+			if (flyingObject->landing()) {
+				if (flyingObject->playerCollision(playerPos, offset)) {
+					flyingObject->deadFlyingObject();
+				}
+			}
+		}
+		break;
+	case 1:
+		//修復タイマー
+		if (!flyingObject->isEnable()) {
+			if (repairBlock > 0) {
+				if (input.isPressed(InputType::shot)) {
+					spaceHpDisplay = true;
+				}
+				else {
+					spaceHpDisplay = false;
+				}
+			}
+			else {
+				spaceHpDisplay = false;
+			}
+		}
+		break;
+	case 2:
+		if (recoveryItem > 0) {
+			if (input.isTriggered(InputType::shot)) {
+				if (playerHp < 10) {
+					playerHp = (std::min)({ playerHp + 5, 10 });
+					recoveryItem--;
+				}
+			}
+		}
+		break;
+	}
+
+	//隠れる処理
+	int objectChipNo = objectData::object[underfootChipNoY - 1][underfootChipNoX];
+	if (objectChipNo == 36 || objectChipNo == 37) {
+		if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
+			if (input.isPressed(InputType::next)) {
+				DrawString(300, 100, "aiueo", 0xffffff);
+				push = true;
+			}
+			else {
+				push = false;
+			}
+		}
+	}
+	else {
+		hidden = false;
+		push = false;
+	}
+}
+
 void Player::updateField(Vec2 offset, const InputState& input)
 {
 	//モーション関係
@@ -81,7 +227,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
 
 	//配列の中身を見る
-	//int chipNo = FieldData::tempField[underfootChipNoY][underfootChipNoX];
 	int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
 
 	//梯子を降りる
@@ -149,18 +294,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		}
 	}
 
-
-	//デバッグ用
-	{
-		/*if (input.isTriggered(InputType::prev)) {
-		repairBlock++;
-	}
-
-	if (input.isTriggered(InputType::next)) {
-		recoveryItem++;
-	}*/
-	}
-
 	//アイテムの切り替え
 	switch (inventory->setCurrentInputIndex()) {
 	case 0:
@@ -170,9 +303,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 				if (!flyingObject->isEnable()) {
 					flyingObject->attack(playerPos, playerDirections);
 				}
-			}
-			if (flyingObject->isEnable()) {
-				flyingObject->update(offset);
 			}
 			if (flyingObject->landing()) {
 				if (flyingObject->playerCollision(playerPos, offset)) {
@@ -201,7 +331,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		if (recoveryItem > 0) {
 			if (input.isTriggered(InputType::shot)) {
 				if (playerHp < 10) {
-					playerHp = (std::min)({ playerHp + 5, 10 });
+					playerHp = (std::min)({ playerHp + 5, hp->returnMaxHp()});
 					recoveryItem--;
 				}
 			}
@@ -333,7 +463,7 @@ void Player::setItemControl(int num)
 {
 	switch (num) {
 	case 0:
-
+		hp->setObjectMaxHp(hp->returnMaxHp() + 1);
 		break;
 	case 1:
 		repairBlock++;
@@ -357,74 +487,18 @@ void Player::consumption()
 //描画
 void Player::draw(Vec2 offset)
 {
-	//デバッグ用
-	{
-		/*if (proximityAttack) {
-			if (playerDirections) {
-				DrawBox(playerPos.x - 50, playerPos.y + 10, playerPos.x  + 20, playerPos.y + 50, 0xff00ff, true);
-				DrawString(playerPos.x - 65, playerPos.y + 10, "近接攻撃", 0x000000);
-			}
-			else {
-				DrawBox(playerPos.x + 20, playerPos.y + 10, playerPos.x + 80, playerPos.y + 50, 0xff00ff, true);
-				DrawString(playerPos.x + 55, playerPos.y + 10, "近接攻撃", 0x000000);
-			}
-		}*/
+	hp->playerHpDraw(hpHandle);
 
-		/*if (updateFunc == &Player::updateField) {
-			int aiuX = (playerPos.x + 14) / Field::chipSize;
-			int aiuY = (playerPos.y + Field::chipSize * 3) / Field::chipSize;
-			int color = 0xff0000;
-			DrawString(0, 150, "フィールド", 0xffffff);
-			DrawBox(aiuX * Field::chipSize, aiuY * Field::chipSize, aiuX * Field::chipSize + Field::chipSize, aiuY * Field::chipSize + Field::chipSize, 0xff0000, true);
-			if (Field::field[aiuY - 1][aiuX] == 2) {
-				color = 0x00ff00;
-			}
-			DrawBox(aiuX * Field::chipSize, (aiuY - 1) * Field::chipSize, aiuX * Field::chipSize + Field::chipSize, (aiuY - 1) * Field::chipSize + Field::chipSize, color, true);
-		}
-		else if (updateFunc == &Player::updateLadder) {
-			int aiuX = (playerPos.x + 14) / Field::chipSize;
-			int aiuY = (playerPos.y + Field::chipSize * 2) / Field::chipSize;
-			DrawString(0, 150, "梯子", 0xffffff);
-			if (Pad::isPress(PAD_INPUT_UP)) {
-				DrawBox(aiuX * Field::chipSize, (aiuY ) * Field::chipSize, aiuX * Field::chipSize + Field::chipSize, (aiuY ) * Field::chipSize + Field::chipSize, 0x00ff00, true);
-			}
-			if (Pad::isPress(PAD_INPUT_DOWN)) {
-				DrawBox(aiuX * Field::chipSize, (aiuY+1) * Field::chipSize, aiuX * Field::chipSize + Field::chipSize, (aiuY + 1) * Field::chipSize + Field::chipSize, 0x00ff00, true);
-			}
-			DrawBox((aiuX + 1) * Field::chipSize, (aiuY - 2) * Field::chipSize, (aiuX + 1) * Field::chipSize + Field::chipSize, (aiuY - 2) * Field::chipSize + Field::chipSize, 0x00ff00, true);
-			DrawBox((aiuX + 1) * Field::chipSize, (aiuY - 1) * Field::chipSize, (aiuX + 1) * Field::chipSize + Field::chipSize, (aiuY - 1) * Field::chipSize + Field::chipSize, 0x00ff00, true);
-			DrawBox((aiuX + 1) * Field::chipSize, aiuY * Field::chipSize, (aiuX + 1) * Field::chipSize + Field::chipSize, aiuY * Field::chipSize + Field::chipSize, 0x00ff00, true);
-		}
-		else if (updateFunc == &Player::updateDescent) {
-			int aiuX = (playerPos.x) / Field::chipSize;
-			int aiuY = (playerPos.y + Field::chipSize * 3) / Field::chipSize;
-			DrawString(0, 150, "降下", 0xffffff);
-			DrawBox(aiuX * Field::chipSize, aiuY * Field::chipSize, aiuX * Field::chipSize + Field::chipSize, aiuY * Field::chipSize + Field::chipSize, 0x0000ff, true);
-		}
-		DrawBox(playerPos.x, playerPos.y, playerPos.x + 25, playerPos.y + 74, 0xffffff, true);
-		DrawLine(playerPos.x + 15, playerPos.y , playerPos.x + 15, playerPos.y + 74, 0xffffff);
-		DrawFormatString(0, 105, 0xffffff, "%d:%d", aiuX2, aiuY2);
-		DrawFormatString(0, 120, 0xffffff, "%d", chipNo3);
-		DrawFormatString(0, 165, 0xffffff, "%f : %f", playerPos.x + 24,playerPos.y);
-		DrawBox(playerPos.x + 10, playerPos.y + Field::chipSize + 10, playerPos.x + Field::chipSize + 10, playerPos.y + Field::chipSize*2 + 10, 0xffffff, false);
-		DrawBox(playerPos.x, playerPos.y, playerPos.x + Field::chipSize, playerPos.y + Field::chipSize, 0xffffff, false);
-
-		DrawBox(objectLeft, objectTop, objectRight, objectBottom, 0xff00ff, true);
-		DrawBox(playerPos.x + 24.0f, playerPos.y, playerPos.x + 25.0f, playerPos.y + 74, 0x00ff00, true);*/
-	}
-
-	//飛び道具
-	if (flyingObject->isEnable()) {
-		flyingObject->draw(macheteHandle);
-	}
-
-	
-	hp->playerHpDraw();
-	
 	inventory->setNum(repairBlock, recoveryItem, flyingObject->isEnable());
 	inventory->draw();
 
-	DrawFormatString(0, 0, 0xffffff, "お金 : %d", money);
+	DrawRotaGraph(1810, 50, 2.0f, 0.0f, coinHandle, true);
+	DrawFormatString(1845, 50, 0xffffff, "%d", money);
+
+	//飛び道具
+	if (flyingObject->isEnable()) {
+		flyingObject->draw(macheteHandle, offset);
+	}
 
 	if (ultimateTimer_ > 0) {
 		if ((ultimateTimer_ / 10) % 2 == 0) {
@@ -432,11 +506,10 @@ void Player::draw(Vec2 offset)
 		}
 	}
 
-	motion->draw(playerPos, playerHandle, playerDirections, offset);
-
+	if (!push) {
+		motion->draw(playerPos, playerHandle, playerDirections, offset);
+	}
 }
-
-
 
 
 //隠れる
@@ -477,6 +550,11 @@ int Player::enemyAttack(Vec2 enemyPos, Vec2 offset)
 	return enemyHit;
 }
 
+
+
+//++++++++++++++++++++++++++++++++++
+//　　　　　　当たり判定
+//++++++++++++++++++++++++++++++++++
 
 //近接攻撃の当たり判定
 bool Player::proximityAttackCollision(const Vec2& pos)
@@ -597,8 +675,11 @@ bool Player::shopCollision(int x, int y, Vec2 offset)
 	float objectBottom = y * chipSize + chipSize * 3;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
+	DrawString(300, 400, "aiu", 0xffffff);
 	if (playerPos.x + correctionSizeX > objectRight)	return false;
+	DrawString(300, 400, "aiu", 0xffffff);
 	if (playerPos.y + correctionSizeY < objectTop)		return false;
+	DrawString(300, 400, "aiu", 0xffffff);
 	if (playerPos.y > objectBottom)						return false;
 
 	return true;

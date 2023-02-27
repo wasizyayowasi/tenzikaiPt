@@ -24,7 +24,7 @@ public:
 
 	void setPlayer(Player* dPlayer) { player = dPlayer; }
 
-	void enemySetPlayer(int setHandle);
+	void enemySetPlayer(int setHandle,int coinHandle);
 
 	void setPos(Vec2 pos) { spacePos = pos; }
 

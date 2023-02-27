@@ -11,9 +11,11 @@ public:
 	void setObjectMaxHp(int obJectMaxHp) { maxHp = obJectMaxHp; }
 
 	void draw(Vec2 pos,Vec2 offset);
-	void playerHpDraw();
+	void playerHpDraw(int handle);
+
+	int returnMaxHp() { return maxHp; }
 private:
-	int hpHandle = -1;
+	
 	int deathHpHandle = -1;
 
 	int hp = 0;

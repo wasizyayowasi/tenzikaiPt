@@ -12,18 +12,21 @@
 #include "Pause.h"
 #include "Shop.h"
 #include "BossBattleScene.h"
+#include "../DrawFunctions.h"
 
 
 GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameMain::fadeInUpdate)
 {
-	enemyHandle = LoadGraph("data/enemy.png");
-	
-	portionHandle = LoadGraph("data/portion.png");
-	hacheteHandle = LoadGraph("data/machete.png");
-	guiHandle = LoadGraph("data/GUI.png");
+	enemyHandle = my::myLoadGraph("data/enemy.png");
+	hpHandle = LoadGraph("data/heart.png");
+	portionHandle = my::myLoadGraph("data/portion.png");
+	hacheteHandle = my::myLoadGraph("data/machete.png");
+	guiHandle = my::myLoadGraph("data/GUI.png");
+	repairHandle = my::myLoadGraph("data/repair.png");
+	coinHandle = my::myLoadGraph("data/CopperCoin.png");
 
 	player = new Player;
-	player->setHandle(portionHandle, hacheteHandle,guiHandle);
+	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
 
 	//空間のデータを作る
 	for (int i = 0; i < 3;i++) {
@@ -34,7 +37,7 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 		space->setPlayer(player);
 	}
 	for (auto& space : space) {
-		space->enemySetPlayer(enemyHandle);
+		space->enemySetPlayer(enemyHandle,coinHandle);
 	}
 	field = std::make_shared<Field>();
 
@@ -49,6 +52,9 @@ GameMain::~GameMain()
 	DeleteGraph(portionHandle);
 	DeleteGraph(guiHandle);
 	DeleteGraph(hacheteHandle);
+	DeleteGraph(hpHandle);
+	DeleteGraph(repairHandle);
+	DeleteGraph(coinHandle);
 }
 
 
@@ -87,8 +93,7 @@ void GameMain::update(const InputState& input)
 void GameMain::draw()
 {
 	//フィールドの描画
-	field->draw(offset);
-
+	field->draw(offset,1);
 
 	//空間の描画
 	for (auto& space : space) {
@@ -98,15 +103,14 @@ void GameMain::draw()
 	}
 
 	//網目の描画
-	for (int x = 0; x < bgNumX; x++) {
+	/*for (int x = 0; x < bgNumX; x++) {
 		for (int y = 0; y < bgNumY; y++) {
 			DrawBox(x * chipSize + offset.x, y * chipSize, x * chipSize + chipSize, y * chipSize + chipSize, 0x660000, false);
 		}
-	}
+	}*/
 
 	//プレイヤーの描画
 	player->draw(offset);
-
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	//画面全体を真っ黒に塗りつぶす
@@ -147,19 +151,16 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 	}
 
-	for (int x = 0; x < bgNumX; x++) {
-		for (int y = 0; y < bgNumY; y++) {
-			const int chipNo = FieldData::tempField[y][x];
-			if (chipNo == 6) {
-				//if (player->shopCollision(x, y, offset)) {
-					if (input.isTriggered(InputType::next))
-					{
-						manager_.pushScene(new Shop(manager_,input,player, hacheteHandle,portionHandle,guiHandle));
-					}
-				//}
-			}
+	int x = (2130) / chipSize;
+	int y = (780) / chipSize;
+
+	if (player->shopCollision(x, y, offset)) {
+		if (input.isTriggered(InputType::next))
+		{
+			manager_.pushScene(new Shop(manager_,input,player,portionHandle,guiHandle,hpHandle,repairHandle));
 		}
 	}
+	
 
 	clearCount = 0;
 
@@ -186,7 +187,7 @@ void GameMain::normalUpdate(const InputState& input)
 	}
 
 
-	offset = targetOffset * 0.5f + offset * 0.5f;
+	offset = targetOffset;
 
 
 	
@@ -200,7 +201,7 @@ void GameMain::gameoverFadeOutUpdate(const InputState& input)
 {
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
-		manager_.changeScene(new Gameover(manager_));
+		manager_.changeScene(new Gameover(manager_,input));
 		return;
 	}
 }

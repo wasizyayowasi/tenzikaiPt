@@ -25,10 +25,12 @@ private:
 	int fadeValue = 255;
 
 	int enemyHandle = -1;
-	
+	int repairHandle = -1;
+	int hpHandle = -1;
 	int portionHandle = -1;
 	int hacheteHandle = -1;
 	int guiHandle = -1;
+	int coinHandle = -1;
 
 	int scrollX = 0;
 

@@ -55,7 +55,7 @@ void BugSpace::update(Vec2 offset)
 	hp->setObjectHp(maxHp);
 
 	
-	/*if (--enemySpawnTime < 0) {
+	if (--enemySpawnTime < 0) {
 		for (auto& enemy : enemy) {
 			if (!enemy->isEnable()) {
 				enemy->dispatch(spacePos);
@@ -64,7 +64,7 @@ void BugSpace::update(Vec2 offset)
 				break;
 			}
 		}
-	}*/
+	}
 	
 	
 
@@ -113,10 +113,10 @@ void BugSpace::move(int scrollX)
 	spacePos.x += scrollX;
 }
 
-void BugSpace::enemySetPlayer(int handle)
+void BugSpace::enemySetPlayer(int handle,int coinHandle)
 {
 	for (auto& enemy : enemy) {
-		enemy->setPlayer(player, handle);
+		enemy->setPlayer(player, handle,coinHandle);
 	}
 }
 

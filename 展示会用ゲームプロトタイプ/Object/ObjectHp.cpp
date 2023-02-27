@@ -4,13 +4,12 @@
 
 ObjectHp::ObjectHp()
 {
-	hpHandle = LoadGraph("data/heart.png");
 	deathHpHandle = LoadGraph("data/heart2.png");
 }
 
 ObjectHp::~ObjectHp()
 {
-	DeleteGraph(hpHandle);
+	
 }
 
 //hp‚Ì•\Ž¦
@@ -24,16 +23,16 @@ void ObjectHp::draw(Vec2 pos, Vec2 offset)
 	}
 }
 
-void ObjectHp::playerHpDraw()
+void ObjectHp::playerHpDraw(int handle)
 {
 	int increaseX = 0;
-	for (int i = 0; i < hp; i++) {
-		DrawRotaGraph(Game::kScreenWidth / 2 + 122 + increaseX, 998, 2.0f, 0.0f, hpHandle, true);
+	for (int i = 0; i < maxHp; i++) {
+		DrawRotaGraph(Game::kScreenWidth / 2 + 122 + increaseX, 998, 2.0f, 0.0f, deathHpHandle, true);
 		increaseX += 26;
 	}
-	int decreaseX = 1316;
-	for (int i = maxHp - hp; i > 0; i--) {
-		DrawRotaGraph(decreaseX, 998, 2.0f, 0.0f, deathHpHandle, true);
-		decreaseX -= 26;
+	increaseX = 0;
+	for (int i = 0; i < hp; i++) {
+		DrawRotaGraph(Game::kScreenWidth / 2 + 122 + increaseX, 998, 2.0f, 0.0f, handle, true);
+		increaseX += 26;
 	}
 }
