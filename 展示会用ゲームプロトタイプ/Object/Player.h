@@ -12,10 +12,11 @@ class Inventory;
 class Player
 {
 public:
-	Player();
+	Player(int num);
 	virtual~Player();
 
 	Vec2 getPos()const { return playerPos; }
+	void  setPos(Vec2 pos) { playerPos = pos; }
 
 	void init();
 	void update(Vec2 offset,const InputState& input);
@@ -23,6 +24,7 @@ public:
 
 
 	void damege(bool inversion);
+	void bossDamege();
 
 	int enemyAttack(Vec2 enemyPos, Vec2 offset);
 
@@ -40,6 +42,7 @@ public:
 	bool shopCollision(int x,int y, Vec2 offset);
 
 	void tutorialUpdate(Vec2 offset, const InputState& input);
+	void BossUpdate(Vec2 offset, const InputState& input);
 	void updateField(Vec2 offset, const InputState& input);
 	void updateDescent(Vec2 offset, const InputState& input);
 	void updateLadder(Vec2 offset, const InputState& input);
@@ -55,15 +58,25 @@ public:
 	void setItemControl(int num);
 	void setMoney(int amount);
 
+	void giftMoney() { money = 5000; }
+
 	void consumption();
 
 	void setHandle(int pHandle, int mHandle,int gHandle,int hHandle,int rHandle,int cHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle,hpHandle = hHandle,repairHandle = rHandle,coinHandle = cHandle; }
 	int returnHp() { return playerHp; }
+
+	void setMotion(bool start);
+
+	int returnRepair() { return repairBlock; }
+
+	int returnHpDisplay() { return spaceHpDisplay; }
+
+	bool returnFlyingisEnabled();
 private:
 	//所持アイテム
-	int money = 4000;
-	int repairBlock = 3;
-	int recoveryItem = 1;
+	int money = 0;
+	int repairBlock = 0;
+	int recoveryItem = 0;
 
 	//グラフィックハンドル
 	int playerHandle = -1;
@@ -73,6 +86,17 @@ private:
 	int hpHandle = -1;
 	int repairHandle = -1;
 	int coinHandle = -1;
+	int smokeHandle = -1;
+
+	int sceneNum = 0;
+
+	//スモークの画像の類
+	int imgX = 0;
+	int imgY = 3;
+
+	bool motionStart = false;
+	bool bat = false;
+	bool bat2 = false;
 
 	//無敵時間
 	int ultimateTimer_ = 0;
@@ -89,6 +113,9 @@ private:
 	//HP関連
 	int playerHp = 3;
 	int hpDisplayTime = 120;
+
+	bool rightClosure = false;
+	bool leftClosure = false;
 
 	//生死
 	bool isEnabled = true;

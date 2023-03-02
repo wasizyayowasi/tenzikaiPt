@@ -5,8 +5,9 @@
 #include "DxLib.h"
 #include "../game.h"
 #include "GameMain.h"
+#include "BossBattleScene.h"
 
-Gameover::Gameover(SceneManager& manager, const InputState& input):SceneBase(manager),updateFunc_(&Gameover::fadeInUpdate), inputState(input)
+Gameover::Gameover(SceneManager& manager, const InputState& input, int num):SceneBase(manager),updateFunc_(&Gameover::fadeInUpdate), inputState(input),sceneNum(num)
 {
 	gameOverChoiceTable[GameOverChoice::continueMain] = "continue";
 	gameOverChoiceTable[GameOverChoice::end] = "end";
@@ -113,7 +114,12 @@ void Gameover::continueFadeOutUpdate(const InputState& input)
 {
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
-		manager_.changeScene(new GameMain(manager_));
+		if (sceneNum == 1) {
+			manager_.changeScene(new GameMain(manager_));
+		}
+		else if(sceneNum == 2) {
+			manager_.changeScene(new BossBattleScene(manager_));
+		}
 		return;
 	}
 }

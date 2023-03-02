@@ -11,12 +11,13 @@ public:
 
 	void update(int num);
 	void walk();
+	void bossWalk();
 	void rolling();
 	
 	void death();
 	void attack();
 
-	void draw(Vec2 enemyPos,int handle,bool trun,Vec2 offset);
+	void draw(Vec2 enemyPos,int handle,bool trun,Vec2 offset,float scale);
 
 	int dead() { return isEnabled; }
 private:

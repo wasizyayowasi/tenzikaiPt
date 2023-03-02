@@ -6,14 +6,217 @@
 #include "../DrawFunctions.h"
 #include "EnemyMotion.h"
 #include "../field.h" 
+#include "../DrawFunctions.h"
+#include <algorithm>
 
-Enemy::Enemy()
+Enemy::Enemy(int num) : sceneNum(num)
 {
+	hitHandle = my::myLoadGraph("data/hit.png");
+
 	hp = new ObjectHp;
 	motion = new EnemyMotion;
+	if (sceneNum == 3) {
+		enemyHp = 1000;
+	}
 	hp->setObjectMaxHp(enemyHp);
-	updateFunc = &Enemy::normalUpdate;
-	drawFunc = &Enemy::normalDraw;
+
+}
+
+Enemy::~Enemy()
+{
+	delete hp;
+	DeleteGraph(hitHandle);
+}
+
+void Enemy::tutorialUpdate(Vec2 offset)
+{
+	vec.y = 0.0f;
+
+	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+
+	const int chipNo = groundData::tutorialGround[underfootChipNoY][underfootChipNoX];
+
+	if (chipNo == 0) {
+		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
+			updateFunc = &Enemy::updateDescent;
+		}
+	}
+
+	DrawFormatString(0, 30, 0xffffff, "%f : %f", enemyPos.x, enemyPos.y);
+
+	//現状のHPを設定する
+	hp->setObjectHp(enemyHp);
+
+	motionNum = 0;
+
+	//HPがなくなり死亡した場合
+	if (enemyHp == 0) {
+		motionNum = 3;
+	}
+
+	//プレイヤーが隠れているか
+	hidden = player->beHidden();
+
+	//ターゲットの座標を見つける
+	targetPlayer = { 0.0f,0.0f };
+	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
+	targetPlayer.y = player->getPos().y + 44 - enemyPos.y;
+
+	//検知範囲内だった場合
+	if (motionNum != 3) {
+		if (!hidden) {
+			if (landing) {
+				if (targetPlayer.length() < 200) {
+
+					targetPlayer2 = { 0.0f,0.0f };
+					targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
+					//targetPlayer2.y = player->getPos().y + 44 - enemyPos.y;
+
+					targetPlayer2 = targetPlayer2.normalize() * 3;
+
+					stop = true;
+
+					motionNum = 1;
+
+					if (--sleepTime < 0) {
+						enemyPos += targetPlayer2;
+					}
+
+					//画像の向き
+					if (targetPlayer.x > 0) {
+						inversion = false;
+					}
+					else {
+						inversion = true;
+
+					}
+				}
+				else {
+
+					//画像の向き
+					if (vec.x > 0) {
+						inversion = false;
+					}
+					else {
+						inversion = true;
+
+					}
+					stop = false;
+				}
+			}
+		}
+		else {
+			stop = false;
+			//画像の向き
+			if (vec.x > 0) {
+				inversion = false;
+			}
+			else {
+				inversion = true;
+
+			}
+			stop = false;
+		}
+	}
+
+	//右の壁反射
+	if (enemyPos.x > 3000) {
+		vec.x = 0.0f;
+	}
+	//左の壁反射
+	if (enemyPos.x > 700) {
+		enemyPos.x = 2900;
+		inversion = true;
+	}
+
+	//移動
+	if (motionNum != 3) {
+		if (!stop) {
+			if (landing) {
+				enemyPos += vec;
+			}
+		}
+	}
+
+	//if (!player->beHidden()) {
+	//	if (enemyHp > 0) {
+	//		if (targetPlayer.length() < 50) {
+	//			motionNum = 2;
+	//			//攻撃
+	//			if (--sleepTime < 0) {
+	//				player->damege(inversion);
+	//				sleepTime = 60;
+	//			}
+	//		}
+	//	}
+	//}
+
+	//投擲が当たった場合の処理
+	if (player->enemyAttack(enemyPos, offset)) {
+		enemyHp = 0;
+	}
+
+	//プレイヤーの近接攻撃との当たり判定
+	if (enemyHp > 0) {
+		if (--coolTime < 0) {
+			if (player->proximityAttackCollision(enemyPos)) {
+				enemyHp -= 3;
+				hpDisplay = true;
+				coolTime = 23;
+			}
+		}
+	}
+
+	//HPを描画する際の条件
+	if (hpDisplay) {
+		if (--hpDisplayTime < 0) {
+			hpDisplay = false;
+			hpDisplayTime = 120;
+		}
+	}
+
+	if (motion->dead()) {
+		//motion->init();
+		//isEnabled = false;
+		updateFunc = &Enemy::coinUpdate;
+		drawFunc = &Enemy::coinDraw;
+	}
+
+	//エネミーの動きを更新
+	if (landing) {
+		motion->update(motionNum);
+	}
+}
+
+void Enemy::BossUpdate(Vec2 offset)
+{
+	//現状のHPを設定する
+	hp->setObjectHp(enemyHp);
+
+	landing = true;
+
+	motionNum = 0;
+
+	enemyPos.x += 3.5f;
+
+	
+	if (!player->beHidden()) {
+		if (enemyHp > 0) {
+			if (470 + enemyPos.x> player->getPos().x) {
+				motionNum = 2;
+				//攻撃
+				if (--sleepTime < 0) {
+					player->bossDamege();
+					sleepTime = 60;
+				}
+			}
+		}
+	}
+
+	if (landing) {
+		motion->bossWalk();
+	}
 }
 
 void Enemy::normalUpdate(Vec2 offset)
@@ -30,7 +233,6 @@ void Enemy::normalUpdate(Vec2 offset)
 			updateFunc = &Enemy::updateDescent;
 		}
 	}
-	
 
 	//現状のHPを設定する
 	hp->setObjectHp(enemyHp);
@@ -133,6 +335,7 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
+	//攻撃
 	if (!player->beHidden()) {
 		if (enemyHp > 0) {
 			if (targetPlayer.length() < 50) {
@@ -158,6 +361,7 @@ void Enemy::normalUpdate(Vec2 offset)
 				enemyHp -= 3;
 				hpDisplay = true;
 				coolTime = 23;
+				time = 4;
 			}
 		}
 	}
@@ -186,29 +390,46 @@ void Enemy::normalUpdate(Vec2 offset)
 void Enemy::normalDraw(Vec2 offset)
 {
 	Vec2 pos = enemyPos + offset;
-
-	{
-		/*int underfootChipNoX = (enemyPos.x + 20) / chipSize;
-		int underfootChipNoY = (enemyPos.y + 32) / chipSize;
-
-		int color = 0x44ff44;
-
-		if (updateFunc == &Enemy::updateDescent) {
-			color = 0x4444ff;
-		}
-		DrawBox(underfootChipNoX * 32, underfootChipNoY * 32, underfootChipNoX * 32 + 32, underfootChipNoY * 32 + 32, color, true);*/
-
-	}
 	
 	DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
 	DrawString(pos.x, pos.y - 15, "敵", 0xffffff);
 
-	motion->draw(enemyPos, handle, inversion, offset);
+	motion->draw(enemyPos, handle, inversion, offset,2.0f);
+
+	if (hpDisplay) {
+		hp->draw(enemyPos, offset);
+		
+	}
+
+	if (--time == 0) {
+		imgX++;
+		time = 4;
+		if (imgX > 3) {
+			imgX = 0;
+			time = 0;
+		}
+		my::myDrawRectRotaGraph(pos.x, pos.y, imgX * 40, 0, 40, 40, 1.5f, 0.0f, hitHandle, true, false);
+	}
+
+	DrawFormatString(1910, 0, 0xffffff, "%d", imgX);
+	
+}
+
+void Enemy::BossDraw(Vec2 offset)
+{
+
+	Vec2 pos = enemyPos + offset;
+
+	inversion = false;
+
+	DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
+	DrawString(pos.x, pos.y - 15, "敵", 0xffffff);
+
+	motion->draw(enemyPos, handle, inversion, offset,50.0f);
 
 	if (hpDisplay) {
 		hp->draw(enemyPos, offset);
 	}
-
 }
 
 void Enemy::coinUpdate(Vec2 offset)
@@ -221,7 +442,6 @@ void Enemy::coinUpdate(Vec2 offset)
 void Enemy::coinDraw(Vec2 offset)
 {
 	DrawGraph(enemyPos.x + offset.x, enemyPos.y + offset.y, coinHandle, true);
-	//DrawBox(enemyPos.x + offset.x, enemyPos.y + offset.y, enemyPos.x + 30 + offset.x, enemyPos.y + 30 + offset.y, 0xffffff, true);
 }
 
 void Enemy::updateDescent(Vec2 offset)
@@ -232,14 +452,59 @@ void Enemy::updateDescent(Vec2 offset)
 	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
 	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
 
-	const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
+	switch (sceneNum) {
+	case 0:
+		for (int i = 0; i < 1; i++) {
+			const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
-	if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
-			landing = true;
-			updateFunc = &Enemy::normalUpdate;
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (filedCollision(underfootChipNoX, underfootChipNoY)) {
+					landing = true;
+					updateFunc = &Enemy::normalUpdate;
+				}
+			}
 		}
+		break;
+	case 1:
+		for (int i = 0; i < 1; i++) {
+			const int chipNo = groundData::tutorialGround[underfootChipNoY][underfootChipNoX];
+
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				landing = true;
+				updateFunc = &Enemy::tutorialUpdate;
+			}
+		}
+		break;
+	case 2:
+		for (int i = 0; i < 1; i++) {
+			const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
+
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (filedCollision(underfootChipNoX, underfootChipNoY)) {
+					landing = true;
+					updateFunc = &Enemy::normalUpdate;
+				}
+			}
+		}
+		break;
+	case 3:
+		bunderfootChipNoX = (enemyPos.x + 20) / chipSize;
+		bunderfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+
+		for (int i = 0; i < 1; i++) {
+			const int chipNo = groundData::tutorialGround[underfootChipNoY + 12][underfootChipNoX];
+			
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+					landing = true;
+					updateFunc = &Enemy::BossUpdate;
+			}
+		}
+		break;
 	}
+
+	
+
+	
 }
 
 void Enemy::dispatch(const Vec2& pos)
@@ -254,7 +519,24 @@ void Enemy::dispatch(const Vec2& pos)
 	motionNum = 0;
 	motion->init();
 	vec = { 3.0f,0.0f };
-	updateFunc = &Enemy::normalUpdate;
+	switch (sceneNum) {
+	case 0:
+		updateFunc = &Enemy::updateDescent;
+		drawFunc = &Enemy::normalDraw;
+		break;
+	case 1:
+		updateFunc = &Enemy::updateDescent;
+		drawFunc = &Enemy::normalDraw;
+		break;
+	case 2:
+		updateFunc = &Enemy::updateDescent;
+		drawFunc = &Enemy::normalDraw;
+		break;
+	case 3:
+		updateFunc = &Enemy::updateDescent;
+		drawFunc = &Enemy::BossDraw;
+		break;
+	}
 	drawFunc = &Enemy::normalDraw;
 }
 
@@ -265,6 +547,7 @@ void Enemy::update(Vec2 offset)
 
 void Enemy::draw(Vec2 offset)
 {
+	
 	(this->*drawFunc)(offset);
 }
 

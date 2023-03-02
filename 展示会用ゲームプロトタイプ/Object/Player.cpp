@@ -19,16 +19,28 @@ namespace {
 	constexpr int ultimate_frames = 120;
 }
 
-Player::Player()
+Player::Player(int num) : sceneNum(num)
 {
-	playerHandle =my::myLoadGraph("data/player.png");
+	playerHandle = my::myLoadGraph("data/player.png");
+	smokeHandle = my::myLoadGraph("data/spritesheet.png");
 
 	hp = new ObjectHp;
 	motion = new PlayerMotion;
 	inventory = new Inventory();
-	flyingObject = std::make_shared<PlayerThrowinAttack>();
+	flyingObject = std::make_shared<PlayerThrowinAttack>(sceneNum);
 	hp->setObjectMaxHp(playerHp);
-	updateFunc = &Player::updateField;
+	switch (sceneNum) {
+	case 0:
+		updateFunc = &Player::updateDescent;
+		break;
+	case 1:
+		updateFunc = &Player::updateDescent;
+		break;
+	case 2:
+		updateFunc = &Player::updateDescent;
+		break;
+	}
+	
 	
 }
 
@@ -39,6 +51,7 @@ Player::~Player()
 	delete inventory;
 
 	DeleteGraph(playerHandle);
+	DeleteGraph(smokeHandle);
 }
 
 void Player::init()
@@ -48,12 +61,18 @@ void Player::init()
 
 void Player::update(Vec2 offset, const InputState& input)
 {
-	
+
 	inventory->update(input);
 	hp->setObjectHp(playerHp);
 
 	if (flyingObject->isEnable()) {
-		flyingObject->update(offset);
+		if (sceneNum != 2) {
+			flyingObject->update(offset);
+		}
+		else {
+			flyingObject->bossUpdate(offset);
+		}
+		
 	}
 
 	ultimateTimer_ = (std::max)(ultimateTimer_ - 1, 0);
@@ -63,9 +82,17 @@ void Player::update(Vec2 offset, const InputState& input)
 	if (playerPos.x < 0) {
 		playerPos.x = 0;
 	}
-	if (playerPos.x + 50 > Game::kScreenWidth*2) {
-		playerPos.x = Game::kScreenWidth * 2 - 50;
+	if (sceneNum != 2) {
+		if (playerPos.x + 50 > Game::kScreenWidth * 2) {
+			playerPos.x = Game::kScreenWidth * 2 - 50;
+		}
 	}
+	else {
+		if (playerPos.x + 50 > Game::kScreenWidth * 8) {
+			playerPos.x = Game::kScreenWidth * 8 - 50;
+		}
+	}
+	
 
 	if (playerHp < 1) {
 		motionNum = 4;
@@ -85,40 +112,43 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
 
 	//配列の中身を見る
-	int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
+	int chipNo = buildingData::tutorialBuilding[underfootChipNoY][underfootChipNoX];
 
-	//梯子を降りる
-	if (chipNo == 119 || chipNo == 121) {
-		if (input.isPressed(InputType::down)) {
-			playerPos.y += 3.0f;
-			if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
-				updateFunc = &Player::updateLadder;
+	{
+		//梯子を降りる
+		if (chipNo == 119 || chipNo == 121) {
+			if (input.isPressed(InputType::down)) {
+				playerPos.y += 3.0f;
+				if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
+					updateFunc = &Player::updateLadder;
+				}
 			}
 		}
-	}
 
-	//梯子を上る
-	for (int x = -1; x < 1; x++) {
-		int chipNo = buildingData::building[underfootChipNoY - 1][underfootChipNoX - x];
-		if (chipNo == 119 || chipNo == 121) {
-			if (input.isPressed(InputType::up)) {
-				if (ladderCollision(underfootChipNoX - x, underfootChipNoY - 1)) {
-					updateFunc = &Player::updateLadder;
-					return;
+		//梯子を上る
+		for (int x = -1; x < 1; x++) {
+			int chipNo = buildingData::tutorialBuilding[underfootChipNoY - 1][underfootChipNoX - x];
+			if (chipNo == 119 || chipNo == 121) {
+				if (input.isPressed(InputType::up)) {
+					if (ladderCollision(underfootChipNoX - x, underfootChipNoY - 1)) {
+						updateFunc = &Player::updateLadder;
+						return;
+					}
 				}
 			}
 		}
 	}
 
 	//降下
-	int DescentChipNo3 = groundData::ground[underfootChipNoY][underfootChipNoX];
-	int DescentChipNo4 = buildingData::building[underfootChipNoY][underfootChipNoX];
+	int DescentChipNo3 = groundData::tutorialGround[underfootChipNoY][underfootChipNoX];
+	int DescentChipNo4 = buildingData::tutorialBuilding[underfootChipNoY][underfootChipNoX];
 	if (DescentChipNo3 == 0 && DescentChipNo4 == 0) {
 		updateFunc = &Player::updateDescent;
 	}
 
 	//移動
 	if (!push) {
+
 		if (input.isPressed(InputType::left)) {
 			if (!(motionNum == 3)) {
 				motionNum = 1;
@@ -162,34 +192,29 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 					flyingObject->attack(playerPos, playerDirections);
 				}
 			}
-			if (flyingObject->landing()) {
-				if (flyingObject->playerCollision(playerPos, offset)) {
-					flyingObject->deadFlyingObject();
-				}
-			}
 		}
 		break;
 	case 1:
 		//修復タイマー
-		if (!flyingObject->isEnable()) {
-			if (repairBlock > 0) {
-				if (input.isPressed(InputType::shot)) {
-					spaceHpDisplay = true;
-				}
-				else {
-					spaceHpDisplay = false;
-				}
+		if (repairBlock > 0) {
+			if (input.isPressed(InputType::shot)) {
+				spaceHpDisplay = true;
 			}
 			else {
 				spaceHpDisplay = false;
+				motionStart = false;
 			}
+		}
+		else {
+			spaceHpDisplay = false;
+			motionStart = false;
 		}
 		break;
 	case 2:
 		if (recoveryItem > 0) {
 			if (input.isTriggered(InputType::shot)) {
 				if (playerHp < 10) {
-					playerHp = (std::min)({ playerHp + 5, 10 });
+					playerHp = (std::min)({ playerHp + 5, hp->returnMaxHp() });
 					recoveryItem--;
 				}
 			}
@@ -197,22 +222,188 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 		break;
 	}
 
-	//隠れる処理
-	int objectChipNo = objectData::object[underfootChipNoY - 1][underfootChipNoX];
-	if (objectChipNo == 36 || objectChipNo == 37) {
-		if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
-			if (input.isPressed(InputType::next)) {
-				DrawString(300, 100, "aiueo", 0xffffff);
-				push = true;
+	if (flyingObject->landing()) {
+		if (flyingObject->playerCollision(playerPos, offset)) {
+			flyingObject->deadFlyingObject();
+		}
+	}
+
+	{
+		//隠れる処理
+		int objectChipNo = objectData::tutorialObject[underfootChipNoY - 1][underfootChipNoX];
+		if (objectChipNo == 36 || objectChipNo == 37) {
+			if (objectCollision(underfootChipNoX, underfootChipNoY - 1)) {
+				if (input.isPressed(InputType::next)) {
+					DrawString(300, 100, "aiueo", 0xffffff);
+					push = true;
+				}
+				else {
+					push = false;
+				}
 			}
-			else {
-				push = false;
+		}
+		else {
+			hidden = false;
+			push = false;
+		}
+	}
+	
+}
+
+void Player::BossUpdate(Vec2 offset, const InputState& input)
+{
+	rightClosure = false;
+	leftClosure = false;
+
+	//モーション関係
+	motionNum = 0;
+	motion->update(motionNum);
+
+	//足元の配列番号を見る
+	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
+	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
+
+	//配列の中身を見る
+	int chipNo = buildingData::bossBuilding[underfootChipNoY][underfootChipNoX];
+
+	//梯子を降りる
+	if (chipNo == 119 || chipNo == 121) {
+		if (input.isPressed(InputType::down)) {
+			playerPos.y += 3.0f;
+			if (ladderCollision(underfootChipNoX, underfootChipNoY)) {
+				updateFunc = &Player::updateLadder;
 			}
 		}
 	}
+
+	//梯子を上る
+	for (int x = -1; x < 1; x++) {
+		int chipNo = buildingData::bossBuilding[underfootChipNoY - 1][underfootChipNoX - x];
+		if (chipNo == 119 || chipNo == 121) {
+			if (input.isPressed(InputType::up)) {
+				if (ladderCollision(underfootChipNoX - x, underfootChipNoY - 1)) {
+					updateFunc = &Player::updateLadder;
+					return;
+				}
+			}
+		}
+	}
+
+	//降下
+	int DescentChipNo3 = groundData::bossGround[underfootChipNoY][underfootChipNoX];
+	int DescentChipNo4 = buildingData::bossBuilding[underfootChipNoY][underfootChipNoX];
+	if (DescentChipNo3 == 0 && DescentChipNo4 == 0) {
+		updateFunc = &Player::updateDescent;
+	}
+
+
+
+	//つま先の配列番号を見る
+	int tiptoeChipNoY = (playerPos.y + chipSize * 2) / chipSize;
+
+	if (!playerDirections) {
+		int rightTiptoeChipNoX = (playerPos.x + correctionSizeX + chipSize) / chipSize;
+		int chipNo2 = groundData::bossGround[tiptoeChipNoY][rightTiptoeChipNoX];
+		if (chipNo2 != 0) {
+			rightClosure = true;
+		}
+	}
 	else {
-		hidden = false;
-		push = false;
+		int leftTiptoeChipNoX = (playerPos.x + correctionSizeX - chipSize) / chipSize;
+		int chipNo2 = groundData::bossGround[tiptoeChipNoY][leftTiptoeChipNoX];
+		if (chipNo2 != 0) {
+			leftClosure = true;
+		}
+	}
+	
+	
+
+	//移動
+	if (!push) {
+		if (input.isPressed(InputType::left)) {
+			if (!leftClosure) {
+				if (!(motionNum == 3)) {
+					motionNum = 1;
+				}
+				motion->update(motionNum);
+				playerPos.x -= 5;
+				playerDirections = true;
+			}
+		}
+		else if (input.isPressed(InputType::right)) {
+			if (!rightClosure) {
+				if (!(motionNum == 3)) {
+					motionNum = 1;
+				}
+				motion->update(motionNum);
+				playerPos.x += 5;
+				playerDirections = false;
+			}
+		}
+	}
+
+
+	//近接攻撃
+	if (!push) {
+		if (!flyingObject->isEnable()) {
+			if (input.isPressed(InputType::attack)) {
+				motionNum = 3;
+				motion->update(motionNum);
+				proximityAttack = true;
+			}
+			else {
+				proximityAttack = false;
+			}
+		}
+	}
+
+	//アイテムの切り替え
+	switch (inventory->setCurrentInputIndex()) {
+	case 0:
+		//投擲
+		if (!push) {
+			if (input.isTriggered(InputType::shot)) {
+				if (!flyingObject->isEnable()) {
+					flyingObject->bossAttack(playerPos, playerDirections);
+				}
+			}
+		}
+		break;
+	case 1:
+		//修復タイマー
+
+		if (repairBlock > 0) {
+			if (input.isPressed(InputType::shot)) {
+				spaceHpDisplay = true;
+			}
+			else {
+				spaceHpDisplay = false;
+				motionStart = false;
+			}
+		}
+		else {
+			spaceHpDisplay = false;
+			motionStart = false;
+		}
+
+		break;
+	case 2:
+		if (recoveryItem > 0) {
+			if (input.isTriggered(InputType::shot)) {
+				if (playerHp < 10) {
+					playerHp = (std::min)({ playerHp + 5, hp->returnMaxHp() });
+					recoveryItem--;
+				}
+			}
+		}
+		break;
+	}
+
+	//得物を回収
+	if (flyingObject->landing()) {
+		if (flyingObject->playerCollision(playerPos, offset)) {
+			flyingObject->deadFlyingObject();
+		}
 	}
 }
 
@@ -304,28 +495,25 @@ void Player::updateField(Vec2 offset, const InputState& input)
 					flyingObject->attack(playerPos, playerDirections);
 				}
 			}
-			if (flyingObject->landing()) {
-				if (flyingObject->playerCollision(playerPos, offset)) {
-					flyingObject->deadFlyingObject();
-				}
-			}
 		}
 		break;
 	case 1:
 		//修復タイマー
-		if (!flyingObject->isEnable()) {
-			if (repairBlock > 0) {
-				if (input.isPressed(InputType::shot)) {
-					spaceHpDisplay = true;
-				}
-				else {
-					spaceHpDisplay = false;
-				}
+		
+		if (repairBlock > 0) {
+			if (input.isPressed(InputType::shot)) {
+				spaceHpDisplay = true;
 			}
 			else {
 				spaceHpDisplay = false;
+				motionStart = false;
 			}
 		}
+		else {
+			spaceHpDisplay = false;
+			motionStart = false;
+		}
+		
 		break;
 	case 2:
 		if (recoveryItem > 0) {
@@ -339,6 +527,13 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		break;
 	}
 	
+	//得物を回収
+	if (flyingObject->landing()) {
+		if (flyingObject->playerCollision(playerPos, offset)) {
+			flyingObject->deadFlyingObject();
+		}
+	}
+
 	//隠れる処理
 	int objectChipNo = objectData::object[underfootChipNoY - 1][underfootChipNoX];
 	if (objectChipNo == 36 || objectChipNo == 37) {
@@ -367,24 +562,75 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 	//降下
 	playerPos += vec;
 
-	//地面との判定
-	for (int x = 0; x < bgNumX; x++) {
-		for (int y = 0; y < bgNumY; y++) {
+	switch (sceneNum) {
+	case 0:
+		//地面との判定
+		for (int x = 0; x < bgNumX; x++) {
+			for (int y = 0; y < bgNumY; y++) {
 
-			const int chipNo = groundData::ground[y][x];
+				const int chipNo = groundData::ground[y][x];
 
-			//地面
-			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-				if (playerFiledCollision(x, y)) {
-					if (playerPos.y + correctionSizeY > y * chipSize) {
-						playerPos.y = y * chipSize - 74;
+				//地面
+				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+					if (playerFiledCollision(x, y)) {
+						if (playerPos.y + correctionSizeY > y * chipSize) {
+							playerPos.y = y * chipSize - 74;
+						}
+
+						updateFunc = &Player::updateField;
+						break;
+						return;
 					}
-					updateFunc = &Player::updateField;
-					return;
 				}
 			}
 		}
+		break;
+	case 1:
+		//地面との判定
+		for (int x = 0; x < bgNumX; x++) {
+			for (int y = 0; y < bgNumY; y++) {
+
+				const int chipNo = groundData::tutorialGround[y][x];
+
+				//地面
+				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+					if (playerFiledCollision(x, y)) {
+						if (playerPos.y + correctionSizeY > y * chipSize) {
+							playerPos.y = y * chipSize - 74;
+						}
+
+						updateFunc = &Player::tutorialUpdate;
+						break;
+						return;
+					}
+				}
+			}
+		}
+		break;
+	case 2:
+		//地面との判定
+		for (int x = 0; x < bgNumX; x++) {
+			for (int y = 0; y < bgNumY; y++) {
+
+				const int chipNo = groundData::ground[y][x];
+
+				//地面
+				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+					if (playerFiledCollision(x, y)) {
+						if (playerPos.y + correctionSizeY > y * chipSize) {
+							playerPos.y = y * chipSize - 74;
+						}
+
+						updateFunc = &Player::BossUpdate;
+						return;
+					}
+				}
+			}
+		}
+		break;
 	}
+
+	
 
 	//梯子との判定
 	for (int x = -1; x < 1; x++) {
@@ -407,39 +653,117 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
 	int underfootChipNoY = (playerPos.y + chipSize * 2) / chipSize;
 
-	//登りきった後
-	if (input.isPressed(InputType::up)) {
+	switch (sceneNum) {
+	case 0:
+		//登りきった後
+		if (input.isPressed(InputType::up)) {
 
-		motionNum = 2;
-		playerPos.y -= 5;
-		motion->update(motionNum);
-		
-		int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
-		//地面
-		if (chipNo == 0 || chipNo == 106|| chipNo == 108) {
-			if (playerFiledCollision(underfootChipNoX, underfootChipNoY)) {
-				updateFunc = &Player::updateField;
-				return;
+			motionNum = 2;
+			playerPos.y -= 5;
+			motion->update(motionNum);
+
+			int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
+			//地面
+			if (chipNo == 0 || chipNo == 106 || chipNo == 108) {
+				if (playerFiledCollision(underfootChipNoX, underfootChipNoY)) {
+					updateFunc = &Player::updateField;
+					return;
+				}
 			}
 		}
-	}
 
-	//下ったとき
-	if (input.isPressed(InputType::down)) {
-		motionNum = 2;
-		playerPos.y += 5;
-		motion->update(motionNum);
+		//下ったとき
+		if (input.isPressed(InputType::down)) {
+			motionNum = 2;
+			playerPos.y += 5;
+			motion->update(motionNum);
 
-		int chipNo = groundData::ground[underfootChipNoY + 1][underfootChipNoX];
-		//地面
-		if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-			if (playerFiledCollision(underfootChipNoX, underfootChipNoY + 1)) {
-				motionNum = 0;
-				updateFunc = &Player::updateField;
-				return;
+			int chipNo = groundData::ground[underfootChipNoY + 1][underfootChipNoX];
+			//地面
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (playerFiledCollision(underfootChipNoX, underfootChipNoY + 1)) {
+					motionNum = 0;
+					updateFunc = &Player::updateField;
+					return;
+				}
 			}
 		}
+		break;
+	case 1:
+		//登りきった後
+		if (input.isPressed(InputType::up)) {
+
+			motionNum = 2;
+			playerPos.y -= 5;
+			motion->update(motionNum);
+
+			int chipNo = buildingData::tutorialBuilding[underfootChipNoY][underfootChipNoX];
+			//地面
+			if (chipNo == 0 || chipNo == 106 || chipNo == 108) {
+				if (playerFiledCollision(underfootChipNoX, underfootChipNoY)) {
+					updateFunc = &Player::tutorialUpdate;
+					return;
+				}
+			}
+		}
+
+		//下ったとき
+		if (input.isPressed(InputType::down)) {
+			motionNum = 2;
+			//playerPos.y += 5;
+			motion->update(motionNum);
+
+			int chipNo = groundData::tutorialGround[underfootChipNoY + 1][underfootChipNoX];
+			//地面
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (playerFiledCollision(underfootChipNoX, underfootChipNoY + 1)) {
+					motionNum = 0;
+					updateFunc = &Player::tutorialUpdate;
+					return;
+				}
+			}
+		}
+		break;
+	case 2:
+		//登りきった後
+		if (input.isPressed(InputType::up)) {
+
+			motionNum = 2;
+			playerPos.y -= 5;
+			motion->update(motionNum);
+
+			int chipNo = buildingData::bossBuilding[underfootChipNoY][underfootChipNoX];
+			//地面
+			if (chipNo == 0 || chipNo == 106 || chipNo == 108) {
+				if (playerFiledCollision(underfootChipNoX, underfootChipNoY)) {
+					updateFunc = &Player::BossUpdate;
+					return;
+				}
+			}
+		}
+
+		//下ったとき
+		if (input.isPressed(InputType::down)) {
+			motionNum = 2;
+			playerPos.y += 5;
+			motion->update(motionNum);
+
+			int chipNo = groundData::bossGround[underfootChipNoY + 1][underfootChipNoX];
+			//地面
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (playerFiledCollision(underfootChipNoX, underfootChipNoY + 1)) {
+					motionNum = 0;
+					updateFunc = &Player::BossUpdate;
+					return;
+				}
+			}
+		}
+		break;
 	}
+
+	
+
+	
 
 	
 	//落下
@@ -484,6 +808,18 @@ void Player::consumption()
 	repairBlock--;
 }
 
+void Player::setMotion(bool start)
+{
+	if (!motionStart) {
+		motionStart = start;
+	}
+}
+
+bool Player::returnFlyingisEnabled()
+{
+	return flyingObject->isEnable();
+}
+
 //描画
 void Player::draw(Vec2 offset)
 {
@@ -506,8 +842,31 @@ void Player::draw(Vec2 offset)
 		}
 	}
 
+	if (motionStart) {
+		imgX++;
+		if (imgX > 9) {
+			imgY++;
+			imgX = 0;
+		}
+		if (imgY == 8 && imgX > 3) {
+			imgY = 0;
+			imgX = 0;
+		}
+	}
+	else {
+		imgX = 0;
+		imgY = 0;
+	}
+	
 	if (!push) {
 		motion->draw(playerPos, playerHandle, playerDirections, offset);
+	}
+
+	if (motionStart) {
+		DrawRectRotaGraph(playerPos.x + offset.x - 10, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraph(playerPos.x + offset.x + 30, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraph(playerPos.x + offset.x + 30, playerPos.y + 30, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraph(playerPos.x + offset.x - 10, playerPos.y + 30, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
 	}
 }
 
@@ -536,6 +895,13 @@ void Player::damege(bool inversion)
 		ultimateTimer_ = ultimate_frames;
 	}
 
+}
+
+void Player::bossDamege()
+{
+	playerPos.x += 30.0f;
+	
+	playerHp -= playerHp;
 }
 
 int Player::enemyAttack(Vec2 enemyPos, Vec2 offset)

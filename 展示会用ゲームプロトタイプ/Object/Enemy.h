@@ -9,14 +9,17 @@ class EnemyMotion;
 class Enemy
 {
 public:
-	Enemy();
-	virtual ~Enemy() { delete hp; }
+	Enemy(int num);
+	virtual ~Enemy();
 
 	Vec2 getPos()const { return enemyPos; }
 	void setPlayer(Player* dPlayer,int setHandle,int cHandle) { player = dPlayer,handle = setHandle,coinHandle = cHandle; }
 
+	void tutorialUpdate(Vec2 offset);
+	void BossUpdate(Vec2 offset);
 	void normalUpdate(Vec2 offset);
 	void normalDraw(Vec2 offset);
+	void BossDraw(Vec2 offset);
 
 	void coinUpdate(Vec2 offset);
 	void coinDraw(Vec2 offset);
@@ -35,8 +38,21 @@ public:
 
 	Vec2 deadPos();
 
+	void setPlayerData(Player* dPlayer) { player = dPlayer; }
+
 	int returnDeath() { return death; }
 private:
+
+	int hitHandle = -1;
+
+	int bunderfootChipNoX = 0;
+	int bunderfootChipNoY = 0;
+
+	int time = 0;
+	int imgX = 0;
+
+	int sceneNum = 0;
+
 	int sleepTime = 0;
 
 	bool death = false;
@@ -55,7 +71,7 @@ private:
 	int enemyHp = 9;
 	int hpDisplayTime = 120;
 
-	bool inversion = false;
+	bool inversion = true;
 
 	bool hpDisplay = false;
 	bool stop = false;
@@ -70,7 +86,7 @@ private:
 
 	Vec2 enemyPos = {800.0f,600.0f};
 	Vec2 deathPos = { 0.0f,0.0f };
-	Vec2 vec = {1.0f,0.0f};
+	Vec2 vec = {-1.0f,0.0f};
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
 	Vec2 targetPlayer2 = { 0.0f,0.0f };

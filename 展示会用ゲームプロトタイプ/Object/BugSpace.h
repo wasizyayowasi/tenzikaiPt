@@ -11,12 +11,13 @@ class BugSpace
 {
 public:
 	BugSpace(int spaceNum);
-	~BugSpace() {}
+	virtual ~BugSpace();
 
 	std::array<std::shared_ptr<Enemy>, 16>& getEnemy();
 
 	void init(int setX,int setY);
 
+	void tutorialUpdate(Vec2 offset);
 	void update(Vec2 offset);
 	void draw(Vec2 offset);
 
@@ -35,6 +36,11 @@ public:
 private:
 	int handle = -1;
 	int time = 0;
+
+	int imgX = 0;
+	int imgY = 0;
+
+	int spaceHandle = -1;
 
 	int enemySpawnTime = 0;
 	int enemySpawnInterval = 600;

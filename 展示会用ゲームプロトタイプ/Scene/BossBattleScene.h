@@ -1,9 +1,11 @@
 #pragma once
 #include "SceneBase.h"
 #include <memory>
+#include <array>
 #include "../Vec2.h"
 
 class Player;
+class Enemy;
 class Field;
 
 class BossBattleScene : public SceneBase
@@ -26,9 +28,24 @@ public:
 	void clearFadeOutUpdate(const InputState& input);
 private:
 
+	int enemyHandle = -1;
+	int repairHandle = -1;
+	int hpHandle = -1;
+	int portionHandle = -1;
+	int hacheteHandle = -1;
+	int guiHandle = -1;
+	int bugHandle = -1;
+	int bottanHandle = -1;
+	int bottanHandle2 = -1;
+	int bottanHandle3 = -1;
+	int coinHandle = -1;
+
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;
 	float fadeValue = 255;//•‹éŒ`‚ÌƒuƒŒƒ“ƒh‹ï‡
+
+	int imgX = 0;
+	int time = 4;
 
 	Vec2 offset;
 
@@ -38,5 +55,8 @@ private:
 
 	using updateFunc_t = void (BossBattleScene::*)(const InputState& input);
 	updateFunc_t updateFunc = nullptr;
+
+	std::shared_ptr<Enemy> bossEnemy;
+
 };
 

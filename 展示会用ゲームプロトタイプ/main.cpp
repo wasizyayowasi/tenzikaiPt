@@ -3,8 +3,12 @@
 #include "Scene/SceneManager.h"
 #include "Scene/TitleScene.h"
 #include "InputState.h"
+
+//消す
 #include "Scene/GameMain.h"
 #include "Scene/BossBattleScene.h"
+#include "Scene/TutorialScene.h"
+
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -30,8 +34,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InputState input;
 	SceneManager sceneManager;
-	//sceneManager.changeScene(new TitleScene(sceneManager));
-	sceneManager.changeScene(new GameMain(sceneManager));
+//	sceneManager.changeScene(new TitleScene(sceneManager));
+//	sceneManager.changeScene(new GameMain(sceneManager));
+//	sceneManager.changeScene(new TutorialScene(sceneManager));
+	sceneManager.changeScene(new BossBattleScene(sceneManager));
 
 	while (ProcessMessage() == 0) {
 
@@ -43,6 +49,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		sceneManager.update(input);
 		sceneManager.draw();
+
+		auto fps = GetFPS();//Frame Per Second;
+		auto drawcall = GetDrawCallCount();//描画命令数
+
+		DrawFormatString(10, 10, 0xffffff, "FPS = %2.2f", fps);
+		DrawFormatString(10, 30, 0xffffff, "DC = %d", drawcall);
 
 		//裏画面を表画面に切り替える
 		ScreenFlip();

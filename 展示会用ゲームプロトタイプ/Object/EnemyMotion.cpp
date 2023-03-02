@@ -83,6 +83,21 @@ void EnemyMotion::walk()
 	
 }
 
+void EnemyMotion::bossWalk()
+{
+	imgY = 6;
+	maxImgX = 7;
+
+	if (--updateTime == 0) {
+		imgX++;
+		updateTime = 50;
+	}
+
+	if (imgX > maxImgX) {
+		imgX = 0;
+	}
+}
+
 void EnemyMotion::rolling()
 {
 
@@ -147,9 +162,9 @@ void EnemyMotion::attack()
 	}
 }
 
-void EnemyMotion::draw(Vec2 enemyPos,int handle, bool trun, Vec2 offset)
+void EnemyMotion::draw(Vec2 enemyPos,int handle, bool trun, Vec2 offset, float scale)
 {
 	Vec2 pos = enemyPos + offset;
 
-	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, imgX * 40, imgY * 40, 40, 40, 2.0f, 0.0f, handle, true, trun);
+	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, imgX * 40, imgY * 40, 40, 40, scale, 0.0f, handle, true, trun);
 }

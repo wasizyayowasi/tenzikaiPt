@@ -4,8 +4,12 @@
 #include <math.h>
 #include "../field.h"
 
-PlayerThrowinAttack::PlayerThrowinAttack()
+PlayerThrowinAttack::PlayerThrowinAttack(int num)
 {
+	if (num == 2) {
+		isEnabled = true;
+		flyingObjectPos = { 14500,800 };
+	}
 }
 
 void PlayerThrowinAttack::attack(const Vec2& playerPos, bool directions)
@@ -14,6 +18,10 @@ void PlayerThrowinAttack::attack(const Vec2& playerPos, bool directions)
 	isEnabled = true;
 	//•ûŒü
 	playerDirections = directions;
+}
+
+void PlayerThrowinAttack::bossAttack(const Vec2& pos, bool directions)
+{
 }
 
 bool PlayerThrowinAttack::isEnable() const
@@ -32,7 +40,13 @@ void PlayerThrowinAttack::init()
 void PlayerThrowinAttack::update(Vec2 offset)
 {
 	if (!landingObject) {
-		angle += 0.3f;
+		if (!playerDirections) {
+			angle += 0.3f;
+		}
+		else {
+			angle -= 0.3f;
+		}
+		
 	}
 	else {
 		if (!playerDirections){
@@ -96,6 +110,65 @@ void PlayerThrowinAttack::update(Vec2 offset)
 
 }
 
+void PlayerThrowinAttack::bossUpdate(Vec2 offset)
+{
+	if (!landingObject) {
+		if (!playerDirections) {
+			angle += 0.3f;
+		}
+		else {
+			angle -= 0.3f;
+		}
+
+	}
+	else {
+		if (!playerDirections) {
+			angle = 0.8f;
+		}
+		else {
+			angle = 5.4f;
+		}
+	}
+
+	int underBlockX = (flyingObjectPos.x) / chipSize;
+	int underBlockY = (flyingObjectPos.y + chipSize) / chipSize;
+
+	const int chipNo = groundData::ground[underBlockY][underBlockX];
+
+
+	if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+		landingObject = true;
+	}
+
+	if (!landingObject) {
+		tempX = flyingObjectPos.y + r + cos(45);
+		tempY = flyingObjectPos.y + r + sin(45);
+
+		normalize.x = tempX;
+		normalize.y = -tempY;
+
+		vec = normalize.normalize() * 2;
+
+		up += 0.3f;
+
+		vec.y += up;
+
+		vec.x *= 15;
+	}
+
+	//ƒvƒŒƒCƒ„[‚ÌŒü‚­•ûŒü‚É‚æ‚Á‚Äobject‚ð”ò‚Î‚·•ûŒü‚ð•Ï‰»‚³‚¹‚é
+	if (!landingObject) {
+		if (playerDirections) {
+			flyingObjectPos.x -= vec.x;
+			flyingObjectPos.y += vec.y;
+		}
+		else if (!playerDirections) {
+			flyingObjectPos += vec;
+		}
+	}
+
+}
+
 void PlayerThrowinAttack::draw(int handle, Vec2 offset)
 {
 	DrawString(flyingObjectPos.x + offset.x, flyingObjectPos.y - 10, "’e", 0xffffff);
@@ -126,10 +199,13 @@ bool PlayerThrowinAttack::enemyCollision(const Vec2& pos, Vec2 offset)
 	
 	if (isEnabled) {
 		if (!landingObject) {
-			float enemyLeft = pos.x + offset.x;
-			float enemyTop = pos.y + offset.y;
-			float enemyRight = pos.x + 30 + offset.x;
-			float enemyBottom = pos.y + 30 + offset.y;
+			
+			float enemyLeft = pos.x ;
+			float enemyTop = pos.y - 10;
+			float enemyRight = pos.x + 30;
+			float enemyBottom = pos.y + 30;
+
+			DrawBox(enemyLeft, enemyTop, enemyRight, enemyBottom, 0xffffff, false);
 
 			if (enemyLeft > flyingObjectPos.x + 20)		return false;
 			if (enemyRight < flyingObjectPos.x)			return false;

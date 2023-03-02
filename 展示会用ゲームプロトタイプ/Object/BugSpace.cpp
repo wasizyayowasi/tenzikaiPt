@@ -5,15 +5,23 @@
 #include "ObjectHp.h"
 #include "../Pad.h"
 #include "../field.h"
+#include "../DrawFunctions.h"
 
 BugSpace::BugSpace(int spaceNum):num(spaceNum)
 {
+	spaceHandle = my::myLoadGraph("data/portal2.png");
+
 	hp = new ObjectHp;
 	hp->setObjectMaxHp(maxHp);
 	isEnabled = true;
 	for (auto& enemy : enemy) {
-		enemy = std::make_shared<Enemy>();
+		enemy = std::make_shared<Enemy>(0);
 	}
+}
+
+BugSpace::~BugSpace()
+{
+	DeleteGraph(spaceHandle);
 }
 
 std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
@@ -37,41 +45,79 @@ void BugSpace::init(int setX, int setY)
 	}
 }
 
+void BugSpace::tutorialUpdate(Vec2 offset)
+{
+	if (player->repairSpace(spacePos, offset)) {
+		if (player->returnSpaceHpDisplay()) {
+			if (--time < 0) {
+				player->setMotion(true);
+				maxHp--;
+				time = 120;
+			}
+		}
+		else {
+			player->setMotion(false);
+		}
+	}
+
+
+	hp->setObjectHp(maxHp);
+
+
+	/*if (--enemySpawnTime < 0) {
+		for (auto& enemy : enemy) {
+			if (!enemy->isEnable()) {
+				enemy->dispatch({ spacePos.x + 50,spacePos.y + 40 });
+				enemySpawnTime = enemySpawnInterval;
+				enemySpawnInterval -= 10;
+				break;
+			}
+		}
+	}*/
+
+	for (auto& enemy : enemy) {
+		if (enemy->isEnable()) {
+			enemy->update(offset);
+		}
+	}
+
+	if (maxHp < 1) {
+		player->consumption();
+		isEnabled = false;
+		player->setMotion(false);
+	}
+}
+
 //バグスペースの更新
 void BugSpace::update(Vec2 offset)
 {
 
 	if (player->repairSpace(spacePos, offset)) {
-		DrawString(600, 0, "siu", 0xffffff);
 		if (player->returnSpaceHpDisplay()) {
 			if (--time < 0) {
+				player->setMotion(true);
 				maxHp--;
-				time = 10;
+				time = 120;
 			}
+		}
+		else {
+			player->setMotion(false);
 		}
 	}
 	
 
 	hp->setObjectHp(maxHp);
 
-	
-	if (--enemySpawnTime < 0) {
-		for (auto& enemy : enemy) {
-			if (!enemy->isEnable()) {
-				enemy->dispatch(spacePos);
-				enemySpawnTime = enemySpawnInterval;
-				enemySpawnInterval -= 10;
-				break;
+	if (!player->returnHpDisplay()) {
+		if (--enemySpawnTime < 0) {
+			for (auto& enemy : enemy) {
+				if (!enemy->isEnable()) {
+					enemy->dispatch({ spacePos.x + 50,spacePos.y + 40 });
+					enemySpawnTime = enemySpawnInterval;
+					enemySpawnInterval -= 10;
+					break;
+				}
 			}
-		}
-	}
-	
-	
-
-	//デバッグ用
-	for (auto& enemy : enemy) {
-		if (enemy->isEnable()) {
-			DrawString(0, 0, "aiu", 0xffffff);
 		}
 	}
 
@@ -84,13 +130,24 @@ void BugSpace::update(Vec2 offset)
 	if (maxHp < 1) {
 		player->consumption();
 		isEnabled = false;
+		player->setMotion(false);
 	}
 }
 
 void BugSpace::draw(Vec2 offset)
 {
-	
-	DrawBox(spacePos.x + offset.x, spacePos.y + offset.y, spacePos.x + chipSize * 3 + offset.x, spacePos.y + chipSize * 3 + offset.y, 0xff0000, true);
+	imgX++;
+	if (imgX > 6) {
+		imgY++;
+		imgX = 0;
+	}
+	if (imgY == 5 && imgX > 5) {
+		imgY = 0;
+		imgX = 0;
+	}
+
+	DrawRectRotaGraph(spacePos.x + offset.x + 50, spacePos.y + offset.y + 50, imgX * 100, imgY * 100, 100, 100, 3.0f, 0.0f, spaceHandle, true, false);
+
 	DrawFormatString(200, 0, 0xffffff, "%f : %f", enemyDeathPos.x, enemyDeathPos.y);
 	if (player->repairSpace(spacePos,offset)) {
 		if (player->returnSpaceHpDisplay()) {

@@ -18,8 +18,8 @@ void ObjectHp::draw(Vec2 pos, Vec2 offset)
 	pos = pos + offset;
 
 	if (hp > 0) {
-		DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 10, pos.y - 20, 0x000000, true);
-		DrawBox(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 20, 0x9B003F, true);
+		DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 10, pos.y - 15, 0x000000, true);
+		DrawBox(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 15, 0x9B003F, true);
 	}
 }
 

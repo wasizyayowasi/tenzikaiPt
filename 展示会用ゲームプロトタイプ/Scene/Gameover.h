@@ -15,7 +15,7 @@ enum class GameOverChoice
 class Gameover : public SceneBase
 {
 public:
-	Gameover(SceneManager& manager, const InputState& input);
+	Gameover(SceneManager& manager, const InputState& input,int num);
 	virtual ~Gameover(){}
 	
 	void update(const InputState& input);
@@ -24,6 +24,8 @@ private:
 	static constexpr int fade_interval = 60;
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
+
+	int sceneNum = 0;
 
 	int currentInputIndex;//現在選択中のインデックス
 

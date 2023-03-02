@@ -5,14 +5,14 @@
 
 class Player;
 class Field;
+class Enemy;
+class BugSpace;
 
 class TutorialScene : public SceneBase
 {
 public:
 	TutorialScene(SceneManager& manager);
 	virtual ~TutorialScene();
-
-	void init();
 
 	void update(const InputState& input);
 	void draw();
@@ -24,6 +24,8 @@ public:
 	//フェードアウト時のupdate関数
 	void gameoverFadeOutUpdate(const InputState& input);
 	void clearFadeOutUpdate(const InputState& input);
+
+	void textDraw(int num);
 private:
 
 	static constexpr int fadeInterval = 60;
@@ -37,10 +39,26 @@ private:
 	int hacheteHandle = -1;
 	int guiHandle = -1;
 	int bugHandle = -1;
+	int bottanHandle = -1;
+	int bottanHandle2 = -1;
+	int bottanHandle3 = -1;
+	int coinHandle = -1;
 
+	int time = 1;
+	int time2 = 1;
+
+	Vec2 targetPlayer = { 0.0f,0.0f };
+	Vec2 targetPlayer2 = { 0.0f,0.0f };
+	Vec2 targetPlayer3 = { 0.0f,0.0f };
 	Vec2 offset;
 
+	int imgX = 0;
+	int imgY = 0;
+	int imgY2 = 3;
+
 	std::shared_ptr<Field> field;
+	std::shared_ptr<Enemy> enemy;
+	std::shared_ptr<BugSpace> space;
 
 	Player* player;
 

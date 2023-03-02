@@ -25,7 +25,7 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	repairHandle = my::myLoadGraph("data/repair.png");
 	coinHandle = my::myLoadGraph("data/CopperCoin.png");
 
-	player = new Player;
+	player = new Player(0);
 	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
 
 	//‹óŠÔ‚Ìƒf[ƒ^‚ğì‚é
@@ -201,7 +201,7 @@ void GameMain::gameoverFadeOutUpdate(const InputState& input)
 {
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
-		manager_.changeScene(new Gameover(manager_,input));
+		manager_.changeScene(new Gameover(manager_,input,1));
 		return;
 	}
 }

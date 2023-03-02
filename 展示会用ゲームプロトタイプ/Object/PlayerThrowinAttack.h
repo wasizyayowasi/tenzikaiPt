@@ -5,15 +5,18 @@
 class PlayerThrowinAttack
 {
 public:
-	PlayerThrowinAttack();
+	PlayerThrowinAttack(int num);
 	~PlayerThrowinAttack(){}
 
 	void attack(const Vec2& pos,bool directions);
+	void bossAttack(const Vec2& pos, bool directions);
+
 	bool isEnable()const;
 
 	void init();
 
 	void update(Vec2 offset);
+	void bossUpdate(Vec2 offset);
 	void draw(int handle, Vec2 offset);
 
 	bool playerCollision(const Vec2& pos,Vec2 offset);

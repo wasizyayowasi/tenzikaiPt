@@ -63,6 +63,9 @@ void Shop::update(const InputState& input)
 		if (!(currentInputIndex == 0 && player->returnHp() > 9)) {
 			manager_.pushScene(new Trade(manager_, input, player, amount, currentInputIndex));
 		}
+		else {
+			int aiu = 0;
+		}
 		isEditing = false;
 	}
 
