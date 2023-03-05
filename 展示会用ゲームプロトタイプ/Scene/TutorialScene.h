@@ -38,21 +38,37 @@ private:
 	int portionHandle = -1;
 	int hacheteHandle = -1;
 	int guiHandle = -1;
-	int bugHandle = -1;
+	int coinHandle = -1;
+	int shopperHandle = -1;
 	int bottanHandle = -1;
 	int bottanHandle2 = -1;
 	int bottanHandle3 = -1;
-	int coinHandle = -1;
+	int truckHandle = -1;
+
+	int personNum = 0;
+	int count = 1;
+
+	bool buy = false;
 
 	int time = 1;
 	int time2 = 1;
+	int spownCount = 1;
+
+	int textCount = 4;
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
 	Vec2 targetPlayer2 = { 0.0f,0.0f };
 	Vec2 targetPlayer3 = { 0.0f,0.0f };
+	Vec2 targetPlayer4 = { 0.0f,0.0f };
+	Vec2 targetPlayer5 = { 0.0f,0.0f };
+	Vec2 targetPlayer6 = { 0.0f,0.0f };
+	Vec2 targetPlayer7 = { 0.0f,0.0f };
 	Vec2 offset;
 
+	int truckPos = 5400;
+
 	int imgX = 0;
+	int imgX2 = 0;
 	int imgY = 0;
 	int imgY2 = 3;
 

@@ -10,13 +10,13 @@ namespace {
 
 Field::Field()
 {
-	groundHandle = my::myLoadGraph("data/Tiles-1.png");
-	buildingHandle = my::myLoadGraph("data/Buildings1.png");
-	objectHandle = my::myLoadGraph("data/Props-01.png");
-	buildingHandle2 = my::myLoadGraph("data/Buildings2.png");
-	backgroundHandle = my::myLoadGraph("data/BaseColor.png");
-	shopperHandle = my::myLoadGraph("data/shop.png");
-	backBuildingHandle = my::myLoadGraph("data/BackgroundProps1.png");
+	groundHandle = my::myLoadGraph("data/FieldGraph/Tiles-1.png");
+	buildingHandle = my::myLoadGraph("data/FieldGraph/Buildings1.png");
+	objectHandle = my::myLoadGraph("data/FieldGraph/Props-01.png");
+	buildingHandle2 = my::myLoadGraph("data/FieldGraph/Buildings2.png");
+	backgroundHandle = my::myLoadGraph("data/FieldGraph/BaseColor.png");
+	shopperHandle = my::myLoadGraph("data/objectGraph/shop.png");
+	backBuildingHandle = my::myLoadGraph("data/FieldGraph/BackgroundProps1.png");
 	
 	GetGraphSize(groundHandle, &groundGraphWidth, &groundGraphHeight);
 	GetGraphSize(buildingHandle, &buildingGraphWidth, &buildingGraphHeight);
@@ -107,11 +107,8 @@ void Field::draw(Vec2 offset, int num)
 
 		//“Xˆõ
 		DrawRotaGraph(3315 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
-		DrawRotaGraph(2600 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
-		DrawRotaGraph(650 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
-		DrawRotaGraph(1800 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 
-		for (int x = 0; x < bgNumX; x++) {
+		for (int x = 0; x < tutorialNumX; x++) {
 
 			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
 
@@ -140,7 +137,7 @@ void Field::draw(Vec2 offset, int num)
 			}
 		}
 
-		for (int x = 0; x < bgNumX; x++) {
+		for (int x = 0; x < tutorialNumX; x++) {
 
 			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
 
@@ -168,7 +165,7 @@ void Field::draw(Vec2 offset, int num)
 			}
 		}
 
-		for (int x = 0; x < bgNumX; x++) {
+		for (int x = 0; x < tutorialNumX; x++) {
 
 			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
 
@@ -474,7 +471,7 @@ void Field::draw(Vec2 offset, int num)
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
 			}
-			if (posX < -chipSize) {
+			if (posX < chipSize * 14) {
 				continue;
 			}
 
@@ -486,6 +483,37 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
 
 				
+				int posY = y * chipSize + graphChipSize;
+
+				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+				if (!(offset.x < -13430)) {
+					if (chipNo != 1) {
+						DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+					}
+				}
+			}
+		}
+		//’n–Ê
+		for (int x = 0; x < bossNumX; x++) {
+
+			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+
+			if (posX > Game::kScreenWidth + chipSize) {
+				break;
+			}
+			if (posX < -chipSize) {
+				continue;
+			}
+
+			for (int y = 0; y < bgNumY + 1; y++) {
+
+				const int chipNo = groundData::bossGround2[y][x];
+
+				assert(chipNo >= 0);
+				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
+
+
 				int posY = y * chipSize + graphChipSize;
 
 				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
@@ -503,7 +531,7 @@ void Field::draw(Vec2 offset, int num)
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
 			}
-			if (posX < -chipSize) {
+			if (posX < chipSize * 14) {
 				continue;
 			}
 
@@ -554,6 +582,11 @@ int Field::getWidth() const
 int Field::getBossWidth() const
 {
 	return Game::kScreenWidth * 8;
+}
+
+int Field::getTutorialWidth() const
+{
+	return Game::kScreenWidth * 3;
 }
 
 int Field::getHeight() const

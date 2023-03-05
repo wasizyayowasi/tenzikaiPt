@@ -9,7 +9,7 @@ public:
 
 	void init();
 
-	void update(int num);
+	void update(int num,int sceneNum);
 	void walk();
 	void bossWalk();
 	void rolling();

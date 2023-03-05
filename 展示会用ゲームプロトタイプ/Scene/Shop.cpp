@@ -126,7 +126,7 @@ void Shop::draw()
 			case 1:
 				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 4.0f, 0.0f, repairHandle, true, false);
 				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 80, "どろどろとした何か。", 0xffffff);
-				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 1000, "ゲートを閉じることができそうだ", 0xffffff);
+				DrawString(shopkeeperWidth + 20 + offset + 570, shopkeeperWidth + 100, "ゲートを閉じることができそうだ", 0xffffff);
 				break;
 			case 2:
 				DrawRotaGraph(shopkeeperWidth + 20 + offset + 420, shopkeeperWidth + 150, 5.0f, 0.0f, portionHandle, true, false);

@@ -4,12 +4,19 @@
 
 ObjectHp::ObjectHp()
 {
-	deathHpHandle = LoadGraph("data/heart2.png");
+	deathHpHandle = LoadGraph("data/objectGraph/heart2.png");
 }
 
 ObjectHp::~ObjectHp()
 {
-	
+}
+
+void ObjectHp::setObjectHp(int obJectHp)
+{
+	hp = obJectHp;
+	if (tempHp == hp) {
+		tempHp = hp;
+	}
 }
 
 //hp‚Ì•\Ž¦
@@ -17,10 +24,16 @@ void ObjectHp::draw(Vec2 pos, Vec2 offset)
 {
 	pos = pos + offset;
 
-	if (hp > 0) {
-		DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 10, pos.y - 15, 0x000000, true);
-		DrawBox(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 15, 0x9B003F, true);
+	
+	DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 10, pos.y - 15, 0x000000, true);
+	if (static_cast<float>(hp) < tempHp) {
+		tempHp -= 0.08f;
 	}
+	if (tempHp < 0.0f) {
+		tempHp = 0.0f;
+	}
+	DrawBoxAA(pos.x, pos.y - 23.0f, pos.x + tempHp * 10, pos.y - 15.0f, 0xDAC290, true);
+	DrawBox(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 15, 0x9B003F, true);
 }
 
 void ObjectHp::playerHpDraw(int handle)

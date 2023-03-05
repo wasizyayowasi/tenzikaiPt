@@ -21,27 +21,18 @@ namespace {
 
 Player::Player(int num) : sceneNum(num)
 {
-	playerHandle = my::myLoadGraph("data/player.png");
-	smokeHandle = my::myLoadGraph("data/spritesheet.png");
+	playerHandle = my::myLoadGraph("data/objectGraph/player.png");
+	smokeHandle = my::myLoadGraph("data/effect/spritesheet.png");
+	attackSound = LoadSoundMem("data/soundEffect/attack_knight.wav");
+	coinSound = LoadSoundMem("data/soundEffect/Single-Coin-Drop-On-Table-www.fesliyanstudios.com.mp3");
+	walkSound = LoadSoundMem("data/soundEffect/Concrete 1.wav");
 
 	hp = new ObjectHp;
 	motion = new PlayerMotion;
 	inventory = new Inventory();
 	flyingObject = std::make_shared<PlayerThrowinAttack>(sceneNum);
 	hp->setObjectMaxHp(playerHp);
-	switch (sceneNum) {
-	case 0:
-		updateFunc = &Player::updateDescent;
-		break;
-	case 1:
-		updateFunc = &Player::updateDescent;
-		break;
-	case 2:
-		updateFunc = &Player::updateDescent;
-		break;
-	}
-	
-	
+	updateFunc = &Player::updateDescent;
 }
 
 Player::~Player()
@@ -52,6 +43,10 @@ Player::~Player()
 
 	DeleteGraph(playerHandle);
 	DeleteGraph(smokeHandle);
+
+	DeleteSoundMem(attackSound);
+	DeleteSoundMem(coinSound);
+	DeleteSoundMem(walkSound);
 }
 
 void Player::init()
@@ -61,7 +56,7 @@ void Player::init()
 
 void Player::update(Vec2 offset, const InputState& input)
 {
-
+	
 	inventory->update(input);
 	hp->setObjectHp(playerHp);
 
@@ -82,9 +77,14 @@ void Player::update(Vec2 offset, const InputState& input)
 	if (playerPos.x < 0) {
 		playerPos.x = 0;
 	}
-	if (sceneNum != 2) {
+	if (sceneNum == 0) {
 		if (playerPos.x + 50 > Game::kScreenWidth * 2) {
 			playerPos.x = Game::kScreenWidth * 2 - 50;
+		}
+	}
+	else if(sceneNum == 1) {
+		if (playerPos.x + 50 > Game::kScreenWidth * 3) {
+			playerPos.x = Game::kScreenWidth * 3 - 50;
 		}
 	}
 	else {
@@ -153,6 +153,11 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 			if (!(motionNum == 3)) {
 				motionNum = 1;
 			}
+			if (--soundCount == 0) {
+				ChangeVolumeSoundMem(130, walkSound);
+				PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+				soundCount = 20;
+			}
 			motion->update(motionNum);
 			playerPos.x -= 5;
 			playerDirections = true;
@@ -160,6 +165,11 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 		else if (input.isPressed(InputType::right)) {
 			if (!(motionNum == 3)) {
 				motionNum = 1;
+			}
+			if (--soundCount == 0) {
+				ChangeVolumeSoundMem(130, walkSound);
+				PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+				soundCount = 20;
 			}
 			motion->update(motionNum);
 			playerPos.x += 5;
@@ -172,6 +182,8 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 	if (!push) {
 		if (!flyingObject->isEnable()) {
 			if (input.isPressed(InputType::attack)) {
+				ChangeVolumeSoundMem(soundVolume, attackSound);
+				PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
 				motionNum = 3;
 				motion->update(motionNum);
 				proximityAttack = true;
@@ -290,9 +302,10 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 	}
 
 	//~‰º
-	int DescentChipNo3 = groundData::bossGround[underfootChipNoY][underfootChipNoX];
+	int DescentChipNo3 = groundData::bossGround2[underfootChipNoY][underfootChipNoX];
 	int DescentChipNo4 = buildingData::bossBuilding[underfootChipNoY][underfootChipNoX];
-	if (DescentChipNo3 == 0 && DescentChipNo4 == 0) {
+	int DescentChipNo5 = groundData::bossGround[underfootChipNoY][underfootChipNoX];
+	if (DescentChipNo3 == 0 && DescentChipNo4 == 0 && DescentChipNo5 == 0) {
 		updateFunc = &Player::updateDescent;
 	}
 
@@ -325,6 +338,11 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 				if (!(motionNum == 3)) {
 					motionNum = 1;
 				}
+				if (--soundCount == 0) {
+					ChangeVolumeSoundMem(130, walkSound);
+					PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+					soundCount = 20;
+				}
 				motion->update(motionNum);
 				playerPos.x -= 5;
 				playerDirections = true;
@@ -334,6 +352,11 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 			if (!rightClosure) {
 				if (!(motionNum == 3)) {
 					motionNum = 1;
+				}
+				if (--soundCount == 0) {
+					ChangeVolumeSoundMem(130, walkSound);
+					PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+					soundCount = 20;
 				}
 				motion->update(motionNum);
 				playerPos.x += 5;
@@ -347,6 +370,9 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 	if (!push) {
 		if (!flyingObject->isEnable()) {
 			if (input.isPressed(InputType::attack)) {
+				ChangeVolumeSoundMem(soundVolume, attackSound);
+
+				PlaySoundMem(attackSound, DX_PLAYTYPE_NORMAL, true);
 				motionNum = 3;
 				motion->update(motionNum);
 				proximityAttack = true;
@@ -456,6 +482,11 @@ void Player::updateField(Vec2 offset, const InputState& input)
 			if (!(motionNum == 3)) {
 				motionNum = 1;
 			}
+			if (--soundCount == 0) {
+				ChangeVolumeSoundMem(130, walkSound);
+				PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+				soundCount = 20;
+			}
 			motion->update(motionNum);
 			playerPos.x -= 5;
 			playerDirections = true;
@@ -463,6 +494,11 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		else if (input.isPressed(InputType::right)) {
 			if (!(motionNum == 3)) {
 				motionNum = 1;
+			}
+			if (--soundCount == 0) {
+				ChangeVolumeSoundMem(130, walkSound);
+				PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+				soundCount = 20;
 			}
 			motion->update(motionNum);
 			playerPos.x += 5;
@@ -474,7 +510,9 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	//‹ßÚUŒ‚
 	if (!push) {
 		if (!flyingObject->isEnable()) {
-			if (input.isPressed(InputType::attack)) {
+			if (input.isTriggered(InputType::attack)) {
+				ChangeVolumeSoundMem(soundVolume, attackSound);
+				PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
 				motionNum = 3;
 				motion->update(motionNum);
 				proximityAttack = true;
@@ -587,7 +625,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 		break;
 	case 1:
 		//’n–Ê‚Æ‚Ì”»’è
-		for (int x = 0; x < bgNumX; x++) {
+		for (int x = 0; x < tutorialNumX; x++) {
 			for (int y = 0; y < bgNumY; y++) {
 
 				const int chipNo = groundData::tutorialGround[y][x];
@@ -600,7 +638,6 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 						}
 
 						updateFunc = &Player::tutorialUpdate;
-						break;
 						return;
 					}
 				}
@@ -612,7 +649,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 		for (int x = 0; x < bgNumX; x++) {
 			for (int y = 0; y < bgNumY; y++) {
 
-				const int chipNo = groundData::ground[y][x];
+				const int chipNo = groundData::bossGround2[y][x];
 
 				//’n–Ê
 				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
@@ -710,7 +747,7 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 		//‰º‚Á‚½‚Æ‚«
 		if (input.isPressed(InputType::down)) {
 			motionNum = 2;
-			//playerPos.y += 5;
+			playerPos.y += 5;
 			motion->update(motionNum);
 
 			int chipNo = groundData::tutorialGround[underfootChipNoY + 1][underfootChipNoX];
@@ -749,8 +786,9 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 			motion->update(motionNum);
 
 			int chipNo = groundData::bossGround[underfootChipNoY + 1][underfootChipNoX];
+			int chipNo2 = groundData::bossGround2[underfootChipNoY + 1][underfootChipNoX];
 			//’n–Ê
-			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo2 == 45 || chipNo2 == 46 || chipNo2 == 53 || chipNo2 == 60 || chipNo2 == 61 || chipNo2 == 31 || chipNo2 == 32) {
 				if (playerFiledCollision(underfootChipNoX, underfootChipNoY + 1)) {
 					motionNum = 0;
 					updateFunc = &Player::BossUpdate;
@@ -801,6 +839,8 @@ void Player::setItemControl(int num)
 void Player::setMoney(int amount)
 {
 	money -= amount;
+	ChangeVolumeSoundMem(soundVolume, coinSound);
+	PlaySoundMem(coinSound, DX_PLAYTYPE_BACK, true);
 }
 
 void Player::consumption()
@@ -833,7 +873,13 @@ void Player::draw(Vec2 offset)
 
 	//”ò‚Ñ“¹‹ï
 	if (flyingObject->isEnable()) {
-		flyingObject->draw(macheteHandle, offset);
+		if (sceneNum != 2) {
+			flyingObject->draw(macheteHandle, offset);
+		}
+		else {
+			flyingObject->bossDraw(macheteHandle, offset);
+		}
+		
 	}
 
 	if (ultimateTimer_ > 0) {
@@ -916,6 +962,15 @@ int Player::enemyAttack(Vec2 enemyPos, Vec2 offset)
 	return enemyHit;
 }
 
+int Player::bossEnemyAttack(Vec2 enemyPos, Vec2 offset)
+{
+	if (flyingObject->bossEnemyCollision(enemyPos, offset)) {
+		enemyHit = true;
+	}
+
+	return enemyHit;
+}
+
 
 
 //++++++++++++++++++++++++++++++++++
@@ -927,21 +982,21 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 {
 	float enemyLeft = pos.x;
 	float enemyTop = pos.y;
-	float enemyRight = pos.x + 30;
-	float enemyBottom = pos.y + 30;
+	float enemyRight = pos.x + 40;
+	float enemyBottom = pos.y + 40;
 
 	if (proximityAttack) {
 		if (playerDirections) {
 			if (enemyLeft > playerPos.x + 20)			return false;
 			if (enemyRight < playerPos.x - 50)			return false;
-			if (enemyTop <= playerPos.y + 10)			return false;
-			if (enemyBottom <= playerPos.y + 50)		return false;
+			if (enemyTop > playerPos.y + 50)			return false;
+			if (enemyBottom < playerPos.y + 10)			return false;
 		}
 		else if (!playerDirections) {
 			if (enemyLeft > playerPos.x  + 80)			return false;
-			if (enemyRight < playerPos.x + 20)				return false;
-			if (enemyTop <= playerPos.y + 10)			return false;
-			if (enemyBottom <= playerPos.y + 50)		return false;
+			if (enemyRight < playerPos.x + 20)			return false;
+			if (enemyTop > playerPos.y + 50)			return false;
+			if (enemyBottom < playerPos.y + 10)			return false;
 		}
 		return true;
 	}
@@ -1029,6 +1084,8 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 	if (playerPos.y + offset.y > objectBottom)						return false;
 
 	money += 1000;
+	ChangeVolumeSoundMem(soundVolume, coinSound);
+	PlaySoundMem(coinSound, DX_PLAYTYPE_BACK, true);
 
 	return true;
 }

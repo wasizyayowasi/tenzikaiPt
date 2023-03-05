@@ -176,6 +176,7 @@
     <ClCompile Include="Scene\Shop.cpp" />
     <ClCompile Include="Scene\Trade.cpp" />
     <ClCompile Include="Scene\TutorialScene.cpp" />
+    <ClCompile Include="Scene\TextScene.cpp" />
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +205,7 @@
     <ClInclude Include="Scene\Shop.h" />
     <ClInclude Include="Scene\Trade.h" />
     <ClInclude Include="Scene\TutorialScene.h" />
+    <ClInclude Include="Scene\TextScene.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

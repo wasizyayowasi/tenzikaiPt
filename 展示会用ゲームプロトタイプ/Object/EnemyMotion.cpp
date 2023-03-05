@@ -17,11 +17,14 @@ void EnemyMotion::init()
 	isEnabled = false;
 }
 
-void EnemyMotion::update(int num)
+void EnemyMotion::update(int num, int sceneNum)
 {
 	switch (num) {
 	case 0:
 		func = &EnemyMotion::walk;
+		if (sceneNum == 1) {
+			func = &EnemyMotion::bossWalk;
+		}
 		break;
 	case 1:
 		func = &EnemyMotion::rolling;
@@ -90,7 +93,7 @@ void EnemyMotion::bossWalk()
 
 	if (--updateTime == 0) {
 		imgX++;
-		updateTime = 50;
+		updateTime = 25;
 	}
 
 	if (imgX > maxImgX) {

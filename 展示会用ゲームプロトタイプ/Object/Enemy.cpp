@@ -11,7 +11,7 @@
 
 Enemy::Enemy(int num) : sceneNum(num)
 {
-	hitHandle = my::myLoadGraph("data/hit.png");
+	hitHandle = my::myLoadGraph("data/effect/hit.png");
 
 	hp = new ObjectHp;
 	motion = new EnemyMotion;
@@ -43,15 +43,10 @@ void Enemy::tutorialUpdate(Vec2 offset)
 		}
 	}
 
-	DrawFormatString(0, 30, 0xffffff, "%f : %f", enemyPos.x, enemyPos.y);
-
-	//現状のHPを設定する
-	hp->setObjectHp(enemyHp);
-
 	motionNum = 0;
 
 	//HPがなくなり死亡した場合
-	if (enemyHp == 0) {
+	if (hp->returnTempHp() == 0.0f) {
 		motionNum = 3;
 	}
 
@@ -121,12 +116,12 @@ void Enemy::tutorialUpdate(Vec2 offset)
 	}
 
 	//右の壁反射
-	if (enemyPos.x > 3000) {
+	if (enemyPos.x > 2200) {
 		vec.x = 0.0f;
 	}
 	//左の壁反射
-	if (enemyPos.x > 700) {
-		enemyPos.x = 2900;
+	if (enemyPos.x > 1000) {
+		enemyPos.x = 2200;
 		inversion = true;
 	}
 
@@ -155,6 +150,7 @@ void Enemy::tutorialUpdate(Vec2 offset)
 	//投擲が当たった場合の処理
 	if (player->enemyAttack(enemyPos, offset)) {
 		enemyHp = 0;
+		hpDisplay = true;
 	}
 
 	//プレイヤーの近接攻撃との当たり判定
@@ -172,21 +168,23 @@ void Enemy::tutorialUpdate(Vec2 offset)
 	if (hpDisplay) {
 		if (--hpDisplayTime < 0) {
 			hpDisplay = false;
-			hpDisplayTime = 120;
+			hpDisplayTime = 180;
 		}
 	}
 
 	if (motion->dead()) {
-		//motion->init();
-		//isEnabled = false;
 		updateFunc = &Enemy::coinUpdate;
 		drawFunc = &Enemy::coinDraw;
 	}
 
 	//エネミーの動きを更新
 	if (landing) {
-		motion->update(motionNum);
+		motion->update(motionNum,0);
 	}
+
+	//現状のHPを設定する
+	hp->setObjectHp(enemyHp);
+
 }
 
 void Enemy::BossUpdate(Vec2 offset)
@@ -198,12 +196,24 @@ void Enemy::BossUpdate(Vec2 offset)
 
 	motionNum = 0;
 
-	enemyPos.x += 3.5f;
-
+	if (!player->returnEnemyHit()) {
+		enemyPos.x += 3.5f;
+		//enemyPos.x += 10.0f;
+	}
 	
+	
+	//HPがなくなり死亡した場合
+	if (enemyHp == 0) {
+		motionNum = 3;
+	}
+	
+	if (motion->dead()) {
+		isEnabled = false;
+	}
+
 	if (!player->beHidden()) {
 		if (enemyHp > 0) {
-			if (470 + enemyPos.x> player->getPos().x) {
+			if (450 + enemyPos.x> player->getPos().x) {
 				motionNum = 2;
 				//攻撃
 				if (--sleepTime < 0) {
@@ -214,9 +224,14 @@ void Enemy::BossUpdate(Vec2 offset)
 		}
 	}
 
-	if (landing) {
-		motion->bossWalk();
+	if (player->bossEnemyAttack(enemyPos, offset)) {
+		enemyHp = 0;
 	}
+
+	if (landing) {
+		motion->update(motionNum,1);
+	}
+
 }
 
 void Enemy::normalUpdate(Vec2 offset)
@@ -234,13 +249,10 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
-	//現状のHPを設定する
-	hp->setObjectHp(enemyHp);
-
 	motionNum = 0;
 
 	//HPがなくなり死亡した場合
-	if (enemyHp == 0) {
+	if (hp->returnTempHp() == 0.0f) {
 		motionNum = 3;
 	}
 
@@ -269,7 +281,9 @@ void Enemy::normalUpdate(Vec2 offset)
 					motionNum = 1;
 
 					if (--sleepTime < 0) {
-						enemyPos += targetPlayer2;
+						if (enemyHp > 0) {
+							enemyPos += targetPlayer2;
+						}
 					}
 
 					//画像の向き
@@ -315,7 +329,7 @@ void Enemy::normalUpdate(Vec2 offset)
 		inversion = true;
 	}
 	//左の壁反射
-	if (enemyPos.x + offset.x < 0) {
+	if (enemyPos.x< 0) {
 		vec.x = -vec.x;
 		inversion = false;
 	}
@@ -324,12 +338,8 @@ void Enemy::normalUpdate(Vec2 offset)
 	if (motionNum != 3) {
 		if (!stop) {
 			if (landing) {
-				enemyPos += vec;
-				if (vec.x > 0) {
-					moveCount++;
-				}
-				else {
-					moveCount--;
+				if (enemyHp > 0) {
+					enemyPos += vec;
 				}
 			}
 		}
@@ -352,6 +362,7 @@ void Enemy::normalUpdate(Vec2 offset)
 	//投擲が当たった場合の処理
 	if (player->enemyAttack(enemyPos, offset)) {
 		enemyHp = 0;
+		hpDisplay = true;
 	}
 
 	//プレイヤーの近接攻撃との当たり判定
@@ -383,8 +394,11 @@ void Enemy::normalUpdate(Vec2 offset)
 
 	//エネミーの動きを更新
 	if (landing) {
-		motion->update(motionNum);
+		motion->update(motionNum,0);
 	}
+
+	//現状のHPを設定する
+	hp->setObjectHp(enemyHp);
 }
 
 void Enemy::normalDraw(Vec2 offset)
@@ -398,7 +412,6 @@ void Enemy::normalDraw(Vec2 offset)
 
 	if (hpDisplay) {
 		hp->draw(enemyPos, offset);
-		
 	}
 
 	if (--time == 0) {
@@ -411,8 +424,6 @@ void Enemy::normalDraw(Vec2 offset)
 		my::myDrawRectRotaGraph(pos.x, pos.y, imgX * 40, 0, 40, 40, 1.5f, 0.0f, hitHandle, true, false);
 	}
 
-	DrawFormatString(1910, 0, 0xffffff, "%d", imgX);
-	
 }
 
 void Enemy::BossDraw(Vec2 offset)
@@ -430,6 +441,34 @@ void Enemy::BossDraw(Vec2 offset)
 	if (hpDisplay) {
 		hp->draw(enemyPos, offset);
 	}
+}
+
+void Enemy::titleUpdate(Vec2 offset)
+{
+	landing = false;
+	enemyPos += vec;
+	motionNum = 1;
+
+	if (enemyPos.y > 800) {
+		enemyPos.y = 800;
+		landing = true;
+	}
+
+	if (landing) {
+		vec.y = jump;
+		if (jump < 0) {
+			jump += 0.3;
+		}
+	}
+
+	vec.y += 0.1;
+
+	if (enemyPos.x + 40 < 0) {
+		isEnabled = false;
+	}
+
+	motion->update(motionNum, 0);
+
 }
 
 void Enemy::coinUpdate(Vec2 offset)
@@ -495,16 +534,22 @@ void Enemy::updateDescent(Vec2 offset)
 			const int chipNo = groundData::tutorialGround[underfootChipNoY + 12][underfootChipNoX];
 			
 			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-					landing = true;
-					updateFunc = &Enemy::BossUpdate;
+				landing = true;
+				updateFunc = &Enemy::BossUpdate;
+			}
+		}
+		break;
+	case 4:
+		for (int i = 0; i < 1; i++) {
+			const int chipNo = groundData::tutorialGround[underfootChipNoY][underfootChipNoX];
+
+			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				landing = true;
+				updateFunc = &Enemy::titleUpdate;
 			}
 		}
 		break;
 	}
-
-	
-
-	
 }
 
 void Enemy::dispatch(const Vec2& pos)
@@ -536,8 +581,13 @@ void Enemy::dispatch(const Vec2& pos)
 		updateFunc = &Enemy::updateDescent;
 		drawFunc = &Enemy::BossDraw;
 		break;
+	case 4:
+		vec = { -3.0f,0.0f };
+		jump = -3.0f;
+		updateFunc = &Enemy::updateDescent;
+		drawFunc = &Enemy::normalDraw;
+		break;
 	}
-	drawFunc = &Enemy::normalDraw;
 }
 
 void Enemy::update(Vec2 offset)

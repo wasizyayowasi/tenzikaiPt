@@ -34,11 +34,13 @@ private:
 	int portionHandle = -1;
 	int hacheteHandle = -1;
 	int guiHandle = -1;
-	int bugHandle = -1;
-	int bottanHandle = -1;
-	int bottanHandle2 = -1;
-	int bottanHandle3 = -1;
 	int coinHandle = -1;
+
+	int mainSound = -1;
+	int collapseSound = -1;
+	int footstepSound = -1;
+	int soundVolume = 150;
+	int soundCount = 20;
 
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;

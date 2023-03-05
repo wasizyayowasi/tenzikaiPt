@@ -1,8 +1,13 @@
 #pragma once
 #include "SceneBase.h"
+#include "../Vec2.h"
 #include <memory>
 #include <string>
 #include <map>
+#include <array>
+
+class Enemy;
+class Field;
 
 enum class choice
 {
@@ -17,7 +22,7 @@ class TitleScene : public SceneBase
 public:
 
 	TitleScene(SceneManager& manager);
-	~TitleScene() {}
+	~TitleScene();
 
 	void update(const InputState& input);
 	void draw();
@@ -42,7 +47,23 @@ private:
 	void fadeOutUpdateGameMain(const InputState& input);
 	void fadeOutUpdateTutorial(const InputState& input);
 
+	int soundHandle = -1;
+	int soundVolume = 150;
+
+	int enemyHandle = -1;
+	int collTime = 300;
+	int luck = 0;
+	int fontSize = 0;
+	bool enemyGo = false;
+	bool enemiesGo = false;
+	Vec2 shift = {120.0f,800.0f};
+
 	std::map<choice, std::string> sceneTable;
+
+	std::shared_ptr<Enemy> enemy;
+	std::shared_ptr<Field> field;
+
+	std::array<std::shared_ptr<Enemy>, 16> enemies;
 
 	//update用メンバ関数ポインタ
 	void (TitleScene::* updateFunc_)(const InputState& input);

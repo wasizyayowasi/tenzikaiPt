@@ -31,6 +31,13 @@ private:
 	int hacheteHandle = -1;
 	int guiHandle = -1;
 	int coinHandle = -1;
+	int truckHandle = -1;
+	
+	int mainSound = -1;
+
+	int soundVolume = 150;
+
+	float truckPos = 0;
 
 	int scrollX = 0;
 
@@ -50,15 +57,16 @@ private:
 
 	int clearCount = 0;
 
-	int noLongerUsedX[3];
-	int noLongerUsedY[3];
+	int noLongerUsedX[6];
+	int noLongerUsedY[6];
+
+	int spacePosNum[3];
+
+	int wave = 3;
+	int waveCount = 0;
 
 	bool configured = false;
 	bool skip = false;
-
-	static constexpr int fade_interval = 60;
-	int fadeTimer_ = fade_interval;
-	int fadeValue_ = 255;
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 

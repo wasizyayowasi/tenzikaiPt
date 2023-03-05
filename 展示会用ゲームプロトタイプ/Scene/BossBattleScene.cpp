@@ -14,29 +14,29 @@
 BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),updateFunc(&BossBattleScene::fadeInUpdate)
 {
 
-	enemyHandle = my::myLoadGraph("data/enemy.png");
-	hpHandle = my::myLoadGraph("data/heart.png");
-	portionHandle = my::myLoadGraph("data/portion.png");
-	hacheteHandle = my::myLoadGraph("data/machete.png");
-	guiHandle = my::myLoadGraph("data/GUI.png");
-	repairHandle = my::myLoadGraph("data/repair.png");
-	bugHandle = my::myLoadGraph("data/Bag.png");
-	bottanHandle = my::myLoadGraph("data/bottan1.png");
-	bottanHandle2 = my::myLoadGraph("data/bottan2.png");
-	bottanHandle3 = my::myLoadGraph("data/bottan3.png");
-	coinHandle = my::myLoadGraph("data/CopperCoin.png");
+	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
+	hpHandle = my::myLoadGraph("data/objectGraph/heart.png");
+	portionHandle = my::myLoadGraph("data/objectGraph/portion.png");
+	hacheteHandle = my::myLoadGraph("data/objectGraph/machete.png");
+	guiHandle = my::myLoadGraph("data/GUIGraph/GUI.png");
+	repairHandle = my::myLoadGraph("data/objectGraph/repair.png");
+	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
+
+	mainSound = LoadSoundMem("data/music/Battle-Dawn.mp3");
+	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
 	player = new Player(2);
-	player->setHandle(portionHandle, hacheteHandle, guiHandle, hpHandle, repairHandle, bugHandle);
+	player->setHandle(portionHandle, hacheteHandle, guiHandle, hpHandle, repairHandle, coinHandle);
 	player->init();
-	player->setPos({Game::kScreenWidth / 2,600});
+	player->setPos({Game::kScreenWidth / 2,760});
 
 	field = std::make_shared<Field>();
 	bossEnemy = std::make_shared <Enemy>(3);
 	
 	bossEnemy->setPlayer(player, enemyHandle, coinHandle);
-	bossEnemy->dispatch({ 0,0 });
+	bossEnemy->dispatch({ 0,400 });
 
+	init();
 }
 
 BossBattleScene::~BossBattleScene()
@@ -48,16 +48,16 @@ BossBattleScene::~BossBattleScene()
 	DeleteGraph(hacheteHandle);
 	DeleteGraph(hpHandle);
 	DeleteGraph(repairHandle);
-	DeleteGraph(bugHandle);
-	DeleteGraph(bottanHandle);
-	DeleteGraph(bottanHandle2);
-	DeleteGraph(bottanHandle3);
 	DeleteGraph(coinHandle);
+
+	DeleteSoundMem(mainSound); 
+	DeleteSoundMem(footstepSound);
 }
 
 void BossBattleScene::init()
 {
-	player->init();
+	ChangeVolumeSoundMem(soundVolume, mainSound);
+	PlaySoundMem(mainSound, DX_PLAYTYPE_LOOP, true);
 }
 
 void BossBattleScene::update(const InputState& input)
@@ -68,16 +68,6 @@ void BossBattleScene::update(const InputState& input)
 void BossBattleScene::draw()
 {
 	field->draw(offset,2);
-	player->draw(offset);
-	bossEnemy->BossDraw(offset);
-	
-	if (--time == 0) {
-		imgX++;
-		time = 4;
-		if (imgX > 3) {
-			imgX = 0;
-		}
-	}
 
 	for (int x = 0; x < bossNumX; x++) {
 
@@ -86,7 +76,7 @@ void BossBattleScene::draw()
 		if (posX > Game::kScreenWidth + chipSize) {
 			break;
 		}
-		if (posX < -chipSize) {
+		if (posX < chipSize * 14) {
 			continue;
 		}
 
@@ -99,6 +89,22 @@ void BossBattleScene::draw()
 			}
 		}
 	}
+
+	player->draw(offset);
+
+	DrawFormatString(1100, 1000, 0xffffff, "%f", offset.x);
+
+	if (bossEnemy->isEnable()) {
+		bossEnemy->BossDraw(offset);
+	}
+	
+	if (--time == 0) {
+		imgX++;
+		time = 4;
+		if (imgX > 3) {
+			imgX = 0;
+		}
+	}
 }
 
 
@@ -107,7 +113,9 @@ void BossBattleScene::normalUpdate(const InputState& input)
 
 	if (player->isEnable()) {
 		player->update(offset, input);
-		bossEnemy->update(offset);
+		if (bossEnemy->isEnable()) {
+			bossEnemy->update(offset);
+		}
 	}
 	else {
 		player->updateDeath(offset,input);
@@ -130,6 +138,17 @@ void BossBattleScene::normalUpdate(const InputState& input)
 
 	offset = targetOffset * 0.5f + offset * 0.5f;
 
+	if (!bossEnemy->isEnable()) {
+		updateFunc = &BossBattleScene::clearFadeOutUpdate;
+	}
+
+	if (bossEnemy->isEnable()) {
+		if (--soundCount == 0) {
+			ChangeVolumeSoundMem(130, footstepSound);
+			PlaySoundMem(footstepSound, DX_PLAYTYPE_BACK, true);
+			soundCount = 100;
+		}
+	}
 }
 
 void BossBattleScene::fadeInUpdate(const InputState& input)
@@ -143,6 +162,8 @@ void BossBattleScene::fadeInUpdate(const InputState& input)
 
 void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 {
+	soundVolume--;
+	ChangeVolumeSoundMem(soundVolume, mainSound);
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new Gameover(manager_,input,2));
@@ -152,6 +173,8 @@ void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 
 void BossBattleScene::clearFadeOutUpdate(const InputState& input)
 {
+	soundVolume--;
+	ChangeVolumeSoundMem(soundVolume, mainSound);
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new GameClear(manager_));

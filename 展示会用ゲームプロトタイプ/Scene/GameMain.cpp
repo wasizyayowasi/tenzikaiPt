@@ -17,20 +17,23 @@
 
 GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameMain::fadeInUpdate)
 {
-	enemyHandle = my::myLoadGraph("data/enemy.png");
-	hpHandle = LoadGraph("data/heart.png");
-	portionHandle = my::myLoadGraph("data/portion.png");
-	hacheteHandle = my::myLoadGraph("data/machete.png");
-	guiHandle = my::myLoadGraph("data/GUI.png");
-	repairHandle = my::myLoadGraph("data/repair.png");
-	coinHandle = my::myLoadGraph("data/CopperCoin.png");
+	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
+	hpHandle = LoadGraph("data/objectGraph/heart.png");
+	portionHandle = my::myLoadGraph("data/objectGraph/portion.png");
+	hacheteHandle = my::myLoadGraph("data/objectGraph/machete.png");
+	guiHandle = my::myLoadGraph("data/GUIGraph/GUI.png");
+	repairHandle = my::myLoadGraph("data/objectGraph/repair.png");
+	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
+	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
+	
+	mainSound = LoadSoundMem("data/music/Dystopian.wav");
 
 	player = new Player(0);
 	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
 
 	//空間のデータを作る
-	for (int i = 0; i < 3;i++) {
-		space[i] = std::make_shared<BugSpace>(i);
+	for (auto& space : space) {
+		space = std::make_shared<BugSpace>();
 	}
 	//プレイヤーのデータを送る
 	for (auto& space : space) {
@@ -43,6 +46,9 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 
 	init();
 	
+	ChangeVolumeSoundMem(soundVolume, mainSound);
+
+	PlaySoundMem(mainSound, DX_PLAYTYPE_LOOP, true);
 }
 
 GameMain::~GameMain()
@@ -55,6 +61,9 @@ GameMain::~GameMain()
 	DeleteGraph(hpHandle);
 	DeleteGraph(repairHandle);
 	DeleteGraph(coinHandle);
+	DeleteGraph(truckHandle);
+	
+	DeleteSoundMem(mainSound);
 }
 
 
@@ -76,13 +85,26 @@ void GameMain::init()
 		}
 	}
 
+	for (int i = 0; i < wave; i++) {
+		spacePosNum[i] = GetRand(5);
+		for (int j = 0; j < wave; j++) {
+			if (i != j) {
+				if (spacePosNum[i] == spacePosNum[j]) {
+					i--;
+				}
+			}
+		}
+	}
+
 	i = 0;
 
 	//空間の場所をランダムで設定
 	for (auto& space : space) {
-		space->init(noLongerUsedX[i],noLongerUsedY[i]);
+		space->init(noLongerUsedX[spacePosNum[i]], noLongerUsedY[spacePosNum[i]]);
 		i++;
 	}
+
+	wave = 1;
 }
 
 void GameMain::update(const InputState& input)
@@ -102,17 +124,16 @@ void GameMain::draw()
 		}
 	}
 
-	//網目の描画
-	/*for (int x = 0; x < bgNumX; x++) {
-		for (int y = 0; y < bgNumY; y++) {
-			DrawBox(x * chipSize + offset.x, y * chipSize, x * chipSize + chipSize, y * chipSize + chipSize, 0x660000, false);
-		}
-	}*/
+	if (updateFunc != &GameMain::fadeInUpdate) {
+		//プレイヤーの描画
+		player->draw(offset);
+	}
 
-	//プレイヤーの描画
-	player->draw(offset);
+	if (updateFunc == &GameMain::fadeInUpdate) {
+		DrawGraph(truckPos, 643, truckHandle, true);
+	}
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
 	//画面全体を真っ黒に塗りつぶす
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -120,10 +141,12 @@ void GameMain::draw()
 
 void GameMain::fadeInUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
-	if (--fadeTimer_ == 0) {
+	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	truckPos += 10.0f;
+	if (--fadeTimer == 0) {
 		updateFunc = &GameMain::normalUpdate;
-		fadeValue_ = 0;
+		fadeValue = 0;
+		player->setPos({ truckPos + 20,720 });
 	}
 }
 
@@ -199,8 +222,10 @@ void GameMain::normalUpdate(const InputState& input)
 
 void GameMain::gameoverFadeOutUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
-	if (++fadeTimer_ == fade_interval) {
+	soundVolume--;
+	ChangeVolumeSoundMem(soundVolume, mainSound);
+	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new Gameover(manager_,input,1));
 		return;
 	}
@@ -208,8 +233,10 @@ void GameMain::gameoverFadeOutUpdate(const InputState& input)
 
 void GameMain::bossBattleSceneFadeOutUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
-	if (++fadeTimer_ == fade_interval) {
+	soundVolume--;
+	ChangeVolumeSoundMem(soundVolume, mainSound);
+	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new BossBattleScene(manager_));
 		return;
 	}

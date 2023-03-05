@@ -10,7 +10,7 @@ class ObjectHp;
 class BugSpace
 {
 public:
-	BugSpace(int spaceNum);
+	BugSpace();
 	virtual ~BugSpace();
 
 	std::array<std::shared_ptr<Enemy>, 16>& getEnemy();

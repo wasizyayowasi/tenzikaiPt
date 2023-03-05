@@ -18,15 +18,18 @@ public:
 	void update(Vec2 offset);
 	void bossUpdate(Vec2 offset);
 	void draw(int handle, Vec2 offset);
+	void bossDraw(int handle, Vec2 offset);
 
 	bool playerCollision(const Vec2& pos,Vec2 offset);
 	bool enemyCollision(const Vec2& pos, Vec2 offset);
+	bool bossEnemyCollision(const Vec2& pos, Vec2 offset);
 
 	void deadFlyingObject();
 
 	bool landing() { return landingObject; }
 
 	bool filedCollision(int x,int y,Vec2 offset);
+
 private:
 	int time = 50;
 	bool playerDirections = false;
@@ -44,6 +47,6 @@ private:
 	Vec2 normalize;
 	Vec2 flyingObjectPos;
 	Vec2 pos;
-	Vec2 vec = {5.0f,0.0f};
+	Vec2 vec = {40.0f,0.0f};
 };
 

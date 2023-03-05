@@ -15,11 +15,14 @@ public:
 	Vec2 getPos()const { return enemyPos; }
 	void setPlayer(Player* dPlayer,int setHandle,int cHandle) { player = dPlayer,handle = setHandle,coinHandle = cHandle; }
 
+	void setHandle(int eHandle) {handle = eHandle;}
+
 	void tutorialUpdate(Vec2 offset);
 	void BossUpdate(Vec2 offset);
 	void normalUpdate(Vec2 offset);
 	void normalDraw(Vec2 offset);
 	void BossDraw(Vec2 offset);
+	void titleUpdate(Vec2 offset);
 
 	void coinUpdate(Vec2 offset);
 	void coinDraw(Vec2 offset);
@@ -42,6 +45,7 @@ public:
 
 	int returnDeath() { return death; }
 private:
+	float jump = -3.0f;
 
 	int hitHandle = -1;
 

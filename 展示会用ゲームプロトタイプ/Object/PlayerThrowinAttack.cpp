@@ -8,7 +8,7 @@ PlayerThrowinAttack::PlayerThrowinAttack(int num)
 {
 	if (num == 2) {
 		isEnabled = true;
-		flyingObjectPos = { 14500,800 };
+		flyingObjectPos = { 14900,800 };
 	}
 }
 
@@ -22,6 +22,11 @@ void PlayerThrowinAttack::attack(const Vec2& playerPos, bool directions)
 
 void PlayerThrowinAttack::bossAttack(const Vec2& pos, bool directions)
 {
+	flyingObjectPos = pos;
+	isEnabled = true;
+	//ï˚å¸
+	playerDirections = directions;
+	vec = {40.0f,-100.0f};
 }
 
 bool PlayerThrowinAttack::isEnable() const
@@ -133,27 +138,18 @@ void PlayerThrowinAttack::bossUpdate(Vec2 offset)
 	int underBlockX = (flyingObjectPos.x) / chipSize;
 	int underBlockY = (flyingObjectPos.y + chipSize) / chipSize;
 
-	const int chipNo = groundData::ground[underBlockY][underBlockX];
+	const int chipNo = groundData::bossGround2[underBlockY][underBlockX];
+
+	if (flyingObjectPos.y > 800) {
+		flyingObjectPos.y = 800;
+		landingObject = true;
+		vec = { 0.0f,0.0f };
+	}
 
 
 	if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 		landingObject = true;
-	}
-
-	if (!landingObject) {
-		tempX = flyingObjectPos.y + r + cos(45);
-		tempY = flyingObjectPos.y + r + sin(45);
-
-		normalize.x = tempX;
-		normalize.y = -tempY;
-
-		vec = normalize.normalize() * 2;
-
-		up += 0.3f;
-
-		vec.y += up;
-
-		vec.x *= 15;
+		vec.y = 0.0f;
 	}
 
 	//ÉvÉåÉCÉÑÅ[ÇÃå¸Ç≠ï˚å¸Ç…ÇÊÇ¡ÇƒobjectÇîÚÇŒÇ∑ï˚å¸ÇïœâªÇ≥ÇπÇÈ
@@ -167,12 +163,28 @@ void PlayerThrowinAttack::bossUpdate(Vec2 offset)
 		}
 	}
 
+	if (!landingObject) {
+
+		vec.y += 10.0f;
+
+	}
+
 }
 
 void PlayerThrowinAttack::draw(int handle, Vec2 offset)
 {
+	//DrawBox(14900 + offset.x, 700, 15000 + offset.x, 800, 0xffffff, true);
+
 	DrawString(flyingObjectPos.x + offset.x, flyingObjectPos.y - 10, "íe", 0xffffff);
 	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y + 10,1.5f, angle,handle, true, playerDirections);
+}
+
+void PlayerThrowinAttack::bossDraw(int handle, Vec2 offset)
+{
+	DrawFormatString(1000, 600, 0xffffff, "%f : %f", flyingObjectPos.x + offset.x, flyingObjectPos.y + 10);
+
+	DrawString(flyingObjectPos.x + offset.x, flyingObjectPos.y - 10, "íe", 0xffffff);
+	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y - 100, 10.0f, angle, handle, true, playerDirections);
 }
 
 
@@ -224,6 +236,26 @@ bool PlayerThrowinAttack::enemyCollision(const Vec2& pos, Vec2 offset)
 
 }
 
+bool PlayerThrowinAttack::bossEnemyCollision(const Vec2& pos, Vec2 offset)
+{
+	if (isEnabled) {
+		if (!landingObject) {
+
+			float enemyRight = pos.x + 400;
+
+			if (enemyRight < flyingObjectPos.x)			return false;
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
 
 void PlayerThrowinAttack::deadFlyingObject()
 {
@@ -252,3 +284,4 @@ bool PlayerThrowinAttack::filedCollision(int x,int y,Vec2 offset)
 
 	return true;
 }
+

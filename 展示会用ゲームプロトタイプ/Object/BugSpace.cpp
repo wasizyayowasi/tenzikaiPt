@@ -7,9 +7,9 @@
 #include "../field.h"
 #include "../DrawFunctions.h"
 
-BugSpace::BugSpace(int spaceNum):num(spaceNum)
+BugSpace::BugSpace()
 {
-	spaceHandle = my::myLoadGraph("data/portal2.png");
+	spaceHandle = my::myLoadGraph("data/objectGraph/portal2.png");
 
 	hp = new ObjectHp;
 	hp->setObjectMaxHp(maxHp);
@@ -31,18 +31,8 @@ std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
 
 void BugSpace::init(int setX, int setY)
 {
-	if (num == 0) {
-		spacePos.x = setX * chipSize;
-		spacePos.y = setY * chipSize;
-	}
-	else if (num == 1) {
-		spacePos.x = setX * chipSize;
-		spacePos.y = setY * chipSize;
-	}
-	else if (num == 2) {
-		spacePos.x = setX * chipSize;
-		spacePos.y = setY * chipSize;
-	}
+	spacePos.x = setX * chipSize;
+	spacePos.y = setY * chipSize;
 }
 
 void BugSpace::tutorialUpdate(Vec2 offset)

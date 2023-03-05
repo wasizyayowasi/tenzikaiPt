@@ -45,6 +45,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//‰æ–Ê‚ÌƒNƒŠƒA
 		ClearDrawScreen();
 
+
 		input.update();
 
 		sceneManager.update(input);
@@ -55,7 +56,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		DrawFormatString(10, 10, 0xffffff, "FPS = %2.2f", fps);
 		DrawFormatString(10, 30, 0xffffff, "DC = %d", drawcall);
-
+		
 		//— ‰æ–Ê‚ğ•\‰æ–Ê‚ÉØ‚è‘Ö‚¦‚é
 		ScreenFlip();
 

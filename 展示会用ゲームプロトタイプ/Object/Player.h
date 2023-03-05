@@ -27,7 +27,7 @@ public:
 	void bossDamege();
 
 	int enemyAttack(Vec2 enemyPos, Vec2 offset);
-
+	int bossEnemyAttack(Vec2 enemyPos, Vec2 offset);
 
 	bool beHidden();
 	bool setPush() { return push; }
@@ -72,6 +72,8 @@ public:
 	int returnHpDisplay() { return spaceHpDisplay; }
 
 	bool returnFlyingisEnabled();
+
+	bool returnEnemyHit() { return enemyHit; }
 private:
 	//所持アイテム
 	int money = 0;
@@ -89,6 +91,14 @@ private:
 	int smokeHandle = -1;
 
 	int sceneNum = 0;
+
+	int attackSound = -1;
+	int coinSound = -1;
+	int walkSound = -1;
+
+	int soundCount = 1;
+
+	int soundVolume = 150;
 
 	//スモークの画像の類
 	int imgX = 0;
@@ -141,7 +151,7 @@ private:
 	PlayerMotion* motion;
 	Inventory* inventory;
 
-	Vec2 playerPos = {400.0f,300.0f};
+	Vec2 playerPos = {400.0f,700.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;
