@@ -35,19 +35,9 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	hp = new ObjectHp;
 	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
 
-	//空間のデータを作る
-	/*for (auto& space : space) {
-		space = std::make_shared<BugSpace>();
-	}*/
-	
 	for (int i = 0; i < maxWave; i++) {
 		space.push_back(std::make_shared<BugSpace>());
 	}
-	
-	//プレイヤーのデータを送る
-	/*for (auto& space : space) {
-		space->setPlayer(player);
-	}*/
 	
 	field = std::make_shared<Field>();
 
