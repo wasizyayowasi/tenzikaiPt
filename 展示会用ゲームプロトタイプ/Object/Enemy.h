@@ -51,9 +51,17 @@ private:
 	float jump = -3.0f;
 
 	int hitHandle = -1;
+	int windHandle = -1;
 
 	int bunderfootChipNoX = 0;
 	int bunderfootChipNoY = 0;
+
+	int tempChipNoX = 0;
+	int tempChipNoY = 0;
+
+	int windImgX = 0;
+	int windJump = false;
+	int windTime = 8;
 
 	int time = 0;
 	int imgX = 0;

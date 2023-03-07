@@ -79,6 +79,10 @@ GameMain::~GameMain()
 
 	DeleteSoundMem(mainSound);
 	DeleteSoundMem(footstepSound);
+
+	for (int i = 0; i < maxWave; i++) {
+		space[i]->init(0,0);
+	}
 }
 
 

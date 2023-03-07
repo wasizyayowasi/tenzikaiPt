@@ -53,7 +53,7 @@ void ObjectHp::playerHpDraw(int handle)
 
 void ObjectHp::waveHpDraw(Vec2 pos)
 {
-	DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 100, pos.y - 10, 0x000000, true);
+	DrawBox(pos.x, pos.y - 23, pos.x + 1000, pos.y - 10, 0x000000, true);
 	if (static_cast<float>(hp) < tempHp) {
 		tempHp -= decreaseHp;
 		decreaseHp += 0.03f;

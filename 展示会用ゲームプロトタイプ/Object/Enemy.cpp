@@ -12,6 +12,7 @@
 Enemy::Enemy(int num) : sceneNum(num)
 {
 	hitHandle = my::myLoadGraph("data/effect/hit.png");
+	windHandle = my::myLoadGraph("data/objectGraph/Wind.png");
 
 	hp = new ObjectHp;
 	motion = new EnemyMotion;
@@ -25,6 +26,7 @@ Enemy::~Enemy()
 {
 	delete hp;
 	DeleteGraph(hitHandle);
+	DeleteGraph(windHandle);
 }
 
 void Enemy::tutorialUpdate(Vec2 offset)
@@ -249,6 +251,11 @@ void Enemy::normalUpdate(Vec2 offset)
 
 	const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
+	if (chipNo == 16) {
+		tempChipNoX = underfootChipNoX;
+		tempChipNoY = underfootChipNoY;
+	}
+
 	if (chipNo == 0) {
 		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
 			updateFunc = &Enemy::updateDescent;
@@ -259,6 +266,7 @@ void Enemy::normalUpdate(Vec2 offset)
 		steamVentTime = 1;
 	}
 
+	//’ˆ‚ð•‘‚¤
 	if (--steamVentTime == 0) {
 		if (chipNo == 16) {
 			if (inversion) {
@@ -267,8 +275,9 @@ void Enemy::normalUpdate(Vec2 offset)
 			else {
 				jumpVec = { 1.7f,0.0f };
 			}
+			windJump = true;
 			updateFunc = &Enemy::jumpUpdate;
-			steamVentTime = 15;
+			steamVentTime = GetRand(30);
 			return;
 		}
 	}
@@ -461,6 +470,18 @@ void Enemy::normalDraw(Vec2 offset)
 	
 	DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
 	DrawString(pos.x, pos.y - 15, "“G", 0xffffff);
+
+	if (windJump) {
+		if (--windTime == 0) {
+			windImgX++;
+			windTime = 8;
+		}
+		DrawRectRotaGraph(tempChipNoX * chipSize + 8 + offset.x, (tempChipNoY - 1) * chipSize - 10, windImgX * 48, 0, 48, 32, 2.0f, 4.6f, windHandle, true, false);
+		if (windImgX > 11) {
+			windImgX = 0;
+			windJump = false;
+		}
+	}
 
 	motion->draw(enemyPos, handle, inversion, offset,2.0f);
 
