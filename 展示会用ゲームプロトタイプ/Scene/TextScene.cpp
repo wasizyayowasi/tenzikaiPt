@@ -3,13 +3,41 @@
 #include "../DrawFunctions.h"
 #include "../InputState.h"
 #include "SceneManager.h"
+#include <string>
+
+namespace {
+	const char* const textNum1textCount1 = "お前さんそこで何してる";
+	const char* const textNum1textCount2 = "後ろの化け物が見えんのか";
+	const char* const textNum1textCount3 = "早くこのポストの裏に隠れなさい";
+
+	const char* const textNum2textCount1 = "お前さんいい武具をもってるじゃないか";
+	const char* const textNum2textCount2 = "ちょいとそこの化け物を退治してくれないか";
+
+	const char* const textNum3textCount1 = "お前さんあのボワボワした空間が見えるか？";
+	const char* const textNum3textCount2 = "今はなりを潜めているからかわからないが";
+	const char* const textNum3textCount3 = "あの空間からさっきの化け物が出てきている";
+	const char* const textNum3textCount4 = "お前さんなら前の街並みに戻せるはずだ";
+	const char* const textNum3textCount5 = "頼んだぞ";
+
+	const char* const textNum4textCount1 = "お前さんなかなかいい腕をしてるじゃないか";
+	const char* const textNum4textCount2 = "お前さんを見越して願いがある";
+	const char* const textNum4textCount3 = "現在進行形で町が化け物たちに襲われている";
+	const char* const textNum4textCount4 = "あの空間を壊して俺たちの街を取り戻してくれ";
+	const char* const textNum4textCount5 = "頼んだぞ";
+}
 
 TextScene::TextScene(SceneManager& manager, const InputState& input, int num, Vec2 tempOffset, int handle) : inputState(input),SceneBase(manager),textNum(num),offset(tempOffset), bottanHandle(handle)
 {
-	
+	LPCSTR fontPath = "data/other/Silver.ttf";
+	if (AddFontResourceEx(fontPath, FR_PRIVATE, NULL) > 0)
+	{
+	}
+
+	textHandle = CreateFontToHandle("Silver", 32, 9, -1);
+
 	switch (textNum) {
 	case 0:
-		textMaxCount = 2;
+		textMaxCount = 3;
 		break;
 	case 1:
 		textMaxCount = 2;
@@ -21,12 +49,11 @@ TextScene::TextScene(SceneManager& manager, const InputState& input, int num, Ve
 		textMaxCount = 4;
 		break;
 	}
-
 }
 
 TextScene::~TextScene()
 {
-	
+	DeleteFontToHandle(textHandle);
 }
 
 void TextScene::update(const InputState& input)
@@ -57,15 +84,18 @@ void TextScene::draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
 		DrawBox(660 + offset.x, 650, 1040 + offset.x, 720, 0xffffff, false);
 
+		
 		switch (textCount) {
 		case 0:
-			DrawString(750 + offset.x, 665, "お前さんそこで何してる", 0xffffff);
-			DrawString(750 + offset.x, 690, "後ろの化け物が見えんのか", 0xffffff);
+			DrawString(750 + offset.x, 680, "お前さんそこで何してる", 0xffffff);
 			break;
 		case 1:
-			DrawString(730 + offset.x, 680, "早くこのポストの裏に隠れなさい", 0xffffff);
+			DrawString(750 + offset.x, 680, "後ろの化け物が見えんのか", 0xffffff);
 			break;
 		case 2:
+			DrawString(730 + offset.x, 680, "早くこのポストの裏に隠れなさい", 0xffffff);
+			break;
+		case 3:
 			imgY = 1;
 			if (imgX > 5) {
 				imgX = 2;
@@ -122,7 +152,7 @@ void TextScene::draw()
 			DrawString(4030 + offset.x, 640, "お前さんあのボワボワした空間が見えるか？", 0xffffff);
 			break;
 		case 1:
-			DrawString(4040 + offset.x, 640, "今はなりを潜めているからかわからないが", 0xffffff);
+			DrawString(4040 + offset.x, 640, "今はなりを潜めているのかわからないが", 0xffffff);
 			break;
 		case 2:
 			DrawString(4030 + offset.x, 640, "あの空間からさっきの化け物が出てきている", 0xffffff);
@@ -147,7 +177,7 @@ void TextScene::draw()
 			DrawString(5130 + offset.x, 640, "お前さんなかなかいい腕をしてるじゃないか", 0xffffff);
 			break;
 		case 1:
-			DrawString(5150 + offset.x, 640, "お前さんを見越してお願いがある", 0xffffff);
+			DrawString(5150 + offset.x, 640, "お前さんを見越して願いがある", 0xffffff);
 			break;
 		case 2:
 			DrawString(5130 + offset.x, 640, "現在進行形で町が化け物たちに襲われている", 0xffffff);

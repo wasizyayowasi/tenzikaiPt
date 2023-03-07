@@ -7,6 +7,7 @@
 #include "../game.h"
 #include "../Object/Enemy.h"
 #include "../DrawFunctions.h"
+#include "../Scene/BossBattleScene.h"
 #include "../field.h"
 
 TitleScene::TitleScene(SceneManager& manager):SceneBase(manager),updateFunc_(&TitleScene::fadeInUpdate)
@@ -14,9 +15,28 @@ TitleScene::TitleScene(SceneManager& manager):SceneBase(manager),updateFunc_(&Ti
 	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
 	soundHandle = LoadSoundMem("data/soundEffect/Wind-Synthetic_Ambi02-1.mp3");
 
-	sceneTable[choice::main] = "本番";
+	LPCSTR fontPath = "data/other/CompassPro.ttf";
+	LPCSTR UIfontPath = "data/other/Silver.ttf";
+
+	if (AddFontResourceEx(fontPath, FR_PRIVATE, NULL) > 0)
+	{
+	}
+	if (AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL) > 0)
+	{
+	}
+	
+
+	fontHandle = CreateFontToHandle("CompassPro", 64, -1, -1);
+	fontHandle2 = CreateFontToHandle("CompassPro", 200, -1, -1);
+	UIfontHandle = CreateFontToHandle("Silver", 32, 9, -1);
+	UIfontHandle2 = CreateFontToHandle("Silver", 48, 9, -1);
+
+	titleWidth = GetDrawStringWidthToHandle("P  R  O  J  E  C  T", strlen("P  R  O  J  E  C  T"), fontHandle);
+	titleWidth2 = GetDrawStringWidthToHandle("VIKING", strlen("VIKING"), fontHandle2);
+
 	sceneTable[choice::tutorial] = "チュートリアル";
-	sceneTable[choice::option] = "オプション";
+	sceneTable[choice::main] = "メイン";
+	sceneTable[choice::boss] = "ボス";
 	sceneTable[choice::end] = "終了";
 
 	field = std::make_shared<Field>();
@@ -34,6 +54,10 @@ TitleScene::~TitleScene()
 {
 	DeleteGraph(enemyHandle);
 	DeleteSoundMem(soundHandle);
+	DeleteFontToHandle(fontHandle);
+	DeleteFontToHandle(fontHandle2);
+	DeleteFontToHandle(UIfontHandle);
+	DeleteFontToHandle(UIfontHandle2);
 }
 
 void TitleScene::update(const InputState& input)
@@ -93,6 +117,9 @@ void TitleScene::draw()
 {
 	field->draw({ 0.0f,0.0f },0);
 
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2, Game::kScreenHeight / 5, "P  R  O  J  E  C  T", 0xffffff, fontHandle);
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2, Game::kScreenHeight / 5 + 32, "VIKING", 0xffffff, fontHandle2);
+
 	if (enemy->isEnable()) {
 		enemy->draw({ 0.0f,0.0f });
 	}
@@ -129,15 +156,16 @@ void TitleScene::choiceScene(const InputState& input)
 
 	if (input.isTriggered(InputType::next)) {
 		if (currentInputIndex == 0) {
-			updateFunc_ = &TitleScene::fadeOutUpdateGameMain;
-			return;
-		}
-		if (currentInputIndex == 1) {
 			updateFunc_ = &TitleScene::fadeOutUpdateTutorial;
 			return;
 		}
+		if (currentInputIndex == 1) {
+			updateFunc_ = &TitleScene::fadeOutUpdateGameMain;
+			return;
+		}
 		if (currentInputIndex == 2) {
-
+			updateFunc_ = &TitleScene::fadeOutUpdateBoss;
+			return;
 		}
 		if (currentInputIndex == 3) {
 			DxLib_End();
@@ -154,7 +182,7 @@ void TitleScene::choiceSceneDraw()
 	constexpr int pw_start_x = Game::kScreenWidth / 2 + 200;	//ポーズ枠に左
 	constexpr int pw_start_y = Game::kScreenHeight / 2 + 200;	//ポーズ枠上
 
-	auto y = Game::kScreenHeight / 2 + 100;
+	auto y = Game::kScreenHeight / 2 + 200;
 	int x = Game::kScreenWidth / 2;
 	int idx = 0;
 	bool isInputtypeSelected = false;
@@ -163,25 +191,18 @@ void TitleScene::choiceSceneDraw()
 		unsigned int color = 0xffffff;
 
 		int font = strlen(name.second.c_str());
-		fontSize = GetDrawStringWidth(name.second.c_str(), font);
+		fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font,UIfontHandle);
 
 		//選択された時の処理
 		if (currentInputIndex == idx) {
+			fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, UIfontHandle2);
 			offset = 10;
 			isInputtypeSelected = true;
 			color = 0xffff00;
-			DrawString(x - fontSize / 2 - 20, y, "⇒", 0xff0000);
+			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle2);
 		}
-
-		//各キーの表示
-		if (currentInputIndex == idx) {
-			x += offset;
-		}
-		DrawString(x - fontSize / 2, y, name.second.c_str(), color);
-		DrawFormatString(x + 200, y, 0xffffff, "%d", fontSize);
-
-		if (currentInputIndex == idx) {
-			x -= offset;
+		else {
+			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle);
 		}
 
 		y += 50;
@@ -224,6 +245,17 @@ void TitleScene::fadeOutUpdateTutorial(const InputState& input)
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new TutorialScene(manager_));
+		return;
+	}
+}
+
+void TitleScene::fadeOutUpdateBoss(const InputState& input)
+{
+	soundVolume--;
+	ChangeVolumeSoundMem(soundVolume, soundHandle);
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+	if (++fadeTimer_ == fade_interval) {
+		manager_.changeScene(new BossBattleScene(manager_));
 		return;
 	}
 }

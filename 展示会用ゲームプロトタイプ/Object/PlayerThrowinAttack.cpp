@@ -4,7 +4,7 @@
 #include <math.h>
 #include "../field.h"
 
-PlayerThrowinAttack::PlayerThrowinAttack(int num)
+PlayerThrowinAttack::PlayerThrowinAttack(int num) : sceneNum(num)
 {
 	if (num == 2) {
 		isEnabled = true;
@@ -65,7 +65,12 @@ void PlayerThrowinAttack::update(Vec2 offset)
 	int underBlockX = (flyingObjectPos.x) / chipSize;
 	int underBlockY = (flyingObjectPos.y + chipSize) / chipSize;
 
-	const int chipNo = groundData::ground[underBlockY][underBlockX];
+	if (sceneNum == 0) {
+		chipNo = groundData::ground[underBlockY][underBlockX];
+	}
+	else {
+		chipNo = groundData::tutorialGround[underBlockY][underBlockX];
+	}
 
 
 	if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {	
@@ -103,9 +108,17 @@ void PlayerThrowinAttack::update(Vec2 offset)
 	if (flyingObjectPos.x < -30) {
 		init();
 	}
-	if (flyingObjectPos.x - 20 > Game::kScreenWidth * 2) {
-		init();
+	if (sceneNum == 0) {
+		if (flyingObjectPos.x - 20 > Game::kScreenWidth * 2) {
+			init();
+		}
 	}
+	else {
+		if (flyingObjectPos.x - 20 > Game::kScreenWidth * 3) {
+			init();
+		}
+	}
+	
 	if (flyingObjectPos.y < 0) {
 		init();
 	}

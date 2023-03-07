@@ -8,6 +8,8 @@
 #include "Scene/GameMain.h"
 #include "Scene/BossBattleScene.h"
 #include "Scene/TutorialScene.h"
+#include "Scene/Gameover.h"
+#include "Scene/GameClear.h"
 
 
 // ƒvƒƒOƒ‰ƒ€‚Í WinMain ‚©‚çn‚Ü‚è‚Ü‚·
@@ -34,10 +36,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	InputState input;
 	SceneManager sceneManager;
-//	sceneManager.changeScene(new TitleScene(sceneManager));
+	sceneManager.changeScene(new TitleScene(sceneManager));
 //	sceneManager.changeScene(new GameMain(sceneManager));
 //	sceneManager.changeScene(new TutorialScene(sceneManager));
-	sceneManager.changeScene(new BossBattleScene(sceneManager));
+//	sceneManager.changeScene(new BossBattleScene(sceneManager));
+//	sceneManager.changeScene(new Gameover(sceneManager,input,1));
+//	sceneManager.changeScene(new GameClear(sceneManager));
 
 	while (ProcessMessage() == 0) {
 

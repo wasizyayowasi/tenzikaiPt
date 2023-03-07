@@ -24,6 +24,11 @@ private:
 	int fadeTimer = fadeInterval;
 	int fadeValue = 255;
 
+	float quakeY = 0;
+	int tempScreenH;
+	int quakeTimer = 0;
+	int quakeCount = 0;
+
 	int enemyHandle = -1;
 	int repairHandle = -1;
 	int hpHandle = -1;
@@ -34,7 +39,10 @@ private:
 	int truckHandle = -1;
 	
 	int mainSound = -1;
+	int footstepSound = -1;
 
+	int footstepSoundVolume = 130;
+	int soundCount = 20;
 	int soundVolume = 150;
 
 	float truckPos = 0;
@@ -67,6 +75,7 @@ private:
 
 	bool configured = false;
 	bool skip = false;
+	bool nextScene = false;
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 

@@ -95,7 +95,6 @@ void Player::update(Vec2 offset, const InputState& input)
 	
 
 	if (playerHp < 1) {
-		motionNum = 4;
 		isEnabled = false;
 		updateFunc = &Player::updateDeath;
 	}
@@ -510,7 +509,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	//‹ßÚUŒ‚
 	if (!push) {
 		if (!flyingObject->isEnable()) {
-			if (input.isTriggered(InputType::attack)) {
+			if (input.isPressed(InputType::attack)) {
 				ChangeVolumeSoundMem(soundVolume, attackSound);
 				PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
 				motionNum = 3;
@@ -815,10 +814,33 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 
 void Player::updateDeath(Vec2 offset, const InputState& input)
 {
+	motionNum = 4;
 	motion->update(motionNum);
 	if (motion->setDead()) {
 		gameoverScene = true;
 	}
+}
+
+bool Player::updateSwoon(Vec2 offset)
+{
+	motion->deathDraw(playerPos + offset, playerHandle, playerDirections);
+	if (motion->setDead()) {
+		next = true;
+	}
+
+	return next;
+}
+
+bool Player::updateResuscitation(Vec2 offset)
+{
+	if (!next) {
+		motion->resuscitationDraw(playerPos + offset, playerHandle, playerDirections);
+	}
+	if (motion->returnContinue()) {
+		next = true;
+	}
+
+	return next;
 }
 
 void Player::setItemControl(int num)
@@ -907,6 +929,10 @@ void Player::draw(Vec2 offset)
 	if (!push) {
 		motion->draw(playerPos, playerHandle, playerDirections, offset);
 	}
+
+	DrawLine(playerPos.x + 18 + offset.x, playerPos.y + 23, playerPos.x + 68 + offset.x, playerPos.y + 23, 0x00ff00);
+	DrawLine(playerPos.x + 18 + offset.x, playerPos.y + 33, playerPos.x  - 32 + offset.x, playerPos.y + 33, 0xff00ff);
+	DrawCircle(playerPos.x + 18 + offset.x, playerPos.y + 33, 30, 0x0000ff, false);
 
 	if (motionStart) {
 		DrawRectRotaGraph(playerPos.x + offset.x - 10, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
@@ -1092,17 +1118,14 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 
 bool Player::shopCollision(int x, int y, Vec2 offset)
 {
-	float objectLeft = x * chipSize;
-	float objectRight = x * chipSize + chipSize;
+	float objectLeft = x * chipSize - chipSize;
+	float objectRight = x * chipSize + chipSize * 2;
 	float objectTop = y * chipSize;
 	float objectBottom = y * chipSize + chipSize * 3;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
-	DrawString(300, 400, "aiu", 0xffffff);
 	if (playerPos.x + correctionSizeX > objectRight)	return false;
-	DrawString(300, 400, "aiu", 0xffffff);
 	if (playerPos.y + correctionSizeY < objectTop)		return false;
-	DrawString(300, 400, "aiu", 0xffffff);
 	if (playerPos.y > objectBottom)						return false;
 
 	return true;

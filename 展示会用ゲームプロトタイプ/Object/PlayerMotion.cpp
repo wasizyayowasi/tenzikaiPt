@@ -114,4 +114,41 @@ void PlayerMotion::draw(Vec2 playerPos, int handle, bool trun, Vec2 offset)
 	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, newImgX, imgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
 }
 
+void PlayerMotion::resuscitationDraw(Vec2 playerPos, int handle, bool trun)
+{
+
+	if (--time == 0) {
+		deadImgX--;
+		time = 8;
+	}
+
+	if (deadImgX < 2) {
+		isContinue = true;
+		deadImgY = 0;
+		deadImgX = 7;
+	}
+
+	my::myDrawRectRotaGraph(playerPos.x + 15, playerPos.y + 15, deadImgX * assetSizeX, deadImgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
+}
+
+void PlayerMotion::deadDraw(Vec2 playerPos, int handle, bool trun)
+{
+	my::myDrawRectRotaGraph(playerPos.x + 15, playerPos.y + 15, 11 * assetSizeX, 4 * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
+}
+
+void PlayerMotion::deathDraw(Vec2 playerPos, int handle, bool trun)
+{
+	if (--time == 0) {
+		deathImgX++;
+		time = 8;
+	}
+
+	if (deathImgX > 10) {
+		deathImgX = 10;
+		isEnabled = true;
+	}
+
+	my::myDrawRectRotaGraph(playerPos.x + 15, playerPos.y + 15, deathImgX * assetSizeX, deathImgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
+}
+
 

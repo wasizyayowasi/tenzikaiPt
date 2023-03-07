@@ -69,6 +69,10 @@ void TutorialScene::update(const InputState& input)
 
 	player->update(offset, input);
 
+	if (player->getPos().x > 1000) {
+		enemy->setPos(2200);
+	}
+
 	if (spownCount > 0) {
 		if (player->getPos().x > 550) {
 			enemy->dispatch({ 300,750 });
@@ -116,6 +120,16 @@ void TutorialScene::update(const InputState& input)
 			targetPlayer7.y = player->getPos().y + 44 - 780;
 		}
 
+		if (textCount == 1) {
+			personNum = 1;
+		}
+		else if (textCount == 2) {
+			personNum = 2;
+		}
+		else if (textCount == 3) {
+			personNum = 3;
+		}
+
 		{
 			switch (textCount) {
 			case 0:
@@ -129,7 +143,6 @@ void TutorialScene::update(const InputState& input)
 			case 1:
 				if (textCount == 1) {
 					if (targetPlayer2.length() < 200) {
-						personNum++;
 						manager_.pushScene(new TextScene(manager_, input, 1, offset, bottanHandle));
 						textCount = 2;
 					}
@@ -138,7 +151,6 @@ void TutorialScene::update(const InputState& input)
 			case 2:
 				if (textCount == 2) {
 					if (targetPlayer3.length() < 200) {
-						personNum++;
 						manager_.pushScene(new TextScene(manager_, input, 2, offset, bottanHandle));
 						textCount = 3;
 					}
@@ -147,7 +159,6 @@ void TutorialScene::update(const InputState& input)
 			case 3:
 				if (!space->isEnable()) {
 					if (targetPlayer5.length() < 200) {
-						personNum++;
 						manager_.pushScene(new TextScene(manager_, input, 3, offset, bottanHandle));
 						textCount = 4;
 					}

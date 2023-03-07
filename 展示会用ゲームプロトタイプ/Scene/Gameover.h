@@ -5,6 +5,7 @@
 
 class InputState;
 class SceneManager;
+class PlayerMotion;
 
 enum class GameOverChoice
 {
@@ -16,16 +17,23 @@ class Gameover : public SceneBase
 {
 public:
 	Gameover(SceneManager& manager, const InputState& input,int num);
-	virtual ~Gameover(){}
+	virtual ~Gameover();
 	
 	void update(const InputState& input);
 	void draw();
 private:
+	int handle = -1;
+	int lightHandle = -1;
+	int fontHandle = -1;
+	int fontHandle2 = -1;
+
 	static constexpr int fade_interval = 60;
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
 
 	int sceneNum = 0;
+
+	int fontSize = 0;
 
 	int currentInputIndex;//現在選択中のインデックス
 
@@ -40,6 +48,8 @@ private:
 	UpdateFunc_t updateFunc_;
 
 	const InputState& inputState;
+
+	PlayerMotion* motion;
 
 	std::map<GameOverChoice, std::string> gameOverChoiceTable;
 };

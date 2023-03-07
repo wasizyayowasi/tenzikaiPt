@@ -1,9 +1,38 @@
 #pragma once
 #include "SceneBase.h"
 #include "../Vec2.h"
+#include <map>
+#include <string>
 
 class InputState;
 class SceneManager;
+
+enum class textNum1 {
+	textCount1,
+	textCount2,
+	textCount3,
+};
+
+enum class textNum2 {
+	textCount1,
+	textCount2,
+};
+
+enum class textNum3 {
+	textCount1,
+	textCount2,
+	textCount3,
+	textCount4,
+	textCount5,
+};
+
+enum class textNum4 {
+	textCount1,
+	textCount2,
+	textCount3,
+	textCount4,
+	textCount5,
+};
 
 class TextScene : public SceneBase
 {
@@ -18,6 +47,7 @@ private:
 	int bottanHandle = -1;
 	int bottanHandle2 = -1;
 	
+	int textHandle = -1;
 	
 	int time = 8;
 	int time2 = 8;
@@ -37,5 +67,10 @@ private:
 	const InputState& inputState;
 	
 	Vec2 offset;
+
+	std::map<textNum1, std::string> text1;
+	std::map<textNum2, std::string> text2;
+	std::map<textNum3, std::string> text3;
+	std::map<textNum4, std::string> text4;
 };
 

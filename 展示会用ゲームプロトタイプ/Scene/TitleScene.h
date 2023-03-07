@@ -11,10 +11,10 @@ class Field;
 
 enum class choice
 {
-	main,			/// 次へ行くボタン
-	tutorial,		/// 前に戻るボタン
-	option,
-	end,			/// ポーズボタン
+	tutorial,		
+	main,			
+	boss,
+	end,			
 };
 
 class TitleScene : public SceneBase
@@ -46,9 +46,17 @@ private:
 	//フェードアウト時のupdate関数
 	void fadeOutUpdateGameMain(const InputState& input);
 	void fadeOutUpdateTutorial(const InputState& input);
+	void fadeOutUpdateBoss(const InputState& input);
 
 	int soundHandle = -1;
 	int soundVolume = 150;
+	int fontHandle = -1;
+	int fontHandle2 = -1;
+	int UIfontHandle = -1;
+	int UIfontHandle2 = -1;
+
+	int titleWidth = 0;
+	int titleWidth2 = 0;
 
 	int enemyHandle = -1;
 	int collTime = 300;

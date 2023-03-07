@@ -31,6 +31,10 @@ public:
 	bool filedCollision(int x,int y,Vec2 offset);
 
 private:
+	int chipNo = 0;
+
+	int sceneNum = 0;
+
 	int time = 50;
 	bool playerDirections = false;
 	float angle = 0.0f;

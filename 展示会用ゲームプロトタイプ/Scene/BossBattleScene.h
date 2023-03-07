@@ -19,6 +19,8 @@ public:
 	void update(const InputState& input);
 	void draw();
 
+	void bossAppearanceUpdate(const InputState& input);
+
 	//フェードインの時のupdate関数
 	void fadeInUpdate(const InputState& input);
 	//通常状態のupdate関数
@@ -47,7 +49,15 @@ private:
 	float fadeValue = 255;//黒矩形のブレンド具合
 
 	int imgX = 0;
-	int time = 4;
+	int ImgTime = 4;
+	int startTime = 30;
+
+	bool bossMove = false;
+
+	float quakeY = 0;
+	int tempScreenH;
+	int quakeTimer = 0;
+	int quakeCount = 0;
 
 	Vec2 offset;
 

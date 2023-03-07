@@ -17,6 +17,8 @@ public:
 	float returnTempHp() { return tempHp; }
 private:
 	
+	float decreaseHp = 0.08f;
+
 	float tempHp = 0.0f;
 	int deathHpHandle = -1;
 

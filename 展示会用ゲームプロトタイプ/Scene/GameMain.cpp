@@ -13,6 +13,7 @@
 #include "Shop.h"
 #include "BossBattleScene.h"
 #include "../DrawFunctions.h"
+#include <cassert>
 
 
 GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameMain::fadeInUpdate)
@@ -27,6 +28,7 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
 	
 	mainSound = LoadSoundMem("data/music/Dystopian.wav");
+	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
 	player = new Player(0);
 	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
@@ -43,6 +45,11 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 		space->enemySetPlayer(enemyHandle,coinHandle);
 	}
 	field = std::make_shared<Field>();
+
+	int sw, sh, bit;
+	GetScreenState(&sw, &sh, &bit);
+	tempScreenH = MakeScreen(sw, sh);
+	assert(tempScreenH >= 0);
 
 	init();
 	
@@ -62,8 +69,10 @@ GameMain::~GameMain()
 	DeleteGraph(repairHandle);
 	DeleteGraph(coinHandle);
 	DeleteGraph(truckHandle);
-	
+	DeleteGraph(tempScreenH);
+
 	DeleteSoundMem(mainSound);
+	DeleteSoundMem(footstepSound);
 }
 
 
@@ -114,6 +123,9 @@ void GameMain::update(const InputState& input)
 
 void GameMain::draw()
 {
+	//加工用スクリーンハンドルをセット
+	SetDrawScreen(tempScreenH);
+
 	//フィールドの描画
 	field->draw(offset,1);
 
@@ -126,7 +138,14 @@ void GameMain::draw()
 
 	if (updateFunc != &GameMain::fadeInUpdate) {
 		//プレイヤーの描画
-		player->draw(offset);
+		if (quakeCount > 3) {
+			if (quakeTimer > -120) {
+				nextScene = player->updateSwoon(offset);
+			}
+		}
+		else {
+			player->draw(offset);
+		}
 	}
 
 	if (updateFunc == &GameMain::fadeInUpdate) {
@@ -137,6 +156,14 @@ void GameMain::draw()
 	//画面全体を真っ黒に塗りつぶす
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	SetDrawScreen(DX_SCREEN_BACK);
+	DrawGraph(0, quakeY, tempScreenH, false);
+
+	DrawFormatString(600, 400, 0xffffff, "%d", quakeCount);
+	DrawFormatString(600, 420, 0xffffff, "%d", clearCount);
+	DrawFormatString(600, 440, 0xffffff, "%d", quakeTimer);
+
 }
 
 void GameMain::fadeInUpdate(const InputState& input)
@@ -154,9 +181,9 @@ void GameMain::normalUpdate(const InputState& input)
 {
 	//プレイヤーの更新
 	if (player->isEnable()) {
-		player->update(offset,input);
-		//入力装置の情報を読み取る
-		Pad::update();
+		if (quakeCount < 1) {
+			player->update(offset, input);
+		}
 	}
 	else {
 		player->updateDeath(offset, input);
@@ -187,35 +214,79 @@ void GameMain::normalUpdate(const InputState& input)
 
 	clearCount = 0;
 
-	for (auto& space : space) {
-		if (!space->isEnable()) {
-			clearCount++;
+	if (quakeCount < 1) {
+		for (auto& space : space) {
+			if (!space->isEnable()) {
+				clearCount++;
+			}
 		}
 	}
 
 	if (clearCount == 3) {
+		quakeCount++;
+		quakeTimer = 120;
+		quakeY = 20.0f;
+		ChangeVolumeSoundMem(footstepSoundVolume, footstepSound);
+		PlaySoundMem(footstepSound, DX_PLAYTYPE_BACK, true);
+		footstepSoundVolume += 10;
+	}
+
+	if (quakeCount == 3 && quakeTimer <= 0) {
+		quakeCount++;
+	}
+
+	if (nextScene) {
 		updateFunc = &GameMain::bossBattleSceneFadeOutUpdate;
 	}
 
-	Vec2 targetOffset{};
-
-	targetOffset.x = (Game::kScreenWidth / 2) - player->getPos().x;
-	if (targetOffset.x > 0)
-	{
-		targetOffset.x = 0;
+	if (quakeCount == 1) {
+		if (quakeTimer < -80) {
+			quakeCount++;
+			quakeTimer = 120;
+			quakeY = 40.0f;
+			ChangeVolumeSoundMem(footstepSoundVolume, footstepSound);
+			PlaySoundMem(footstepSound, DX_PLAYTYPE_BACK, true);
+			footstepSoundVolume += 10;
+		}
 	}
-	if (targetOffset.x < -field->getWidth() + Game::kScreenWidth + 16)
-	{
-		targetOffset.x = -field->getWidth() + Game::kScreenWidth + 16;
+	else if (quakeCount == 2) {
+		if (quakeTimer < -80) {
+			quakeCount++;
+			quakeTimer = 120;
+			quakeY = 60.0f;
+			ChangeVolumeSoundMem(footstepSoundVolume, footstepSound);
+			PlaySoundMem(footstepSound, DX_PLAYTYPE_BACK, true);
+		}
 	}
 
+	{
+		Vec2 targetOffset{};
 
-	offset = targetOffset;
+		targetOffset.x = (Game::kScreenWidth / 2) - player->getPos().x;
+		if (targetOffset.x > 0)
+		{
+			targetOffset.x = 0;
+		}
+		if (targetOffset.x < -field->getWidth() + Game::kScreenWidth + 16)
+		{
+			targetOffset.x = -field->getWidth() + Game::kScreenWidth + 16;
+		}
+		offset = targetOffset;
+	}
 
 
 	
 	if (input.isTriggered(InputType::pause)) {
 		manager_.pushScene(new Pause(manager_,input));
+	}
+
+	if (--quakeTimer > 0) {
+		quakeY = -quakeY;
+		quakeY *= 0.95f;
+		--quakeTimer;
+	}
+	else {
+		quakeY = 0.0f;
 	}
 
 }

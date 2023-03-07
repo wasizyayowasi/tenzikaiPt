@@ -87,7 +87,7 @@ void BugSpace::update(Vec2 offset)
 			if (--time < 0) {
 				player->setMotion(true);
 				maxHp--;
-				time = 120;
+				time = 10;
 			}
 		}
 		else {
@@ -98,7 +98,7 @@ void BugSpace::update(Vec2 offset)
 
 	hp->setObjectHp(maxHp);
 
-	if (!player->returnHpDisplay()) {
+	/*if (!player->returnHpDisplay()) {
 		if (--enemySpawnTime < 0) {
 			for (auto& enemy : enemy) {
 				if (!enemy->isEnable()) {
@@ -109,7 +109,7 @@ void BugSpace::update(Vec2 offset)
 				}
 			}
 		}
-	}
+	}*/
 
 	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {

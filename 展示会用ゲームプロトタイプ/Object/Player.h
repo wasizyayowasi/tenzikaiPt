@@ -47,6 +47,8 @@ public:
 	void updateDescent(Vec2 offset, const InputState& input);
 	void updateLadder(Vec2 offset, const InputState& input);
 	void updateDeath(Vec2 offset, const InputState& input);
+	bool updateSwoon(Vec2 offset);
+	bool updateResuscitation(Vec2 offset);
 
 	int returnSpaceHpDisplay() { return spaceHpDisplay; }
 	int isEnable() { return isEnabled; }
@@ -77,7 +79,7 @@ public:
 private:
 	//所持アイテム
 	int money = 0;
-	int repairBlock = 0;
+	int repairBlock = 3;
 	int recoveryItem = 0;
 
 	//グラフィックハンドル
@@ -113,6 +115,7 @@ private:
 
 	//次へのシーン切り替え
 	bool gameoverScene = false;
+	bool next = false;
 
 	//プレイヤーが向いている方向
 	bool playerDirections = false;

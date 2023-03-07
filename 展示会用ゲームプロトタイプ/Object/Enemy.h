@@ -44,6 +44,8 @@ public:
 	void setPlayerData(Player* dPlayer) { player = dPlayer; }
 
 	int returnDeath() { return death; }
+
+	void setPos(int width) { enemyPos.x = width; }
 private:
 	float jump = -3.0f;
 
@@ -79,6 +81,7 @@ private:
 
 	bool hpDisplay = false;
 	bool stop = false;
+	bool attackRange = false;
 
 	bool landing = false;
 

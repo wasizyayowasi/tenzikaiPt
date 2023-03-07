@@ -24,13 +24,14 @@ void ObjectHp::draw(Vec2 pos, Vec2 offset)
 {
 	pos = pos + offset;
 
-	
 	DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 10, pos.y - 15, 0x000000, true);
 	if (static_cast<float>(hp) < tempHp) {
-		tempHp -= 0.08f;
+		tempHp -= decreaseHp;
+		decreaseHp += 0.03f;
 	}
 	if (tempHp < 0.0f) {
 		tempHp = 0.0f;
+		decreaseHp = 0.08f;
 	}
 	DrawBoxAA(pos.x, pos.y - 23.0f, pos.x + tempHp * 10, pos.y - 15.0f, 0xDAC290, true);
 	DrawBox(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 15, 0x9B003F, true);

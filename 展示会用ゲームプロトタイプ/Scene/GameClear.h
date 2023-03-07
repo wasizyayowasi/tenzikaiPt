@@ -5,12 +5,15 @@ class GameClear : public SceneBase
 {
 public:
 	GameClear(SceneManager& manager);
-	virtual ~GameClear(){}
+	virtual ~GameClear();
 
 	void update(const InputState& input);
 	void draw();
 		
 private:
+	
+	int clearHandle = -1;
+
 	static constexpr int fade_interval = 60;
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;

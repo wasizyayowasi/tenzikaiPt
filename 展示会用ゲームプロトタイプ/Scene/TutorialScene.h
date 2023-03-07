@@ -54,7 +54,7 @@ private:
 	int time2 = 1;
 	int spownCount = 1;
 
-	int textCount = 4;
+	int textCount = 0;
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
 	Vec2 targetPlayer2 = { 0.0f,0.0f };

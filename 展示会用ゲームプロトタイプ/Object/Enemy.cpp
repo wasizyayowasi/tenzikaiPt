@@ -19,7 +19,6 @@ Enemy::Enemy(int num) : sceneNum(num)
 		enemyHp = 1000;
 	}
 	hp->setObjectMaxHp(enemyHp);
-
 }
 
 Enemy::~Enemy()
@@ -55,7 +54,7 @@ void Enemy::tutorialUpdate(Vec2 offset)
 
 	//ターゲットの座標を見つける
 	targetPlayer = { 0.0f,0.0f };
-	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
+	targetPlayer.x = player->getPos().x + 18 - enemyPos.x;
 	targetPlayer.y = player->getPos().y + 44 - enemyPos.y;
 
 	//検知範囲内だった場合
@@ -65,7 +64,7 @@ void Enemy::tutorialUpdate(Vec2 offset)
 				if (targetPlayer.length() < 200) {
 
 					targetPlayer2 = { 0.0f,0.0f };
-					targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
+					targetPlayer2.x = player->getPos().x + 18 - enemyPos.x;
 					//targetPlayer2.y = player->getPos().y + 44 - enemyPos.y;
 
 					targetPlayer2 = targetPlayer2.normalize() * 3;
@@ -75,7 +74,11 @@ void Enemy::tutorialUpdate(Vec2 offset)
 					motionNum = 1;
 
 					if (--sleepTime < 0) {
-						enemyPos += targetPlayer2;
+						if (enemyHp > 0) {
+							if (!attackRange) {
+								enemyPos += targetPlayer2;
+							}
+						}
 					}
 
 					//画像の向き
@@ -189,6 +192,10 @@ void Enemy::tutorialUpdate(Vec2 offset)
 
 void Enemy::BossUpdate(Vec2 offset)
 {
+	if (enemyPos.y > 416) {
+		enemyPos.y = 416;
+	}
+
 	//現状のHPを設定する
 	hp->setObjectHp(enemyHp);
 
@@ -197,8 +204,7 @@ void Enemy::BossUpdate(Vec2 offset)
 	motionNum = 0;
 
 	if (!player->returnEnemyHit()) {
-		enemyPos.x += 3.5f;
-		//enemyPos.x += 10.0f;
+		enemyPos.x += 3.7f;
 	}
 	
 	
@@ -261,7 +267,7 @@ void Enemy::normalUpdate(Vec2 offset)
 
 	//ターゲットの座標を見つける
 	targetPlayer = { 0.0f,0.0f };
-	targetPlayer.x = player->getPos().x + 25 - enemyPos.x;
+	targetPlayer.x = player->getPos().x + 18 - enemyPos.x;
 	targetPlayer.y = player->getPos().y + 44 - enemyPos.y;
 
 	//検知範囲内だった場合
@@ -271,7 +277,7 @@ void Enemy::normalUpdate(Vec2 offset)
 				if (targetPlayer.length() < 200) {
 
 					targetPlayer2 = { 0.0f,0.0f };
-					targetPlayer2.x = player->getPos().x + 25 - enemyPos.x;
+					targetPlayer2.x = player->getPos().x + 18 - enemyPos.x;
 					//targetPlayer2.y = player->getPos().y + 44 - enemyPos.y;
 
 					targetPlayer2 = targetPlayer2.normalize() * 3;
@@ -282,7 +288,9 @@ void Enemy::normalUpdate(Vec2 offset)
 
 					if (--sleepTime < 0) {
 						if (enemyHp > 0) {
-							enemyPos += targetPlayer2;
+							if (!attackRange) {
+								enemyPos += targetPlayer2;
+							}
 						}
 					}
 
@@ -348,12 +356,40 @@ void Enemy::normalUpdate(Vec2 offset)
 	//攻撃
 	if (!player->beHidden()) {
 		if (enemyHp > 0) {
-			if (targetPlayer.length() < 50) {
-				motionNum = 2;
-				//攻撃
-				if (--sleepTime < 0) {
-					player->damege(inversion);
-					sleepTime = 60;
+			if (!inversion) {
+				if (targetPlayer.length() < 70) {
+					attackRange = true;
+					vec.x = 0.0f;
+					motionNum = 2;
+					//攻撃
+					if (--sleepTime < 0) {
+						player->damege(inversion);
+						sleepTime = 60;
+					}
+				}
+				else {
+					if (vec.x == 0.0f) {
+						vec.x = 3.0f;
+						attackRange = false;
+					}
+				}
+			}
+			else {
+				if (targetPlayer.length() < 30) {
+					attackRange = true;
+					vec.x = 0.0f;
+					motionNum = 2;
+					//攻撃
+					if (--sleepTime < 0) {
+						player->damege(inversion);
+						sleepTime = 60;
+					}
+				}
+				else {
+					if (vec.x == 0.0f) {
+						vec.x = 3.0f;
+						attackRange = false;
+					}
 				}
 			}
 		}
@@ -386,8 +422,6 @@ void Enemy::normalUpdate(Vec2 offset)
 	}
 
 	if (motion->dead()) {
-		//motion->init();
-		//isEnabled = false;
 		updateFunc = &Enemy::coinUpdate;
 		drawFunc = &Enemy::coinDraw;
 	}
@@ -423,6 +457,8 @@ void Enemy::normalDraw(Vec2 offset)
 		}
 		my::myDrawRectRotaGraph(pos.x, pos.y, imgX * 40, 0, 40, 40, 1.5f, 0.0f, hitHandle, true, false);
 	}
+
+	DrawFormatString(500, 600, 0xffffff, "%f", hp->returnTempHp());
 
 }
 
@@ -564,6 +600,7 @@ void Enemy::dispatch(const Vec2& pos)
 	motionNum = 0;
 	motion->init();
 	vec = { 3.0f,0.0f };
+	hp->setObjectMaxHp(enemyHp);
 	switch (sceneNum) {
 	case 0:
 		updateFunc = &Enemy::updateDescent;
