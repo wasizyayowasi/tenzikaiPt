@@ -78,7 +78,7 @@ public:
 	bool returnEnemyHit() { return enemyHit; }
 private:
 	//ŠƒAƒCƒeƒ€
-	int money = 0;
+	int money = 5000;
 	int repairBlock = 3;
 	int recoveryItem = 0;
 

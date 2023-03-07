@@ -255,6 +255,26 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
+	if (steamVentTime < 1) {
+		steamVentTime = 1;
+	}
+
+	if (--steamVentTime == 0) {
+		if (chipNo == 16) {
+			if (inversion) {
+				jumpVec = { -1.7f,0.0f };
+			}
+			else {
+				jumpVec = { 1.7f,0.0f };
+			}
+			updateFunc = &Enemy::jumpUpdate;
+			steamVentTime = 15;
+			return;
+		}
+	}
+
+	
+
 	motionNum = 0;
 
 	//HP‚ª‚È‚­‚È‚èŽ€–S‚µ‚½ê‡
@@ -459,6 +479,7 @@ void Enemy::normalDraw(Vec2 offset)
 	}
 
 	DrawFormatString(500, 600, 0xffffff, "%f", hp->returnTempHp());
+	DrawFormatString(600, 600, 0xffffff, "%d", steamVentTime);
 
 }
 
@@ -505,6 +526,38 @@ void Enemy::titleUpdate(Vec2 offset)
 
 	motion->update(motionNum, 0);
 
+}
+
+void Enemy::jumpUpdate(Vec2 offset)
+{
+	if (landing) {
+		if (jumpVec.y > -25.0f) {
+			jumpVec.y -= 0.8f;
+			landing = true;
+		}
+		else {
+			landing = false;
+		}
+	}
+
+	if (!landing) {
+		jumpVec.y += 1.0f;
+	}
+
+	enemyPos += jumpVec;
+
+	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+
+	for (int i = 0; i < 1; i++) {
+		const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
+
+		if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46||chipNo == 16||chipNo == 30) {
+			enemyPos.y = (underfootChipNoY - 1) * chipSize;
+			landing = true;
+			updateFunc = &Enemy::normalUpdate;
+		}
+	}
 }
 
 void Enemy::coinUpdate(Vec2 offset)

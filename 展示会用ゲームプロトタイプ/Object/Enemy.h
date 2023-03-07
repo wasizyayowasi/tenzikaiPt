@@ -23,6 +23,7 @@ public:
 	void normalDraw(Vec2 offset);
 	void BossDraw(Vec2 offset);
 	void titleUpdate(Vec2 offset);
+	void jumpUpdate(Vec2 offset);
 
 	void coinUpdate(Vec2 offset);
 	void coinDraw(Vec2 offset);
@@ -91,9 +92,12 @@ private:
 
 	bool lock = false;
 
+	int steamVentTime = 20;
+
 	Vec2 enemyPos = {800.0f,600.0f};
 	Vec2 deathPos = { 0.0f,0.0f };
 	Vec2 vec = {-1.0f,0.0f};
+	Vec2 jumpVec = { -1.0f, 0.0f };
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
 	Vec2 targetPlayer2 = { 0.0f,0.0f };

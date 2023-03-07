@@ -32,13 +32,19 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	player->setHandle(portionHandle, hacheteHandle, guiHandle, hpHandle, repairHandle, coinHandle);
 	player->init();
 	player->giftMoney();
+
 	field = std::make_shared<Field>();
+
 	enemy = std::make_shared<Enemy>(1);
+
 	space = std::make_shared<BugSpace>();
+	int x = 4750 / chipSize;
+	int y = 280 / chipSize;
+	space->init(x,y);
 	space->setPos({ 4750,280 });
 	space->setPlayer(player);
 	enemy->setPlayer(player, enemyHandle, coinHandle);
-	space->enemySetPlayer(enemyHandle, coinHandle);
+	//space->enemySetPlayer(enemyHandle, coinHandle);
 	shopperHandle = field->setHandle();
 }
 

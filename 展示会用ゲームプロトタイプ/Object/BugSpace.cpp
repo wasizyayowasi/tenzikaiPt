@@ -11,17 +11,12 @@ BugSpace::BugSpace()
 {
 	spaceHandle = my::myLoadGraph("data/objectGraph/portal2.png");
 
-	hp = new ObjectHp;
-	hp->setObjectMaxHp(maxHp);
-	isEnabled = true;
-	for (auto& enemy : enemy) {
-		enemy = std::make_shared<Enemy>(0);
-	}
 }
 
 BugSpace::~BugSpace()
 {
 	DeleteGraph(spaceHandle);
+	delete hp;
 }
 
 std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
@@ -31,6 +26,14 @@ std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
 
 void BugSpace::init(int setX, int setY)
 {
+	maxHp = 10;
+	hp = new ObjectHp;
+	hp->setObjectMaxHp(maxHp);
+	isEnabled = true;
+	for (auto& enemy : enemy) {
+		enemy = std::make_shared<Enemy>(0);
+	}
+
 	spacePos.x = setX * chipSize;
 	spacePos.y = setY * chipSize;
 }
@@ -98,7 +101,7 @@ void BugSpace::update(Vec2 offset)
 
 	hp->setObjectHp(maxHp);
 
-	/*if (!player->returnHpDisplay()) {
+	if (!player->returnHpDisplay()) {
 		if (--enemySpawnTime < 0) {
 			for (auto& enemy : enemy) {
 				if (!enemy->isEnable()) {
@@ -109,7 +112,7 @@ void BugSpace::update(Vec2 offset)
 				}
 			}
 		}
-	}*/
+	}
 
 	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {

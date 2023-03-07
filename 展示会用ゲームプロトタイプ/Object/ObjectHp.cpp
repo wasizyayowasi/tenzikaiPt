@@ -50,3 +50,18 @@ void ObjectHp::playerHpDraw(int handle)
 		increaseX += 26;
 	}
 }
+
+void ObjectHp::waveHpDraw(Vec2 pos)
+{
+	DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 100, pos.y - 10, 0x000000, true);
+	if (static_cast<float>(hp) < tempHp) {
+		tempHp -= decreaseHp;
+		decreaseHp += 0.03f;
+	}
+	if (tempHp < 0.0f) {
+		tempHp = 0.0f;
+		decreaseHp = 0.08f;
+	}
+	DrawBoxAA(pos.x, pos.y - 30.0f, pos.x + tempHp * 100, pos.y - 10.0f, 0xDAC290, true);
+	DrawBox(pos.x, pos.y - 30, pos.x + hp * 100, pos.y - 10, 0x9B003F, true);
+}

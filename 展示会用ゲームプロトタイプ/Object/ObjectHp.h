@@ -12,6 +12,7 @@ public:
 
 	void draw(Vec2 pos,Vec2 offset);
 	void playerHpDraw(int handle);
+	void waveHpDraw(Vec2 pos);
 
 	int returnMaxHp() { return maxHp; }
 	float returnTempHp() { return tempHp; }

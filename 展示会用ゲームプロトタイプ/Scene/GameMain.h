@@ -1,12 +1,14 @@
 #pragma once
 #include <memory>
 #include <array>
+#include<vector>
 #include "../Vec2.h"
 #include "SceneBase.h"
 
 class Player;
 class BugSpace;
 class Field;
+class ObjectHp;
 
 class GameMain : public SceneBase
 {
@@ -70,12 +72,16 @@ private:
 
 	int spacePosNum[3];
 
-	int wave = 3;
+	int waveHp = 0;
+	int maxWave = 3;
+	int wave = 1;
 	int waveCount = 0;
 
 	bool configured = false;
 	bool skip = false;
 	bool nextScene = false;
+
+	bool EndOfRaid = false;
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 
@@ -87,8 +93,9 @@ private:
 	Vec2 offset;
 	Vec2 pos;
 	Player* player;
+	ObjectHp* hp;
 
-	std::array<std::shared_ptr<BugSpace>, 3>space;
+	std::vector<std::shared_ptr<BugSpace>>space;
 	std::shared_ptr<Field> field;
 
 	using updateFunc_t = void (GameMain::*)(const InputState& input);

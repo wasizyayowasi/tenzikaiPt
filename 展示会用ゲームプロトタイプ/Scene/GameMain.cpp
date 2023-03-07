@@ -13,6 +13,7 @@
 #include "Shop.h"
 #include "BossBattleScene.h"
 #include "../DrawFunctions.h"
+#include "../Object/ObjectHp.h"
 #include <cassert>
 
 
@@ -31,19 +32,23 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
 	player = new Player(0);
+	hp = new ObjectHp;
 	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
 
 	//空間のデータを作る
-	for (auto& space : space) {
+	/*for (auto& space : space) {
 		space = std::make_shared<BugSpace>();
+	}*/
+	
+	for (int i = 0; i < maxWave; i++) {
+		space.push_back(std::make_shared<BugSpace>());
 	}
+	
 	//プレイヤーのデータを送る
-	for (auto& space : space) {
+	/*for (auto& space : space) {
 		space->setPlayer(player);
-	}
-	for (auto& space : space) {
-		space->enemySetPlayer(enemyHandle,coinHandle);
-	}
+	}*/
+	
 	field = std::make_shared<Field>();
 
 	int sw, sh, bit;
@@ -61,6 +66,7 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 GameMain::~GameMain()
 {
 	delete player;
+	delete hp;
 	DeleteGraph(enemyHandle);
 	DeleteGraph(portionHandle);
 	DeleteGraph(guiHandle);
@@ -81,15 +87,15 @@ void GameMain::init()
 
 	player->init();
 
-	int i = 0;
+	int noLongerNum = 0;
 	
 	for (int x = 0; x < bgNumX; x++) {
 		for (int y = 0; y < bgNumY; y++) {
 			const int chipNo = FieldData::tempField[y][x];
 			if (chipNo == 4) {
-				noLongerUsedX[i] = x;
-				noLongerUsedY[i] = y;
-				i++;
+				noLongerUsedX[noLongerNum] = x;
+				noLongerUsedY[noLongerNum] = y;
+				noLongerNum++;
 			}
 		}
 	}
@@ -105,15 +111,24 @@ void GameMain::init()
 		}
 	}
 
-	i = 0;
-
 	//空間の場所をランダムで設定
-	for (auto& space : space) {
-		space->init(noLongerUsedX[spacePosNum[i]], noLongerUsedY[spacePosNum[i]]);
-		i++;
+	if (wave <= maxWave) {
+		for (int i = 0; i < wave; i++) {
+			space[i]->init(noLongerUsedX[spacePosNum[i]], noLongerUsedY[spacePosNum[i]]);
+			space[i]->setPlayer(player);
+			space[i]->enemySetPlayer(enemyHandle, coinHandle);
+			waveHp += space[i]->returnHp();
+		}
+		hp->setObjectMaxHp(waveHp);
 	}
-
-	wave = 1;
+	else {
+		for (int i = 0; i < wave - 1; i++) {
+			if (!space[i]->isEnable()) {
+				clearCount++;
+			}
+		}
+		EndOfRaid = true;
+	}
 }
 
 void GameMain::update(const InputState& input)
@@ -129,10 +144,14 @@ void GameMain::draw()
 	//フィールドの描画
 	field->draw(offset,1);
 
+	hp->waveHpDraw({Game::kScreenWidth / 4,100});
+
 	//空間の描画
-	for (auto& space : space) {
-		if (space->isEnable()) {
-			space->draw(offset);
+	if (!EndOfRaid) {
+		for (int i = 0; i < wave; i++) {
+			if (space[i]->isEnable()) {
+				space[i]->draw(offset);
+			}
 		}
 	}
 
@@ -163,6 +182,8 @@ void GameMain::draw()
 	DrawFormatString(600, 400, 0xffffff, "%d", quakeCount);
 	DrawFormatString(600, 420, 0xffffff, "%d", clearCount);
 	DrawFormatString(600, 440, 0xffffff, "%d", quakeTimer);
+	DrawFormatString(600, 460, 0xffffff, "%d", wave);
+	DrawFormatString(600, 480, 0xffffff, "%d", maxWave);
 
 }
 
@@ -179,6 +200,18 @@ void GameMain::fadeInUpdate(const InputState& input)
 
 void GameMain::normalUpdate(const InputState& input)
 {
+	waveHp = 0;
+
+	if (!EndOfRaid) {
+		for (int i = 0; i < wave; i++) {
+			if (space[i]->isEnable()) {
+				waveHp += space[i]->returnHp();
+			}
+		}
+	}
+	
+	hp->setObjectHp(waveHp);
+
 	//プレイヤーの更新
 	if (player->isEnable()) {
 		if (quakeCount < 1) {
@@ -194,9 +227,11 @@ void GameMain::normalUpdate(const InputState& input)
 
 	if (player->isEnable()) {
 		//空間の更新
-		for (auto& space : space) {
-			if (space->isEnable()) {
-				space->update(offset);
+		if (!EndOfRaid) {
+			for (int i = 0; i < wave; i++) {
+				if (space[i]->isEnable()) {
+					space[i]->update(offset);
+				}
 			}
 		}
 	}
@@ -211,18 +246,23 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 	}
 	
+	waveCount = 0;
 
-	clearCount = 0;
-
-	if (quakeCount < 1) {
-		for (auto& space : space) {
-			if (!space->isEnable()) {
-				clearCount++;
+	if (!EndOfRaid) {
+		for (int i = 0; i < wave; i++) {
+			if (!space[i]->isEnable()) {
+				waveCount++;
 			}
 		}
 	}
 
+	if (wave == waveCount) {
+		wave++;
+		init();
+	}
+
 	if (clearCount == 3) {
+		clearCount--;
 		quakeCount++;
 		quakeTimer = 120;
 		quakeY = 20.0f;

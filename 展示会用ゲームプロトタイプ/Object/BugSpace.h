@@ -33,6 +33,8 @@ public:
 
 	Vec2 setCoinPos();
 
+	int returnHp() { return maxHp; }
+
 private:
 	int handle = -1;
 	int time = 0;
