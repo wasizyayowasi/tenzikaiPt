@@ -23,6 +23,14 @@ public:
 	void draw();
 
 private:
+	int titleFont = -1;
+	int fontHandle = -1;
+	int titleFont2 = -1;
+	int fontHandle2 = -1;
+	int titleWidth = 0;
+	int titleWidth2 = 0;
+	int fontSize = 0;
+
 	int currentInputIndex;//現在選択中のインデックス
 
 	static constexpr int fadeInterval = 60;

@@ -173,12 +173,6 @@ void GameMain::draw()
 	SetDrawScreen(DX_SCREEN_BACK);
 	DrawGraph(0, quakeY, tempScreenH, false);
 
-	DrawFormatString(600, 400, 0xffffff, "%d", quakeCount);
-	DrawFormatString(600, 420, 0xffffff, "%d", clearCount);
-	DrawFormatString(600, 440, 0xffffff, "%d", quakeTimer);
-	DrawFormatString(600, 460, 0xffffff, "%d", wave);
-	DrawFormatString(600, 480, 0xffffff, "%d", maxWave);
-
 }
 
 void GameMain::fadeInUpdate(const InputState& input)

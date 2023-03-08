@@ -7,13 +7,17 @@ class Player;
 class Enemy;
 class ObjectHp;
 
+namespace {
+	constexpr int enemyNum = 8;
+}
+
 class BugSpace
 {
 public:
 	BugSpace();
 	virtual ~BugSpace();
 
-	std::array<std::shared_ptr<Enemy>, 16>& getEnemy();
+	std::array<std::shared_ptr<Enemy>, enemyNum>& getEnemy();
 
 	void init(int setX,int setY);
 
@@ -59,6 +63,6 @@ private:
 	Player* player = nullptr;
 	ObjectHp* hp;
 
-	std::array<std::shared_ptr<Enemy>, 16>enemy;
+	std::array<std::shared_ptr<Enemy>, enemyNum>enemy;
 };
 

@@ -37,6 +37,7 @@ private:
 	int hacheteHandle = -1;
 	int guiHandle = -1;
 	int coinHandle = -1;
+	int signboardHandle = -1;
 
 	int mainSound = -1;
 	int collapseSound = -1;

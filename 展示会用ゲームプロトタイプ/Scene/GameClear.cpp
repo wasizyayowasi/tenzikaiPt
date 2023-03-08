@@ -27,7 +27,7 @@ void GameClear::draw()
 	DrawString(0, 0, "Gameclear", 0xffffff);
 	DrawString(0, 15, "press to enter", 0xffffff);
 
-	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2, 2.0f, 0.0f, clearHandle, true, false);
+	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2, 1.0f, 0.0f, clearHandle, true, false);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);

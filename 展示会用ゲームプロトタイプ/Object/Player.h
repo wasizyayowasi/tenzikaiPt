@@ -78,8 +78,8 @@ public:
 	bool returnEnemyHit() { return enemyHit; }
 private:
 	//所持アイテム
-	int money = 5000;
-	int repairBlock = 3;
+	int money = 0;
+	int repairBlock = 0;
 	int recoveryItem = 0;
 
 	//グラフィックハンドル

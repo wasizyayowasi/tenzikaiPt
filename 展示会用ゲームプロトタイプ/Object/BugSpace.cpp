@@ -19,7 +19,7 @@ BugSpace::~BugSpace()
 	delete hp;
 }
 
-std::array<std::shared_ptr<Enemy>, 16>& BugSpace::getEnemy()
+std::array<std::shared_ptr<Enemy>, enemyNum>& BugSpace::getEnemy()
 {
 	return enemy;
 }

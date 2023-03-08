@@ -64,6 +64,7 @@ private:
 	int windTime = 8;
 
 	int time = 0;
+	int damageStopTime = 0;
 	int imgX = 0;
 
 	int sceneNum = 0;

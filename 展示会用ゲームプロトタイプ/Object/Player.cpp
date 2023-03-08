@@ -102,6 +102,10 @@ void Player::update(Vec2 offset, const InputState& input)
 
 void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 {
+	if (repairBlock < 1) {
+		money = 500;
+	}
+
 	//ƒ‚[ƒVƒ‡ƒ“ŠÖŒW
 	motionNum = 0;
 	motion->update(motionNum);
@@ -179,17 +183,15 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 
 	//‹ßÚUŒ‚
 	if (!push) {
-		if (!flyingObject->isEnable()) {
-			if (input.isPressed(InputType::attack)) {
-				ChangeVolumeSoundMem(soundVolume, attackSound);
-				PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
-				motionNum = 3;
-				motion->update(motionNum);
-				proximityAttack = true;
-			}
-			else {
-				proximityAttack = false;
-			}
+		if (input.isPressed(InputType::attack)) {
+			ChangeVolumeSoundMem(soundVolume, attackSound);
+			PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
+			motionNum = 3;
+			motion->update(motionNum);
+			proximityAttack = true;
+		}
+		else {
+			proximityAttack = false;
 		}
 	}
 
@@ -890,8 +892,8 @@ void Player::draw(Vec2 offset)
 	inventory->setNum(repairBlock, recoveryItem, flyingObject->isEnable());
 	inventory->draw();
 
-	DrawRotaGraph(1810, 50, 2.0f, 0.0f, coinHandle, true);
-	DrawFormatString(1845, 50, 0xffffff, "%d", money);
+	DrawRotaGraph(Game::kScreenWidth / 2 + 130, Game::kScreenHeight - 130, 2.0f, 0.0f, coinHandle, true);
+	DrawFormatString(Game::kScreenWidth / 2 + 100 + 80, Game::kScreenHeight - 120, 0xffffff, "%d", money);
 
 	//”ò‚Ñ“¹‹ï
 	if (flyingObject->isEnable()) {
@@ -1014,12 +1016,12 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 	if (proximityAttack) {
 		if (playerDirections) {
 			if (enemyLeft > playerPos.x + 20)			return false;
-			if (enemyRight < playerPos.x - 50)			return false;
+			if (enemyRight < playerPos.x -  70)			return false;
 			if (enemyTop > playerPos.y + 50)			return false;
 			if (enemyBottom < playerPos.y + 10)			return false;
 		}
 		else if (!playerDirections) {
-			if (enemyLeft > playerPos.x  + 80)			return false;
+			if (enemyLeft > playerPos.x  + 100)			return false;
 			if (enemyRight < playerPos.x + 20)			return false;
 			if (enemyTop > playerPos.y + 50)			return false;
 			if (enemyBottom < playerPos.y + 10)			return false;
@@ -1109,7 +1111,7 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 	if (playerPos.y + correctionSizeY + offset.y < objectTop)		return false;
 	if (playerPos.y + offset.y > objectBottom)						return false;
 
-	money += 1000;
+	money += 200;
 	ChangeVolumeSoundMem(soundVolume, coinSound);
 	PlaySoundMem(coinSound, DX_PLAYTYPE_BACK, true);
 

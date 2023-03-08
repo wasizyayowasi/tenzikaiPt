@@ -12,10 +12,28 @@ Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager)
 	choiceTable[Choice::keyConfig] = "キーコンフィグ";
 	choiceTable[Choice::title] = "タイトルへ";
 	choiceTable[Choice::prev] = "戻る";
+
+	LPCSTR fontPath = "data/other/CompassPro.ttf";
+	LPCSTR UIfontPath = "data/other/Silver.ttf";
+
+	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
+	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
+	
+	fontHandle = CreateFontToHandle("Silver", 48, 3, -1);
+	fontHandle2 = CreateFontToHandle("Silver", 48, 3, -1);
+	titleFont = CreateFontToHandle("CompassPro", 64, -1, -1);
+	titleFont2 = CreateFontToHandle("CompassPro", 200, -1, -1);
+
+	titleWidth = GetDrawStringWidthToHandle("P  R  O  J  E  C  T", strlen("P  R  O  J  E  C  T"), titleFont);
+	titleWidth2 = GetDrawStringWidthToHandle("VIKING", strlen("VIKING"), titleFont2);
 }
 
 Pause::~Pause()
 {
+	DeleteFontToHandle(fontHandle);
+	DeleteFontToHandle(titleFont);
+	DeleteFontToHandle(fontHandle2);
+	DeleteFontToHandle(titleFont2);
 }
 
 void Pause::update(const InputState& input)
@@ -53,8 +71,6 @@ void Pause::update(const InputState& input)
 
 void Pause::draw()
 {
-	
-
 	constexpr int pw_width = 256;						//ポーズ枠の幅
 	constexpr int pw_height = 144;						//ポーズ枠の高さ
 	constexpr int pw_start_x = (Game::kScreenWidth - pw_width);	//ポーズ枠に左
@@ -62,35 +78,34 @@ void Pause::draw()
 
 	SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
 	//ポーズウィンドウセロファン(黒い)
-	DrawBox(pw_width, pw_height, pw_start_x, pw_start_y, 0x000000, true);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
 
-	DrawString(pw_width + 10, pw_height + 10, "Pausing...", 0xffff88);
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2, Game::kScreenHeight / 5, "P  R  O  J  E  C  T", 0xffffff, titleFont);
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2, Game::kScreenHeight / 5 + 32, "VIKING", 0xffffff, titleFont2);
 
-	//ポーズウィンドウ枠線
-	DrawBox(pw_width, pw_height, pw_start_x, pw_start_y, 0xffffff, false);
-
-	auto y = 520;
-	int x = Game::kScreenWidth / 2 - pw_width;
+	auto y = Game::kScreenHeight / 2 + 80;
+	
 	int idx = 0;
 	bool isInputtypeSelected = false;
 	for (const auto& name : choiceTable) {
 		int offset = 0;
 		unsigned int color = 0xffffff;
 
+		int font = strlen(name.second.c_str());
+		fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, fontHandle);
+
 		//選択された時の処理
 		if (currentInputIndex == idx) {
 			offset = 10;
 			isInputtypeSelected = true;
 			color = 0xffff00;
-			DrawString(x - 50, y, "⇒", 0xff0000);
 		}
 
 		//各キーの表示
-		
-		DrawString(x - 15, y, "・", color);
-		DrawString(x, y, name.second.c_str(), color);
+		int x = Game::kScreenWidth / 2 - fontSize / 2 ;
+		DrawStringToHandle(x, y, name.second.c_str(), color,fontHandle);
 
 		y += 80;
 		++idx;

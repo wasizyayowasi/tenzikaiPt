@@ -23,6 +23,7 @@ BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),upd
 	guiHandle = my::myLoadGraph("data/GUIGraph/GUI.png");
 	repairHandle = my::myLoadGraph("data/objectGraph/repair.png");
 	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
+	signboardHandle = my::myLoadGraph("data/objectGraph/kb.png");
 
 	mainSound = LoadSoundMem("data/music/Battle-Dawn.mp3");
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
@@ -106,7 +107,8 @@ void BossBattleScene::draw()
 			const int chipNo = groundData::bossGround[y][x];
 
 			if (chipNo == 1) {
-				my::myDrawRectRotaGraph(x * 32 + offset.x, y * 32 + 10, imgX * 40, 200, 40, 40, 3.0f, 0.0f, enemyHandle, true, true);
+				DrawGraph(x * chipSize + offset.x, (y - 1) * chipSize + 5, signboardHandle, true);
+				//my::myDrawRectRotaGraph(x * 32 + offset.x, y * 32 + 10, imgX * 40, 200, 40, 40, 3.0f, 0.0f, enemyHandle, true, true);
 			}
 		}
 	}
