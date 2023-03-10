@@ -44,6 +44,7 @@ private:
 	int footstepSound = -1;
 	int soundVolume = 150;
 	int soundCount = 20;
+	int musicVolume = 0;
 
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;

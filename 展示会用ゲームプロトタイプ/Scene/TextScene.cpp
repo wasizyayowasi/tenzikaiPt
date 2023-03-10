@@ -143,50 +143,50 @@ void TextScene::draw()
 		}
 
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
-		DrawBox(4000 + offset.x, 570, 4400 + offset.x, 720, 0x000000, true);
+		DrawBox(2300 + offset.x, 570, 2700 + offset.x, 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
-		DrawBox(4000 + offset.x, 570, 4400 + offset.x, 720, 0xffffff, false);
+		DrawBox(2300 + offset.x, 570, 2700 + offset.x, 720, 0xffffff, false);
 
 		switch (textCount) {
 		case 0:
-			DrawString(4030 + offset.x, 640, "お前さんあのボワボワした空間が見えるか？", 0xffffff);
+			DrawString(2330 + offset.x, 640, "お前さんあのボワボワした空間が見えるか？", 0xffffff);
 			break;
 		case 1:
-			DrawString(4040 + offset.x, 640, "今はなりを潜めているのかわからないが", 0xffffff);
+			DrawString(2340 + offset.x, 640, "今はなりを潜めているのかわからないが", 0xffffff);
 			break;
 		case 2:
-			DrawString(4030 + offset.x, 640, "あの空間からさっきの化け物が出てきている", 0xffffff);
+			DrawString(2330 + offset.x, 640, "あの空間からさっきの化け物が出てきている", 0xffffff);
 			break;
 		case 3:
-			DrawString(4040 + offset.x, 640, "お前さんなら前の街並みに戻せるはずだ", 0xffffff);
+			DrawString(2340 + offset.x, 640, "お前さんなら前の街並みに戻せるはずだ", 0xffffff);
 			break;
 		case 4:
-			DrawString(4165 + offset.x, 640, "頼んだぞ", 0xffffff);
+			DrawString(2465 + offset.x, 640, "頼んだぞ", 0xffffff);
 			break;
 		}
 		break;
 	case 3:
 		
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
-		DrawBox(5100 + offset.x, 570, 5500 + offset.x, 720, 0x000000, true);
+		DrawBox(3200 + offset.x, 570, 3700 + offset.x, 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
-		DrawBox(5100 + offset.x, 570, 5500 + offset.x, 720, 0xffffff, false);
+		DrawBox(3200 + offset.x, 570, 3700 + offset.x, 720, 0xffffff, false);
 
 		switch (textCount) {
 		case 0:
-			DrawString(5130 + offset.x, 640, "お前さんなかなかいい腕をしてるじゃないか", 0xffffff);
+			DrawString(3230 + offset.x, 640, "お前さんなかなかいい腕をしてるじゃないか", 0xffffff);
 			break;
 		case 1:
-			DrawString(5150 + offset.x, 640, "お前さんを見越して願いがある", 0xffffff);
+			DrawString(3250 + offset.x, 640, "お前さんを見越して願いがある", 0xffffff);
 			break;
 		case 2:
-			DrawString(5130 + offset.x, 640, "現在進行形で町が化け物たちに襲われている", 0xffffff);
+			DrawString(3230 + offset.x, 640, "現在進行形で町が化け物たちに襲われている", 0xffffff);
 			break;
 		case 3:
-			DrawString(5120 + offset.x, 640, "あの空間を壊して俺たちの街を取り戻してくれ", 0xffffff);
+			DrawString(3220 + offset.x, 640, "あの空間を壊して俺たちの街を取り戻してくれ", 0xffffff);
 			break;
 		case 4:
-			DrawString(5265 + offset.x, 640, "頼んだぞ", 0xffffff);
+			DrawString(3365 + offset.x, 640, "頼んだぞ", 0xffffff);
 			break;
 		}
 		break;

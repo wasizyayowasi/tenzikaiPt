@@ -14,18 +14,14 @@ TitleScene::TitleScene(SceneManager& manager):SceneBase(manager),updateFunc_(&Ti
 {
 	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
 	soundHandle = LoadSoundMem("data/soundEffect/Wind-Synthetic_Ambi02-1.mp3");
+	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan1.png");
 
 	LPCSTR fontPath = "data/other/CompassPro.ttf";
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
 
-	if (AddFontResourceEx(fontPath, FR_PRIVATE, NULL) > 0)
-	{
-	}
-	if (AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL) > 0)
-	{
-	}
+	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
+	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
 	
-
 	fontHandle = CreateFontToHandle("CompassPro", 64, -1, -1);
 	fontHandle2 = CreateFontToHandle("CompassPro", 200, -1, -1);
 	UIfontHandle = CreateFontToHandle("Silver", 32, 9, -1);
@@ -53,6 +49,7 @@ TitleScene::TitleScene(SceneManager& manager):SceneBase(manager),updateFunc_(&Ti
 TitleScene::~TitleScene()
 {
 	DeleteGraph(enemyHandle);
+	DeleteGraph(bottanHandle);
 	DeleteSoundMem(soundHandle);
 	DeleteFontToHandle(fontHandle);
 	DeleteFontToHandle(fontHandle2);
@@ -115,8 +112,10 @@ void TitleScene::update(const InputState& input)
 
 void TitleScene::draw()
 {
-	field->draw({ 0.0f,0.0f },0);
+	field->draw({ 0.0f,0.0f },3);
 
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2 + 5, Game::kScreenHeight / 5 + 5, "P  R  O  J  E  C  T", 0x888833, fontHandle);
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2 + 5, Game::kScreenHeight / 5 + 37, "VIKING", 0x888833, fontHandle2);
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2, Game::kScreenHeight / 5, "P  R  O  J  E  C  T", 0xffffff, fontHandle);
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2, Game::kScreenHeight / 5 + 32, "VIKING", 0xffffff, fontHandle2);
 
@@ -130,10 +129,19 @@ void TitleScene::draw()
 		}
 	}
 
-	DrawString(0, 0, "TitleScene", 0xffffff);
-	DrawString(0, 15, "press to enter", 0xffffff);
-
 	choiceSceneDraw();
+
+	if (--time < 0) {
+		imgX++;
+		time = 8;
+	}
+
+	if (imgX > 5) {
+		imgX = 2;
+	}
+
+	DrawRectRotaGraph(Game::kScreenWidth / 2 - 32, 950, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
+	DrawStringToHandle(Game::kScreenWidth / 2, 940, "決定", 0xff0000, UIfontHandle);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	//画面全体を真っ黒に塗りつぶす
@@ -182,7 +190,7 @@ void TitleScene::choiceSceneDraw()
 	constexpr int pw_start_x = Game::kScreenWidth / 2 + 200;	//ポーズ枠に左
 	constexpr int pw_start_y = Game::kScreenHeight / 2 + 200;	//ポーズ枠上
 
-	auto y = Game::kScreenHeight / 2 + 200;
+	auto y = Game::kScreenHeight / 2 + 150;
 	int x = Game::kScreenWidth / 2;
 	int idx = 0;
 	bool isInputtypeSelected = false;
@@ -199,6 +207,9 @@ void TitleScene::choiceSceneDraw()
 			offset = 10;
 			isInputtypeSelected = true;
 			color = 0xffff00;
+			if (currentInputIndex == 3) {
+				color = 0x44ff44;
+			}
 			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle2);
 		}
 		else {
@@ -206,6 +217,9 @@ void TitleScene::choiceSceneDraw()
 		}
 
 		y += 50;
+		if (idx == 2) {
+			y += 20;
+		}
 		++idx;
 	}
 

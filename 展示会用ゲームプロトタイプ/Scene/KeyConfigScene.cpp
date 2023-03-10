@@ -5,26 +5,20 @@
 #include "../game.h"
 #include "../DrawFunctions.h"
 
-KeyConfigScene::KeyConfigScene(SceneManager& manager, const InputState& input):SceneBase(manager),inputState(input),currentInputIndex(0)
+KeyConfigScene::KeyConfigScene(SceneManager& manager, const InputState& input):SceneBase(manager),inputState(input),currentInputIndex(0),updateFunc(&KeyConfigScene::firstUpdate)
 {
 	handle = my::myLoadGraph("data/GUIGraph/huti.png");
 	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan.png");
+	tempHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
 
-	if (AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL) > 0)
-	{
-	}
+	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
 
 	subjectFontHandle = CreateFontToHandle("Silver", 64, 9, -1);
+	subjectFontHandle2 = CreateFontToHandle("Silver", 80, 9, -1);
 	fontHandle = CreateFontToHandle("Silver", 32, 9, -1);
-
-	inputDeviceTable[KeySelect::keyNext] = "keyNext";
-	inputDeviceTable[KeySelect::keyNextItem] = "keyNextItem";
-	inputDeviceTable[KeySelect::keyPrevItem] = "keyPrevItem";
-	inputDeviceTable[KeySelect::keyPause] = "keyPause";
-	inputDeviceTable[KeySelect::keyAttack] = "keyAttack";
-	inputDeviceTable[KeySelect::keyAbility] = "keyAbility";
+	fontHandle2 = CreateFontToHandle("Silver", 48, 9, -1);
 
 	inputDeviceTable[KeySelect::padNext] = "padNext";
 	inputDeviceTable[KeySelect::padNextItem] = "padNextItem";
@@ -32,6 +26,7 @@ KeyConfigScene::KeyConfigScene(SceneManager& manager, const InputState& input):S
 	inputDeviceTable[KeySelect::padPause] = "padPause";
 	inputDeviceTable[KeySelect::padAttack] = "padAttack";
 	inputDeviceTable[KeySelect::padAbility] = "padAbility";
+	inputDeviceTable[KeySelect::padPrev] = "padPrev";
 }
 
 KeyConfigScene::~KeyConfigScene()
@@ -39,33 +34,27 @@ KeyConfigScene::~KeyConfigScene()
 	inputState.savekeyInfo();
 	DeleteFontToHandle(subjectFontHandle);
 	DeleteFontToHandle(fontHandle);
+	DeleteFontToHandle(subjectFontHandle2);
+	DeleteFontToHandle(fontHandle2);
 	DeleteGraph(handle);
+	DeleteGraph(tempHandle);
 	DeleteGraph(bottanHandle);
 }
 
 void KeyConfigScene::update(const InputState& input)
 {
+	(this->*updateFunc)(input);
+}
+
+void KeyConfigScene::firstUpdate(const InputState& input)
+{
+	colorChange = false;
+	isEditing = false;
+
 	auto& configInput = const_cast<InputState&>(input);
 
 	if (!isEditing) {
-		/*if (input.isTriggered(InputType::attack)) {
-			manager_.popScene();
-			return;
-		}
-		if (input.isTriggered(InputType::prevItem)) {
-
-			configInput.rewriteInputInfo(InputType::nextItem, InputCategory::keybd, KEY_INPUT_ESCAPE);
-			configInput.rewriteInputInfo(InputType::nextItem, InputCategory::pad, PAD_INPUT_A);
-			configInput.rewriteInputInfo(InputType::nextItem, InputCategory::mouse, MOUSE_INPUT_RIGHT);
-
-			static int count = 0;
-			++count;
-			char logstr[64] = {};
-			sprintf_s(logstr, sizeof(logstr), "%d回キーが書き換えられました。\n", count);
-			OutputDebugStringA(logstr);
-
-		}*/
-
+	
 		const int nameCount = input.inputNameTable.size() + 2;
 
 		if (input.isTriggered(InputType::up)) {
@@ -74,24 +63,8 @@ void KeyConfigScene::update(const InputState& input)
 		else if (input.isTriggered(InputType::down)) {
 			currentInputIndex = (currentInputIndex + 1) % nameCount;
 		}
+		keySelectNum = currentInputIndex;
 	}
-
-	/*if (!isEditing) {
-		const int nameCount = inputDeviceTable.size();
-
-		if (input.isTriggered(InputType::up)) {
-			Y = ((Y - 1) + nameCount) % nameCount;
-		}
-		else if (input.isTriggered(InputType::down)) {
-			Y = (Y + 1) % nameCount;
-		}
-		if (input.isTriggered(InputType::left)) {
-			Y = ((Y - 6) + nameCount) % nameCount;
-		}
-		else if (input.isTriggered(InputType::right)) {
-			Y = (Y + 6) % nameCount;
-		}
-	}*/
 
 	//この時もう、確定しますを選択している
 	if (currentInputIndex == input.inputNameTable.size()) {
@@ -111,73 +84,55 @@ void KeyConfigScene::update(const InputState& input)
 	//nextボタンでエディット中かそうじゃないかを
 	//決定する
 	if (input.isTriggered(InputType::next)) {
+		colorChange = true;
+		updateFunc = &KeyConfigScene::secondUpdate;
+		return;
+	}
+
+	if (input.isTriggered(InputType::prev)) {
+		manager_.popScene();
+		return;
+	}
+}
+
+void KeyConfigScene::secondUpdate(const InputState& input)
+{
+	auto& configInput = const_cast<InputState&>(input);
+
+	if (input.isTriggered(InputType::next)) {
 		isEditing = !isEditing;
 		return;
 	}
+	
 
 	if (isEditing) {
 		char keystate[256];
 		GetHitKeyStateAll(keystate);
 		auto padState = GetJoypadInputState(DX_INPUT_PAD1);
-		auto mouseState = GetMouseInput();
 
 		int idx = 0;
 		InputType currentType = InputType::max;
 		for (const auto& name : inputState.inputNameTable) {
-			if (currentInputIndex == idx) {
+			if (keySelectNum == idx) {
 				currentType = name.first;
 				break;
 			}
 			++idx;
 		}
 
-		for (int i = 0; i < 256; i++) {
-			if (keystate[i]) {
-				configInput.rewriteInputInfo(currentType, InputCategory::keybd, i);
-				break;
-			}
-		}
 		if (padState != 0) {
+			bottanNum(padState);
 			configInput.rewriteInputInfo(currentType, InputCategory::pad, padState);
-		}
-		if (mouseState != 0) {
-			configInput.rewriteInputInfo(currentType, InputCategory::mouse, mouseState);
 		}
 	}
 
+	if (!isEditing) {
+		if (input.isTriggered(InputType::prev)) {
+			updateFunc = &KeyConfigScene::firstUpdate;
+			return;
+		}
+	}
 
-	/*if (isEditing) {
-		char keystate[256];
-		GetHitKeyStateAll(keystate);
-		auto padState = GetJoypadInputState(DX_INPUT_PAD1);
-		auto mouseState = GetMouseInput();
-
-		int idx = 0;
-		InputType currentType = InputType::max;
-		for (const auto& name : inputState.inputNameTable) {
-			if (Y == idx) {
-				currentType = name.first;
-				break;
-			}
-			if (Y == 6) {
-				idx = 0;
-			}
-			++idx;
-		}
-
-		for (int i = 0; i < 256; i++) {
-			if (keystate[i]) {
-				configInput.rewriteInputInfo(currentType, InputCategory::keybd, i);
-				break;
-			}
-		}
-		if (padState != 0) {
-			configInput.rewriteInputInfo(currentType, InputCategory::pad, padState);
-		}
-		if (mouseState != 0) {
-			configInput.rewriteInputInfo(currentType, InputCategory::mouse, mouseState);
-		}
-	}*/
 }
 
 void KeyConfigScene::draw()
@@ -194,30 +149,85 @@ void KeyConfigScene::draw()
 	//キーコンフィグメッセージ
 	DrawString(pw_width + 10, pw_height + 10, "KeyConfig...", 0xffffaa);
 
+
+	DrawFormatString(1000, 200, 0xffffff, "%d", keySelectNum % 7);
+
+	//丸パクリ
+	{
+	//constexpr int pw_width = 450;							//キーコンフィグ枠の幅
+	//constexpr int pw_height = 350;							//キーコンフィグ枠の高さ
+	//constexpr int pw_start_x = (640 - pw_width) / 2 + 50;	//キーコンフィグ枠に左
+	//constexpr int pw_start_y = (480 - pw_height) / 2 + 50;	//キーコンフィグ枠上
+
+		//auto y = pw_start_y + 30;
+	//int idx = 0;
+	//bool isInputtypeSelected = false;
+	//for (const auto& name : inputState.inputNameTable) {
+	//	int offset = 0;
+	//	unsigned int color = 0xffffff;
+
+
+
+	//	if (currentInputIndex == idx) {
+	//		offset = 10;
+	//		isInputtypeSelected = true;
+	//		if (isEditing) {
+	//			color = 0xff0000;
+	//		}
+	//		DrawString(pw_start_x + 10, y, "▶", 0xff0000);
+	//	}
+	//	//各キーの表示
+	//	int x = pw_start_x + 20 + offset;
+	//	DrawString(x, y, name.second.c_str(), color);
+
+
+	//	auto type = name.first;
+	//	auto it = inputState.tempMapTable.find(type);
+
+	//	x += 64;
+	//	DrawString(x, y, " : ", color);
+	//	x += 20;
+	//	for (const auto elem : it->second) {
+
+	//		if (elem.cat == InputCategory::keybd) {
+	//			DrawFormatString(x, y, color, "key = %d", elem.id);
+	//		}
+	//		else if (elem.cat == InputCategory::pad) {
+	//			DrawFormatString(x, y, color, "pad = %d", elem.id);
+	//		}
+	//		else if (elem.cat == InputCategory::mouse) {
+	//			DrawFormatString(x, y, color, "mse = %d", elem.id);
+	//		}
+	//		x += 100;
+	//	}
+	//	y += 18;
+	//	++idx;
+	//}
+	}
+
 	auto y = pw_width;
 	int idx = 0;
 	bool isInputtypeSelected = false;
 	for (const auto& name : inputState.inputNameTable) {
-		int offset = 0;
 		unsigned int color = 0xffffff;
 
 		int font = strlen(name.second.c_str());
 		fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, subjectFontHandle);
 
+		int x = (Game::kScreenWidth / 2 - fontSize) - 100;
+
 		if (currentInputIndex == idx) {
-			offset = 10;
 			isInputtypeSelected = true;
-			if (isEditing) {
-				color = 0xff0000;
-			}
-			DrawString(pw_width + 10, y,"⇒", 0xff0000);
+			color = 0xffff00;
+			fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, subjectFontHandle2);
+
+			int x = (Game::kScreenWidth / 2 - fontSize) - 100;
+			DrawStringToHandle(x, y, name.second.c_str(), color, subjectFontHandle2);
 		}
-		//各キーの表示
-
-
-		int x =  (Game::kScreenWidth / 3 - fontSize) + 20 + offset;
-		DrawStringToHandle(x, y, name.second.c_str(), color,subjectFontHandle);
-
+		else {
+			DrawStringToHandle(x, y, name.second.c_str(), color, subjectFontHandle);
+		}
+	
 		y += 85;
 		idx++;
 	}
@@ -225,44 +235,44 @@ void KeyConfigScene::draw()
 	
 
 	//GUI
-	int graphX = ((Game::kScreenWidth / 3 - fontSize) + 20) + 200;
+	int graphX = Game::kScreenWidth / 2 + 100;
 	int graphY = pw_width - 20;
 	int graphIdX = 0;
 	for (auto& inputDevice : inputDeviceTable) {
+		unsigned int color = 0x00ff00;
 
-		if (Y == graphIdX) {
-			DrawString(graphX - 20, graphY, "->", 0xff0000);
+		if (keySelectNum == graphIdX) {
+			if (currentInputIndex < 7 && colorChange) {
+				if (isEditing) {
+					color = 0xff0000;
+				}
+				DrawBox(graphX - 10, graphY - 10, graphX + 210, graphY + 90, color, false);
+			}
 		}
 
 		DrawGraph(graphX, graphY, handle, true);
 
 		graphY += 85;
 		graphIdX++;
-		if (graphIdX == 6) {
+		if (graphIdX == 7) {
 			graphX += 300;
 			graphY = pw_width - 20;
 		}
 	}
 
-
-	
 	int bottanSetHeight = pw_width + 20;
 	for (const auto& name : inputState.inputNameTable) {
-		int bottanSetWidth = ((Game::kScreenWidth / 3 - fontSize) + 20) + 200 + 100;
+		int bottanSetWidth = (Game::kScreenWidth / 2  + 200);
 		auto type = name.first;
 		auto it = inputState.tempMapTable.find(type);
 
+		
 		for (const auto elem : it->second) {
 
-			if (elem.cat == InputCategory::keybd) {
-				bottanSetWidth += 300;
-				//DrawGraph(bottanSetWidth, bottanSetHeight, bottanHandle, true);
-				my::myDrawRectRotaGraph(bottanSetWidth, bottanSetHeight, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
-			}
-			else if (elem.cat == InputCategory::pad) {
-				bottanSetWidth -= 300;
-				my::myDrawRectRotaGraph(bottanSetWidth, bottanSetHeight, imgX * 16, (imgY + 1) * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
-				//DrawFormatStringToHandle(bottanSetWidth, bottanSetHeight, color, fontHandle, "pad = %d", elem.id);
+			if (elem.cat == InputCategory::pad) {
+				bottanNum(elem.id);
+				//bottanSetWidth += 300;
+				my::myDrawRectRotaGraph(bottanSetWidth, bottanSetHeight, imgX * 16, (imgY) * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
 			}
 			
 		}
@@ -270,83 +280,100 @@ void KeyConfigScene::draw()
 		++idx;
 	}
 
+	int width = GetDrawStringWidthToHandle("確定します", strlen("確定します"), fontHandle);
+	int editingWidth = Game::kScreenWidth / 2 - width / 2;
 
-	//キー設定外のこと
-	y += 20;
-	if (!isInputtypeSelected) {
-		int yOffset = 0;
-		if (currentInputIndex == inputState.inputNameTable.size() + 1) {
-			yOffset = 20;
-		}
-		DrawString(pw_width + 90, y + yOffset, "⇒", 0xff0000);
+	int color = 0xffffff;
+	int keyColor = 0xffffff;
+	if (currentInputIndex == 7) {
+		color = 0xffff00;
+		width = GetDrawStringWidthToHandle("確定します", strlen("確定します"), fontHandle2);
+		editingWidth = Game::kScreenWidth / 2 - width / 2;
+		DrawStringToHandle(editingWidth, y, "確定します", color, fontHandle2);
 	}
-	//各キーの表示
-	DrawString(pw_width + 100, y, " 確定します ", 0xffffff);
+	else {
+		DrawStringToHandle(editingWidth, y, "確定します", color, fontHandle);
+	}
+	
+	y += 32;
 
-	y += 20;
-	DrawString(pw_width + 100, y, " キーリセット ", 0xffffff);
+	width = GetDrawStringWidthToHandle("キーリセット", strlen("キーリセット"), fontHandle);
+	editingWidth = Game::kScreenWidth / 2 - width / 2;
+
+	if(currentInputIndex == 8) {
+		keyColor = 0xffff00;
+		width = GetDrawStringWidthToHandle("キーリセット", strlen("キーリセット"), fontHandle2);
+		editingWidth = Game::kScreenWidth / 2 - width / 2;
+		DrawStringToHandle(editingWidth, y, "キーリセット", keyColor, fontHandle2);
+	}
+	else {
+	DrawStringToHandle(editingWidth, y, "キーリセット", keyColor, fontHandle);
+	}
+
+	
+	
 }
 
 void KeyConfigScene::bottanNum(int num)
 {
 	switch (num) {
 	//X
-	case 0:
+	case 64:
 		imgX = 1;
 		imgY = 2;
 		break;
 	//A
-	case 1:
+	case 16:
 		imgX = 1;
 		imgY = 3;
 		break;
 	//Y
-	case 2:
+	case 128:
 		imgX = 1;
 		imgY = 4;
 		break;
 	//B
-	case 3:
+	case 32:
 		imgX = 1;
 		imgY = 5;
 		break;
 	//上
-	case 4:
+	case 8:
 		imgX = 8;
 		imgY = 5;
 		break;
 	//下
-	case 5:
+	case 1:
 		imgX = 9;
 		imgY = 5;
 		break;
 	//左
-	case 6:
+	case 2:
 		imgX = 8;
 		imgY = 6;
 		break;
 	//右	
-	case 7:
+	case 4:
 		imgX = 9;
 		imgY = 6;
 		break;
 	//LT
-	case 8:
+	case 256:
 		imgX = 21;
-		imgY = 3;
+		imgY = 5;
 		break;
 	//RT
-	case 9:
+	case 512:
 		imgX = 21;
-		imgY = 4;
+		imgY = 6;
 		break;
 	//BACK
-	case 10:
+	case 1024:
 		imgX = 10;
 		imgY = 13;
 		break;
 	//start
-	case 11:
+	case 2048:
 		imgX = 10;
 		imgY = 14;
 		break;

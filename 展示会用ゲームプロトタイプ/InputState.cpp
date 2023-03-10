@@ -5,20 +5,26 @@ InputState::InputState()
 {
 	//次へ
 	defaultMapTable[InputType::next] = { {InputCategory::keybd,KEY_INPUT_RETURN},
-										{InputCategory::pad,PAD_INPUT_R},
+										{InputCategory::pad,PAD_INPUT_1},
 										{InputCategory::mouse,MOUSE_INPUT_LEFT} };//スタートボタン
 	//前へ
-	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_C },
+	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_1 },
 										{InputCategory::pad,PAD_INPUT_6} };
+	//キーコンフィグ
+	defaultMapTable[InputType::attack] = { {InputCategory::keybd,KEY_INPUT_X},
+										   {InputCategory::pad,PAD_INPUT_2} };//左ショルダー
+	//弾
+	defaultMapTable[InputType::shot] = { {InputCategory::keybd,KEY_INPUT_C},
+										  {InputCategory::pad,PAD_INPUT_C} };//弾
+
+	defaultMapTable[InputType::prev] = { {InputCategory::keybd,KEY_INPUT_F},
+										  {InputCategory::pad,PAD_INPUT_4} };//弾
 	//変更
-	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_M},
+	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_2},
 										  {InputCategory::pad,PAD_INPUT_5} };//右ショルダー
 	//ポーズ
-	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_P},
+	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_TAB},
 										 {InputCategory::pad,PAD_INPUT_7} };//セレクトボタン
-	//キーコンフィグ
-	defaultMapTable[InputType::attack] = { {InputCategory::keybd,KEY_INPUT_K},
-										   {InputCategory::pad,PAD_INPUT_Y} };//左ショルダー
 	//上
 	defaultMapTable[InputType::up] = { {InputCategory::keybd,KEY_INPUT_UP},
 									  {InputCategory::pad,PAD_INPUT_UP} };//上
@@ -32,9 +38,6 @@ InputState::InputState()
 	defaultMapTable[InputType::right] = { {InputCategory::keybd,KEY_INPUT_RIGHT},
 									  {InputCategory::pad,PAD_INPUT_RIGHT} };//右
 
-	//弾
-	defaultMapTable[InputType::shot] = { {InputCategory::keybd,KEY_INPUT_C},
-										  {InputCategory::pad,PAD_INPUT_C} };//弾
 
 
 	inputMapTable = defaultMapTable;
@@ -46,11 +49,12 @@ InputState::InputState()
 
 	//入力タイプの名前のテーブルを作る
 	inputNameTable[InputType::next] = "決定";
+	inputNameTable[InputType::attack] = "攻撃";
+	inputNameTable[InputType::shot] = "能力";
+	inputNameTable[InputType::prev] = "戻る";
 	inputNameTable[InputType::nextItem] = "次のアイテム";
 	inputNameTable[InputType::prevItem] = "前のアイテム";
 	inputNameTable[InputType::pause] = "ポーズ";
-	inputNameTable[InputType::attack] = "攻撃";
-	inputNameTable[InputType::shot] = "能力";
 
 
 	currentInput.resize(static_cast<int>(InputType::max));
@@ -122,22 +126,26 @@ void InputState::rewriteInputInfo(InputType type, InputCategory cat, int id)
 	}
 }
 
+//変更を許諾する
 void InputState::commitChangedInputInfo()
 {
 	inputMapTable = tempMapTable;
 }
 
+//前の状態に戻す
 void InputState::rollbackChangedInputInfo()
 {
 	tempMapTable = inputMapTable;
 }
 
+//リセット
 void InputState::resetInputInfo()
 {
 	inputMapTable = defaultMapTable;
 	tempMapTable = defaultMapTable;
 }
 
+//書き出し
 void InputState::savekeyInfo() const
 {
 	FILE* fp = nullptr;
@@ -166,7 +174,7 @@ void InputState::savekeyInfo() const
 
 	fclose(fp);
 }
-
+//読み込み
 void InputState::loadKeyInfo()
 {
 	int handle = FileRead_open("key.info");

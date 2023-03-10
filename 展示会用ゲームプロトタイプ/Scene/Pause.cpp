@@ -20,7 +20,7 @@ Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager)
 	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
 	
 	fontHandle = CreateFontToHandle("Silver", 48, 3, -1);
-	fontHandle2 = CreateFontToHandle("Silver", 48, 3, -1);
+	fontHandle2 = CreateFontToHandle("Silver", 64, 3, -1);
 	titleFont = CreateFontToHandle("CompassPro", 64, -1, -1);
 	titleFont2 = CreateFontToHandle("CompassPro", 200, -1, -1);
 
@@ -67,6 +67,11 @@ void Pause::update(const InputState& input)
 		}
 	}
 
+	if (input.isTriggered(InputType::prev)) {
+		manager_.popScene();
+		return;
+	}
+
 }
 
 void Pause::draw()
@@ -82,6 +87,8 @@ void Pause::draw()
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
 
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2 + 5, Game::kScreenHeight / 5 + 5, "P  R  O  J  E  C  T", 0x888833, titleFont);
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2 + 5, Game::kScreenHeight / 5 + 37, "VIKING", 0x888833, titleFont2);
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2, Game::kScreenHeight / 5, "P  R  O  J  E  C  T", 0xffffff, titleFont);
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2, Game::kScreenHeight / 5 + 32, "VIKING", 0xffffff, titleFont2);
 
@@ -95,17 +102,21 @@ void Pause::draw()
 
 		int font = strlen(name.second.c_str());
 		fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, fontHandle);
+		int x = Game::kScreenWidth / 2 - fontSize / 2;
 
 		//選択された時の処理
 		if (currentInputIndex == idx) {
 			offset = 10;
 			isInputtypeSelected = true;
 			color = 0xffff00;
+			fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, fontHandle2);
+			x = Game::kScreenWidth / 2 - fontSize / 2;
+			DrawStringToHandle(x, y, name.second.c_str(), color, fontHandle2);
 		}
-
-		//各キーの表示
-		int x = Game::kScreenWidth / 2 - fontSize / 2 ;
-		DrawStringToHandle(x, y, name.second.c_str(), color,fontHandle);
+		else {
+			//各キーの表示
+			DrawStringToHandle(x, y, name.second.c_str(), color, fontHandle);
+		}
 
 		y += 80;
 		++idx;

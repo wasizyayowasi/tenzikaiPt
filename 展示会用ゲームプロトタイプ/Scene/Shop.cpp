@@ -8,8 +8,14 @@
 
 
 
-Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int pHandle, int gHandle,int hHandle, int rHandle) : SceneBase(manager), inputState(input), player(dPlayer),portionHandle(pHandle),guiHandle(gHandle), hpHandle(hHandle),repairHandle(rHandle)
+Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int pHandle, int gHandle,int hHandle, int rHandle,int cHandle) : SceneBase(manager), inputState(input), player(dPlayer),portionHandle(pHandle),guiHandle(gHandle), hpHandle(hHandle),repairHandle(rHandle), coinHandle(cHandle)
 {
+
+	LPCSTR fontPath = "data/other/Silver.ttf";
+	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
+
+	fontHandle = CreateFontToHandle("Silver", 64, 9, -1);
+
 	shopTable[ProductList::heart] = "ハート";
 	shopTable[ProductList::block] = "修復アイテム";
 	shopTable[ProductList::potion] = "回復アイテム";
@@ -21,6 +27,7 @@ Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int 
 
 Shop::~Shop()
 {
+	DeleteFontToHandle(fontHandle);
 }
 
 void Shop::update(const InputState& input)
@@ -69,7 +76,7 @@ void Shop::update(const InputState& input)
 		isEditing = false;
 	}
 
-	if (input.isTriggered(InputType::shot)) {
+	if (input.isTriggered(InputType::prev)) {
 		manager_.popScene();
 		return;
 	}
@@ -97,6 +104,14 @@ void Shop::draw()
 	//商品紹介ウィンドウ
 	DrawBox(goodsWidth + 300, goodsHeight, shopkeeperX, goodsY, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
+
+	int coinWidth = Game::kScreenWidth - 64 * 2;
+	DrawRotaGraph(coinWidth, 96, 3.0f, 0.0f, coinHandle, true);
+	std::string tempMoney;
+	tempMoney = std::to_string(player->setMoneyPossessed());
+	int tempWidth = GetDrawStringWidthToHandle(tempMoney.c_str(), strlen(tempMoney.c_str()), fontHandle);
+	coinWidth = (((coinWidth + 96) - coinWidth) / 2 - tempWidth / 2) + coinWidth - 48;
+	DrawFormatStringToHandle(coinWidth, 160, 0xffffff, fontHandle, "%d", player->setMoneyPossessed());
 
 	
 

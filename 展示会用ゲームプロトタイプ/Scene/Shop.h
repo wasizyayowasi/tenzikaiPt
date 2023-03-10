@@ -24,7 +24,7 @@ enum class Price
 class Shop : public SceneBase
 {
 public:
-	Shop(SceneManager& manager, const InputState& input,Player* dPlayer,int pHandle,int gHandle,int hHandle,int rHandle);
+	Shop(SceneManager& manager, const InputState& input,Player* dPlayer,int pHandle,int gHandle,int hHandle,int rHandle,int cHandle);
 	~Shop();
 
 	void update(const InputState& input);
@@ -38,7 +38,9 @@ private:
 	int portionHandle = -1;
 	int guiHandle = -1;
 	int repairHandle = -1;
+	int coinHandle = -1;
 	
+	int fontHandle = -1;
 
 	int currentInputIndex = 0;//現在選択中のインデックス
 	//入力一時テーブル

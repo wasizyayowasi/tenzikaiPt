@@ -426,7 +426,7 @@ void Enemy::normalUpdate(Vec2 offset)
 				coolTime = 23;
 				time = 4;
 				vec.x = 0.0f;
-				damageStopTime = 60;
+				damageStopTime = 20;
 			}
 		}
 	}
@@ -466,8 +466,8 @@ void Enemy::normalDraw(Vec2 offset)
 {
 	Vec2 pos = enemyPos + offset;
 	
-	DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
-	DrawString(pos.x, pos.y - 15, "“G", 0xffffff);
+	//DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
+	//DrawString(pos.x, pos.y - 15, "“G", 0xffffff);
 
 	if (windJump) {
 		if (--windTime == 0) {
@@ -496,10 +496,6 @@ void Enemy::normalDraw(Vec2 offset)
 		}
 		my::myDrawRectRotaGraph(pos.x, pos.y, imgX * 40, 0, 40, 40, 1.5f, 0.0f, hitHandle, true, false);
 	}
-
-	DrawFormatString(500, 600, 0xffffff, "%f", hp->returnTempHp());
-	DrawFormatString(600, 600, 0xffffff, "%d", steamVentTime);
-
 }
 
 void Enemy::BossDraw(Vec2 offset)

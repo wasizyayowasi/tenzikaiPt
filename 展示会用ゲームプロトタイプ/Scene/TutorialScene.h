@@ -22,7 +22,6 @@ public:
 	//通常状態のupdate関数
 	void normalUpdate(const InputState& input);
 	//フェードアウト時のupdate関数
-	void gameoverFadeOutUpdate(const InputState& input);
 	void clearFadeOutUpdate(const InputState& input);
 
 	void textDraw(int num);
@@ -44,11 +43,14 @@ private:
 	int bottanHandle2 = -1;
 	int bottanHandle3 = -1;
 	int truckHandle = -1;
+	int arrowHandle = -1;
 
 	int personNum = 0;
 	int count = 1;
 
 	bool buy = false;
+
+	int musicVolume = 120;
 
 	int time = 1;
 	int time2 = 1;
@@ -65,7 +67,9 @@ private:
 	Vec2 targetPlayer7 = { 0.0f,0.0f };
 	Vec2 offset;
 
-	int truckPos = 5400;
+	int truckPos = 3500;
+
+	bool textUpdate = false;
 
 	int imgX = 0;
 	int imgX2 = 0;

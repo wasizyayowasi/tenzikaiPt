@@ -7,15 +7,16 @@
 enum class InputType
 {
 	next,			/// 次へ行くボタン
+	attack,		/// キーコンフィグ
+	shot,			///投擲
+	prev,
 	nextItem,		/// 前に戻るボタン
 	prevItem,		///変更
 	pause,			/// ポーズボタン
-	attack,		/// キーコンフィグ
 	up,				///上
 	down,			///下
 	left,			///左
 	right,			///右
-	shot,			///投擲
 	max,			///最大入力インデックス
 };
 

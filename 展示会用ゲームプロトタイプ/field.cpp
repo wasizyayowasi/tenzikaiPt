@@ -43,6 +43,7 @@ void Field::update()
 void Field::draw(Vec2 offset, int num)
 {
 	switch (num) {
+	//É`ÉÖÅ[ÉgÉäÉAÉã
 	case 0:
 	{
 		DrawRotaGraph(1920, 540, 2.0f, 0.0f, backgroundHandle, true, false);
@@ -105,8 +106,7 @@ void Field::draw(Vec2 offset, int num)
 			}
 		}
 
-		//ìXàı
-		DrawRotaGraph(3315 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(3635 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 
 		for (int x = 0; x < tutorialNumX; x++) {
 
@@ -132,8 +132,9 @@ void Field::draw(Vec2 offset, int num)
 				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
 				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
 
+				
 				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
-
+			
 			}
 		}
 
@@ -188,14 +189,14 @@ void Field::draw(Vec2 offset, int num)
 				int graphX = (chipNo % chipNumX(buildingGraphWidth)) * graphChipSize;
 				int graphY = (chipNo / chipNumX(buildingGraphWidth)) * graphChipSize;
 
+				
 				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle, true, false);
-
 			}
 		}
 	}
 		break;
 	case 1:
-		//GAMEMAINÇÃï`âÊ
+	//GAMEMAINÇÃï`âÊ
 	{
 		DrawRotaGraph(1920, 540, 2.0f, 0.0f, backgroundHandle, true, false);
 
@@ -405,7 +406,7 @@ void Field::draw(Vec2 offset, int num)
 	}
 		break;
 	case 2:
-		//BOSSêÌÇÃï`âÊ
+	//BOSSêÌÇÃï`âÊ
 	{
 		//ç≈âúÇÃîwåi
 		for (int x = 0; x < 199; x++) {
@@ -553,6 +554,96 @@ void Field::draw(Vec2 offset, int num)
 		}
 	}
 		break;
+	//É^ÉCÉgÉã
+	case 3:
+	{
+		for (int x = 0; x < 49; x++) {
+
+			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f);
+
+			if (posX > Game::kScreenWidth + chipSize) {
+				break;
+			}
+			if (posX < -chipSize) {
+				continue;
+			}
+
+			for (int y = 0; y < 20 + 1; y++) {
+
+				const int chipNo = backGroundData::titleBackGround2[y][x];
+
+				assert(chipNo >= 0);
+				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
+
+
+				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+
+				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+
+				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+
+			}
+		}
+		//âúÇ©ÇÁìÒå¬ñ⁄ÇÃîwåi
+		for (int x = 0; x < 53; x++) {
+
+			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f);
+
+			if (posX > Game::kScreenWidth + chipSize) {
+				break;
+			}
+			if (posX < -chipSize) {
+				continue;
+			}
+
+			for (int y = 0; y < 20 + 1; y++) {
+
+				const int chipNo = backGroundData::titleBackGround[y][x];
+
+				assert(chipNo >= 0);
+				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
+
+				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+
+				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+
+				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+
+			}
+		}
+
+		for (int x = 0; x < tutorialNumX; x++) {
+
+			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+
+			if (posX > Game::kScreenWidth + chipSize) {
+				break;
+			}
+			if (posX < -chipSize) {
+				continue;
+			}
+
+			for (int y = 0; y < bgNumY + 1; y++) {
+
+				const int chipNo = groundData::tutorialGround[y][x];
+
+				assert(chipNo >= 0);
+				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
+
+
+				int posY = y * chipSize + graphChipSize;
+
+				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+
+				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+
+			}
+		}
+	}
+		break;
 	}
 }
 
@@ -586,7 +677,7 @@ int Field::getBossWidth() const
 
 int Field::getTutorialWidth() const
 {
-	return Game::kScreenWidth * 3;
+	return Game::kScreenWidth * 2;
 }
 
 int Field::getHeight() const

@@ -98,11 +98,17 @@ void Gameover::fadeInUpdate(const InputState& input)
 	if (--fadeTimer_ == 0) {
 		updateFunc_ = &Gameover::normalUpdate;
 		fadeValue_ = 0;
+		PlayMusic("data/music/orehamou.mp3", DX_PLAYTYPE_LOOP);
 	}
 }
 
 void Gameover::normalUpdate(const InputState& input)
 {
+	if (musicVolume < 120) {
+		musicVolume++;
+		SetVolumeMusic(musicVolume);
+	}
+
 	const int nameCount = gameOverChoiceTable.size();
 
 	if (input.isTriggered(InputType::up)) {
@@ -129,15 +135,25 @@ void Gameover::normalUpdate(const InputState& input)
 
 void Gameover::fadeOutUpdate(const InputState& input)
 {
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new TitleScene(manager_));
+		StopMusic();
 		return;
 	}
 }
 
 void Gameover::continueFadeOutUpdate(const InputState& input)
 {
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
+
 	if (motion->returnContinue()) {
 		fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 	}
@@ -146,9 +162,11 @@ void Gameover::continueFadeOutUpdate(const InputState& input)
 		if (++fadeTimer_ == fade_interval) {
 			if (sceneNum == 1) {
 				manager_.changeScene(new GameMain(manager_));
+				StopMusic();
 			}
 			else if (sceneNum == 2) {
 				manager_.changeScene(new BossBattleScene(manager_));
+				StopMusic();
 			}
 			return;
 		}

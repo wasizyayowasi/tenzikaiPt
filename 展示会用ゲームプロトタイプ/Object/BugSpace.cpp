@@ -45,7 +45,7 @@ void BugSpace::tutorialUpdate(Vec2 offset)
 			if (--time < 0) {
 				player->setMotion(true);
 				maxHp--;
-				time = 120;
+				time = 10;
 			}
 		}
 		else {
@@ -107,7 +107,7 @@ void BugSpace::update(Vec2 offset)
 				if (!enemy->isEnable()) {
 					enemy->dispatch({ spacePos.x + 50,spacePos.y + 40 });
 					enemySpawnTime = enemySpawnInterval;
-					enemySpawnInterval -= 10;
+					enemySpawnInterval -= 20;
 					break;
 				}
 			}
@@ -141,7 +141,6 @@ void BugSpace::draw(Vec2 offset)
 
 	DrawRectRotaGraph(spacePos.x + offset.x + 50, spacePos.y + offset.y + 50, imgX * 100, imgY * 100, 100, 100, 3.0f, 0.0f, spaceHandle, true, false);
 
-	DrawFormatString(200, 0, 0xffffff, "%f : %f", enemyDeathPos.x, enemyDeathPos.y);
 	if (player->repairSpace(spacePos,offset)) {
 		if (player->returnSpaceHpDisplay()) {
 			hp->draw({ spacePos.x,spacePos.y - 30 },offset);
@@ -152,10 +151,7 @@ void BugSpace::draw(Vec2 offset)
 		if (enemy->isEnable()) {
 			enemy->draw(offset);
 		}
-	}
-
-	DrawFormatString(500, 0, 0xffffff, "%d", maxHp);
-	
+	}	
 }
 
 void BugSpace::move(int scrollX)

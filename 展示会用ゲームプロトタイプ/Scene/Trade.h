@@ -22,8 +22,6 @@ public:
 	void update(const InputState& input);
 	void draw();
 
-	void textDraw(int num);
-
 	int setBuy() { return buy; }
 private:
 	int amount = 0;

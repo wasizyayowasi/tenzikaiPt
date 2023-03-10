@@ -54,6 +54,11 @@ private:
 	int fontHandle2 = -1;
 	int UIfontHandle = -1;
 	int UIfontHandle2 = -1;
+	int bottanHandle = -1;
+
+	int imgX = 2;
+	int imgY = 1;
+	int time = 8;
 
 	int titleWidth = 0;
 	int titleWidth2 = 0;

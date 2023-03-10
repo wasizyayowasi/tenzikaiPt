@@ -60,8 +60,6 @@ public:
 	void setItemControl(int num);
 	void setMoney(int amount);
 
-	void giftMoney() { money = 5000; }
-
 	void consumption();
 
 	void setHandle(int pHandle, int mHandle,int gHandle,int hHandle,int rHandle,int cHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle,hpHandle = hHandle,repairHandle = rHandle,coinHandle = cHandle; }
@@ -92,11 +90,14 @@ private:
 	int coinHandle = -1;
 	int smokeHandle = -1;
 
+	int fontHandle = -1;
+
 	int sceneNum = 0;
 
 	int attackSound = -1;
 	int coinSound = -1;
 	int walkSound = -1;
+	int throwSound = -1;
 
 	int soundCount = 1;
 
@@ -149,6 +150,10 @@ private:
 	bool proximityAttack = false;
 
 	int chipNo3 = 0;
+
+	int coinDisplayTime = 0;
+	static constexpr int fadeInterval = 60;
+	int fadeValue = 255;
 
 	ObjectHp* hp;
 	PlayerMotion* motion;

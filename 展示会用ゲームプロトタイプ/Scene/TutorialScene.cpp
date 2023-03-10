@@ -26,12 +26,11 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	bottanHandle2 = my::myLoadGraph("data/GUIGraph/bottan2.png");
 	bottanHandle3 = my::myLoadGraph("data/GUIGraph/bottan3.png");
 	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
-	
+	arrowHandle = my::myLoadGraph("data/GUIGraph/arrow.png");
 
 	player = new Player(1);
 	player->setHandle(portionHandle, hacheteHandle, guiHandle, hpHandle, repairHandle, coinHandle);
 	player->init();
-	player->giftMoney();
 
 	field = std::make_shared<Field>();
 
@@ -41,10 +40,9 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	int x = 4750 / chipSize;
 	int y = 280 / chipSize;
 	space->init(x,y);
-	space->setPos({ 4750,280 });
+	space->setPos({ 3020,280 });
 	space->setPlayer(player);
 	enemy->setPlayer(player, enemyHandle, coinHandle);
-	//space->enemySetPlayer(enemyHandle, coinHandle);
 	shopperHandle = field->setHandle();
 }
 
@@ -62,11 +60,14 @@ TutorialScene::~TutorialScene()
 	DeleteGraph(bottanHandle2);
 	DeleteGraph(bottanHandle3);
 	DeleteGraph(truckHandle);
+	DeleteGraph(arrowHandle);
 }
 
 void TutorialScene::update(const InputState& input)
 {
-	
+
+	SetVolumeMusic(musicVolume);
+
 	if (--time < 0) {
 		imgX++;
 		imgX2++;
@@ -83,6 +84,13 @@ void TutorialScene::update(const InputState& input)
 		if (player->getPos().x > 550) {
 			enemy->dispatch({ 300,750 });
 			spownCount--;
+		}
+	}
+
+	if (player->getPos().x > 550) {
+		if (!enemy->isEnable()) {
+			enemy->dispatch({ 0,750 });
+			enemy->setPlayer(player, enemyHandle, coinHandle);
 		}
 	}
 
@@ -106,23 +114,23 @@ void TutorialScene::update(const InputState& input)
 			targetPlayer2.y = player->getPos().y + 44 - 780;
 
 			targetPlayer3 = { 0.0f,0.0f };
-			targetPlayer3.x = player->getPos().x + 25 - 4200;
+			targetPlayer3.x = player->getPos().x + 25 - 2500;
 			targetPlayer3.y = player->getPos().y + 44 - 780;
 
 			targetPlayer4 = { 0.0f,0.0f };
-			targetPlayer4.x = player->getPos().x + 25 - 4800;
+			targetPlayer4.x = player->getPos().x + 25 - 3000;
 			targetPlayer4.y = player->getPos().y + 44 - 300;
 
 			targetPlayer5 = { 0.0f,0.0f };
-			targetPlayer5.x = player->getPos().x + 25 - 5300;
+			targetPlayer5.x = player->getPos().x + 25 - 3500;
 			targetPlayer5.y = player->getPos().y + 44 - 780;
 
 			targetPlayer6 = { 0.0f,0.0f };
-			targetPlayer6.x = player->getPos().x + 25 - 4700;
+			targetPlayer6.x = player->getPos().x + 25 - 3000;
 			targetPlayer6.y = player->getPos().y + 44 - 780;
 
 			targetPlayer7 = { 0.0f,0.0f };
-			targetPlayer7.x = player->getPos().x + 25 - 3315;
+			targetPlayer7.x = player->getPos().x + 25 - 3635;
 			targetPlayer7.y = player->getPos().y + 44 - 780;
 		}
 
@@ -174,7 +182,7 @@ void TutorialScene::update(const InputState& input)
 		}
 
 		if (textCount == 4) {
-			if (player->getPos().x > 5500) {
+			if (player->getPos().x > 3650) {
 				updateFunc = &TutorialScene::clearFadeOutUpdate;
 			}
 		}
@@ -190,12 +198,13 @@ void TutorialScene::draw()
 {
 	field->draw(offset,0);
 
+	DrawFormatString(600, 300, 0xffffff, "%d", musicVolume);
 	if (enemy->isEnable()) {
 		enemy->draw(offset);
 	}
 	else {
 		if (targetPlayer7.length() < 300) {
-			if (!buy) {
+			if (player->setMoneyPossessed() > 0) {
 				textDraw(0);
 			}
 		}
@@ -219,20 +228,21 @@ void TutorialScene::draw()
 	//“Xˆõ
 	switch (personNum) {
 	case 0:
+		textUpdate = true;
 		DrawRotaGraph(850 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 		break;
 	case 1:
 		DrawRotaGraph(1800 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 		break;
 	case 2:
-		DrawRotaGraph(4200 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(2500 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 		break;
 	case 3:
-		DrawRotaGraph(5300 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(3400 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 		break;
 	}
 	
-	if (player->getPos().x > 5500) {
+	if (player->getPos().x > 3650) {
 		if (textCount == 4) {
 			
 		}
@@ -248,11 +258,9 @@ void TutorialScene::draw()
 		DrawGraph(truckPos + offset.x, 643,truckHandle,true);
 	}
 
-	DrawFormatString(1300, 500, 0xffffff, "%d", truckPos, true);
+	bool checkFlyingObject = player->returnFlyingisEnabled();
 
-	bool aiu = player->returnFlyingisEnabled();
-
-	if (aiu) {
+	if (checkFlyingObject) {
 		DrawString(Game::kScreenWidth / 2 - 130, 900, "“Š‚°‚½‚à‚Ì‚Í‚¿‚á‚ñ‚ÆE‚¢‚Ü‚µ‚å‚¤", 0xffffff);
 	}
 }
@@ -262,6 +270,7 @@ void TutorialScene::fadeInUpdate(const InputState& input)
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (--fadeTimer == 0) {
 		updateFunc = &TutorialScene::normalUpdate;
+		PlayMusic("data/music/Empty Streets.wav", DX_PLAYTYPE_LOOP);
 		fadeValue = 0;
 	}
 }
@@ -269,13 +278,13 @@ void TutorialScene::fadeInUpdate(const InputState& input)
 void TutorialScene::normalUpdate(const InputState& input)
 {
 
-	int x = (3315) / chipSize;
+	int x = (3635) / chipSize;
 	int y = (780) / chipSize;
 
 	if (player->shopCollision(x, y, offset)) {
 		if (input.isTriggered(InputType::next))
 		{
-			manager_.pushScene(new Shop(manager_, input, player, portionHandle, guiHandle, hpHandle, repairHandle));
+			manager_.pushScene(new Shop(manager_, input, player, portionHandle, guiHandle, hpHandle, repairHandle,coinHandle));
 			buy = true;
 		}
 	}
@@ -300,16 +309,16 @@ void TutorialScene::normalUpdate(const InputState& input)
 	offset = targetOffset;
 }
 
-void TutorialScene::gameoverFadeOutUpdate(const InputState& input)
-{
-}
-
 void TutorialScene::clearFadeOutUpdate(const InputState& input)
 {
-	
+	if (--musicVolume > 1) {
+		SetVolumeMusic(musicVolume);
+	}
+
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	truckPos += 10;
 	if (++fadeTimer == fadeInterval) {
+		StopMusic();
 		manager_.changeScene(new GameMain(manager_));
 		return;
 	}
@@ -335,21 +344,20 @@ void TutorialScene::textDraw(int num)
 	case 1:
 
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//æZ‡¬
-		DrawBox(4700 + offset.x, 570, 4900 + offset.x, 720, 0x000000, true);
+		DrawBox(2970 + offset.x, 570, 3170 + offset.x, 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//’Êí•`‰æ‚É–ß‚·
-		DrawBox(4700 + offset.x, 570, 4900 + offset.x, 720, 0xffffff, false);
+		DrawBox(2970 + offset.x, 570, 3170 + offset.x, 720, 0xffffff, false);
 
-		imgX = 0;
 		if (--time2 == 0) {
-			imgY++;
+			imgX++;
 			time2 = 8;
 		}
 
-		if (imgY > 1) {
-			imgY = 0;
+		if (imgX > 4) {
+			imgX = 0;
 		}
-		DrawString(4785 + offset.x, 680, "“o‚é", 0xffffff);
-		DrawRectRotaGraph(4800 + offset.x, 650, imgX * 18, imgY * 18, 18, 18, 2.0f, 0.0f, bottanHandle3, true, false);
+		DrawString(3055 + offset.x, 680, "“o‚é", 0xffffff);
+		DrawRectRotaGraph(3070 + offset.x, 635, imgX * 112, 0, 112, 153, 0.4f, 0.0f, arrowHandle, true, false);
 		break;
 	case 2:
 		
@@ -362,16 +370,16 @@ void TutorialScene::textDraw(int num)
 			imgX = 2;
 		}
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//æZ‡¬
-		DrawBox(4600 + offset.x, 70, 5000 + offset.x, 220, 0x000000, true);
+		DrawBox(2870 + offset.x, 70, 3250 + offset.x, 220, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//’Êí•`‰æ‚É–ß‚·
-		DrawBox(4600 + offset.x, 70, 5000 + offset.x, 220, 0xffffff, false);
-		DrawString(4720 + offset.x, 95, "è‚¿‚ğØ‚è‘Ö‚¦‚æ‚¤", 0xffffff);
+		DrawBox(2870 + offset.x, 70, 3250 + offset.x, 220, 0xffffff, false);
+		DrawString(2980 + offset.x, 95, "è‚¿‚ğØ‚è‘Ö‚¦‚æ‚¤", 0xffffff);
 
-		DrawRectRotaGraph(4750 + offset.x, 140, imgX2 * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
-		DrawString(4790 + offset.x, 150, "or", 0xffffff);
-		DrawRectRotaGraph(4850 + offset.x, 140, imgX2 * 16, imgY2 * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
-		DrawRectRotaGraph(4730 + offset.x, 190, imgX * 16, (imgY - 2) * 16, 16, 16, 2.0f, 0.0f, bottanHandle, true, false);
-		DrawString(4750 + offset.x, 180, "‚ÅƒAƒCƒeƒ€‚ğg—p", 0xffffff);
+		DrawRectRotaGraph(3010 + offset.x, 140, imgX2 * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
+		DrawString(3050 + offset.x, 150, "or", 0xffffff);
+		DrawRectRotaGraph(3110 + offset.x, 140, imgX2 * 16, imgY2 * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
+		DrawRectRotaGraph(2930 + offset.x, 190, imgX * 16, (imgY - 2) * 16, 16, 16, 2.0f, 0.0f, bottanHandle, true, false);
+		DrawString(2950 + offset.x, 180, "‚ğ‰Ÿ‚µ‚Ä‚¢‚éŠÔAƒAƒCƒeƒ€‚ğg—p", 0xffffff);
 		break;
 	}
 }

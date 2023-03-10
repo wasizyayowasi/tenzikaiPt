@@ -10,6 +10,7 @@
 #include "../InputState.h"
 #include "DxLib.h"
 #include <algorithm>
+#include <string>
 
 
 
@@ -26,6 +27,12 @@ Player::Player(int num) : sceneNum(num)
 	attackSound = LoadSoundMem("data/soundEffect/attack_knight.wav");
 	coinSound = LoadSoundMem("data/soundEffect/Single-Coin-Drop-On-Table-www.fesliyanstudios.com.mp3");
 	walkSound = LoadSoundMem("data/soundEffect/Concrete 1.wav");
+	throwSound = LoadSoundMem("data/soundEffect/Motion-Swish03-7.mp3");
+
+	LPCSTR fontPath = "data/other/Silver.ttf";
+	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
+	
+	fontHandle = CreateFontToHandle("Silver", 64, 9, -1);
 
 	hp = new ObjectHp;
 	motion = new PlayerMotion;
@@ -47,6 +54,7 @@ Player::~Player()
 	DeleteSoundMem(attackSound);
 	DeleteSoundMem(coinSound);
 	DeleteSoundMem(walkSound);
+	DeleteSoundMem(throwSound);
 }
 
 void Player::init()
@@ -102,10 +110,6 @@ void Player::update(Vec2 offset, const InputState& input)
 
 void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 {
-	if (repairBlock < 1) {
-		money = 500;
-	}
-
 	//ƒ‚[ƒVƒ‡ƒ“ŠÖŒW
 	motionNum = 0;
 	motion->update(motionNum);
@@ -202,6 +206,8 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 		if (!push) {
 			if (input.isTriggered(InputType::shot)) {
 				if (!flyingObject->isEnable()) {
+					ChangeVolumeSoundMem(130, throwSound);
+					PlaySoundMem(throwSound, DX_PLAYTYPE_BACK);
 					flyingObject->attack(playerPos, playerDirections);
 				}
 			}
@@ -391,6 +397,8 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 		if (!push) {
 			if (input.isTriggered(InputType::shot)) {
 				if (!flyingObject->isEnable()) {
+					ChangeVolumeSoundMem(130, throwSound);
+					PlaySoundMem(throwSound, DX_PLAYTYPE_BACK);
 					flyingObject->bossAttack(playerPos, playerDirections);
 				}
 			}
@@ -531,6 +539,8 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		if (!push) {
 			if (input.isTriggered(InputType::shot)) {
 				if (!flyingObject->isEnable()) {
+					ChangeVolumeSoundMem(130, throwSound);
+					PlaySoundMem(throwSound, DX_PLAYTYPE_BACK);
 					flyingObject->attack(playerPos, playerDirections);
 				}
 			}
@@ -610,7 +620,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 				const int chipNo = groundData::ground[y][x];
 
 				//’n–Ê
-				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
+				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46||chipNo == 16) {
 					if (playerFiledCollision(x, y)) {
 						if (playerPos.y + correctionSizeY > y * chipSize) {
 							playerPos.y = y * chipSize - 74;
@@ -892,8 +902,21 @@ void Player::draw(Vec2 offset)
 	inventory->setNum(repairBlock, recoveryItem, flyingObject->isEnable());
 	inventory->draw();
 
-	DrawRotaGraph(Game::kScreenWidth / 2 + 130, Game::kScreenHeight - 130, 2.0f, 0.0f, coinHandle, true);
-	DrawFormatString(Game::kScreenWidth / 2 + 100 + 80, Game::kScreenHeight - 120, 0xffffff, "%d", money);
+	if (--coinDisplayTime > 0) {
+		fadeValue = 255 * (static_cast<float>(coinDisplayTime) / static_cast<float>(fadeInterval));
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
+
+		int coinWidth = Game::kScreenWidth - 64 * 2;
+		DrawRotaGraph(coinWidth, 96, 3.0f, 0.0f, coinHandle, true);
+		std::string tempMoney;
+		tempMoney = std::to_string(money);
+		int tempWidth = GetDrawStringWidthToHandle(tempMoney.c_str(), strlen(tempMoney.c_str()), fontHandle);
+		coinWidth = (((coinWidth + 96) - coinWidth) / 2 - tempWidth / 2) + coinWidth - 48;
+		DrawFormatStringToHandle(coinWidth, 150, 0xffffff, fontHandle, "%d", money);
+
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+
 
 	//”ò‚Ñ“¹‹ï
 	if (flyingObject->isEnable()) {
@@ -931,10 +954,6 @@ void Player::draw(Vec2 offset)
 	if (!push) {
 		motion->draw(playerPos, playerHandle, playerDirections, offset);
 	}
-
-	DrawLine(playerPos.x + 18 + offset.x, playerPos.y + 23, playerPos.x + 68 + offset.x, playerPos.y + 23, 0x00ff00);
-	DrawLine(playerPos.x + 18 + offset.x, playerPos.y + 33, playerPos.x  - 32 + offset.x, playerPos.y + 33, 0xff00ff);
-	DrawCircle(playerPos.x + 18 + offset.x, playerPos.y + 33, 30, 0x0000ff, false);
 
 	if (motionStart) {
 		DrawRectRotaGraph(playerPos.x + offset.x - 10, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
@@ -1016,12 +1035,12 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 	if (proximityAttack) {
 		if (playerDirections) {
 			if (enemyLeft > playerPos.x + 20)			return false;
-			if (enemyRight < playerPos.x -  70)			return false;
+			if (enemyRight < playerPos.x -  50)			return false;
 			if (enemyTop > playerPos.y + 50)			return false;
 			if (enemyBottom < playerPos.y + 10)			return false;
 		}
 		else if (!playerDirections) {
-			if (enemyLeft > playerPos.x  + 100)			return false;
+			if (enemyLeft > playerPos.x  + 80)			return false;
 			if (enemyRight < playerPos.x + 20)			return false;
 			if (enemyTop > playerPos.y + 50)			return false;
 			if (enemyBottom < playerPos.y + 10)			return false;
@@ -1112,6 +1131,7 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 	if (playerPos.y + offset.y > objectBottom)						return false;
 
 	money += 200;
+	coinDisplayTime = 180;
 	ChangeVolumeSoundMem(soundVolume, coinSound);
 	PlaySoundMem(coinSound, DX_PLAYTYPE_BACK, true);
 

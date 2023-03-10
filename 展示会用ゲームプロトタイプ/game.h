@@ -10,7 +10,7 @@ namespace Game {
 	constexpr bool kWindowMode = false;
 #endif
 	//windowñº
-	const char* const kTitleText = " ";
+	const char* const kTitleText = " project Viking ";
 	//windowÉTÉCÉY
 	constexpr int kScreenWidth = 1920;
 	constexpr int kScreenHeight =1080;

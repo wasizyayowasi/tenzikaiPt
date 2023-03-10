@@ -28,7 +28,6 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
 	
-	mainSound = LoadSoundMem("data/music/Dystopian.wav");
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
 	player = new Player(0);
@@ -47,10 +46,6 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	assert(tempScreenH >= 0);
 
 	init();
-	
-	ChangeVolumeSoundMem(soundVolume, mainSound);
-
-	PlaySoundMem(mainSound, DX_PLAYTYPE_LOOP, true);
 }
 
 GameMain::~GameMain()
@@ -182,6 +177,7 @@ void GameMain::fadeInUpdate(const InputState& input)
 	if (--fadeTimer == 0) {
 		updateFunc = &GameMain::normalUpdate;
 		fadeValue = 0;
+		PlayMusic("data/music/Dystopian.wav", DX_PLAYTYPE_LOOP);
 		player->setPos({ truckPos + 20,720 });
 	}
 }
@@ -189,6 +185,11 @@ void GameMain::fadeInUpdate(const InputState& input)
 void GameMain::normalUpdate(const InputState& input)
 {
 	waveHp = 0;
+
+	if (musicVolume < 180) {
+		musicVolume++;
+		SetVolumeMusic(musicVolume);
+	}
 
 	if (!EndOfRaid) {
 		for (int i = 0; i < wave; i++) {
@@ -230,7 +231,7 @@ void GameMain::normalUpdate(const InputState& input)
 	if (player->shopCollision(x, y, offset)) {
 		if (input.isTriggered(InputType::next))
 		{
-			manager_.pushScene(new Shop(manager_,input,player,portionHandle,guiHandle,hpHandle,repairHandle));
+			manager_.pushScene(new Shop(manager_,input,player,portionHandle,guiHandle,hpHandle,repairHandle,coinHandle));
 		}
 	}
 	
@@ -254,8 +255,6 @@ void GameMain::normalUpdate(const InputState& input)
 		quakeCount++;
 		quakeTimer = 120;
 		quakeY = 20.0f;
-		ChangeVolumeSoundMem(footstepSoundVolume, footstepSound);
-		PlaySoundMem(footstepSound, DX_PLAYTYPE_BACK, true);
 		footstepSoundVolume += 10;
 	}
 
@@ -321,22 +320,28 @@ void GameMain::normalUpdate(const InputState& input)
 
 void GameMain::gameoverFadeOutUpdate(const InputState& input)
 {
-	soundVolume--;
-	ChangeVolumeSoundMem(soundVolume, mainSound);
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new Gameover(manager_,input,1));
+		StopMusic();
 		return;
 	}
 }
 
 void GameMain::bossBattleSceneFadeOutUpdate(const InputState& input)
 {
-	soundVolume--;
-	ChangeVolumeSoundMem(soundVolume, mainSound);
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new BossBattleScene(manager_));
+		StopMusic();
 		return;
 	}
 }

@@ -22,15 +22,13 @@ void Trade::update(const InputState& input)
 {
 	const int nameCount = purchaseChoiceTable.size();
 
-
-	if (buy == false) {
-		if (input.isTriggered(InputType::left)) {
-			currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
-		}
-		else if (input.isTriggered(InputType::right)) {
-			currentInputIndex = (currentInputIndex + 1) % nameCount;
-		}
+	if (input.isTriggered(InputType::left)) {
+		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 	}
+	else if (input.isTriggered(InputType::right)) {
+		currentInputIndex = (currentInputIndex + 1) % nameCount;
+	}
+	
 
 	if (input.isTriggered(InputType::next)) {
 		if (!(itemNum == 0 && player->returnHp() > 9)) {
@@ -38,13 +36,8 @@ void Trade::update(const InputState& input)
 				if (player->setMoneyPossessed() - amount >= 0) {
 					player->setItemControl(itemNum);
 					player->setMoney(amount);
-					textNum = 0;
-					textDisplayTime = defaultTime;
-					buy = true;
-				}
-				else {
-					textNum = 1;
-					textDisplayTime = defaultTime;
+					manager_.popScene();
+					return;
 				}
 			}
 			else {
@@ -52,14 +45,12 @@ void Trade::update(const InputState& input)
 				return;
 			}
 		}
-		else {
-			textNum = 2;
-			manager_.popScene();
-			return;
-		}
 	}
-	
 
+	if (input.isTriggered(InputType::prev)) {
+		manager_.popScene();
+		return;
+	}
 }
 
 void Trade::draw()
@@ -107,30 +98,5 @@ void Trade::draw()
 			yOffset = 20;
 		}
 		DrawString(pw_width + 90, y + yOffset, "ÅÀ", 0xff0000);
-	}
-
-	if (textDisplayTime != 0) {
-		if (--textDisplayTime > 0) {
-			textDraw(textNum);
-		}
-		else {
-			manager_.popScene();
-			return;
-		}
-	}
-}
-
-void Trade::textDraw(int num)
-{
-	switch (num) {
-	case 0:
-		DrawString(Game::kScreenWidth / 2 - 50, 270, "ñàìxÇ†ÇË", 0xffffff);
-		break;
-	case 1:
-		DrawString(Game::kScreenWidth / 2 - 50, 270, "ã‡ÇÀÅ[Ç∂Ç·ÇÒ", 0xffffff);
-		break;
-	case 2:
-		DrawString(Game::kScreenWidth / 2 - 50, 270, "ïiêÿÇÍÇæ", 0xffffff);
-		break;
 	}
 }

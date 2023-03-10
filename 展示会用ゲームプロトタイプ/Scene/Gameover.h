@@ -27,6 +27,8 @@ private:
 	int fontHandle = -1;
 	int fontHandle2 = -1;
 
+	int musicVolume = 0;
+
 	static constexpr int fade_interval = 60;
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;

@@ -11,12 +11,13 @@ public:
 	void draw();
 		
 private:
-	
+	int musicVolume = 0;
+
 	int clearHandle = -1;
 
-	static constexpr int fade_interval = 60;
-	int fadeTimer_ = fade_interval;
-	int fadeValue_ = 255;
+	static constexpr int fadeInterval = 60;
+	int fadeTimer = fadeInterval;
+	int fadeValue = 255;
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 

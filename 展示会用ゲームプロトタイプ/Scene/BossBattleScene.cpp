@@ -25,7 +25,6 @@ BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),upd
 	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 	signboardHandle = my::myLoadGraph("data/objectGraph/kb.png");
 
-	mainSound = LoadSoundMem("data/music/Battle-Dawn.mp3");
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
 	player = new Player(2);
@@ -65,8 +64,6 @@ BossBattleScene::~BossBattleScene()
 
 void BossBattleScene::init()
 {
-	ChangeVolumeSoundMem(soundVolume, mainSound);
-	PlaySoundMem(mainSound, DX_PLAYTYPE_LOOP, true);
 }
 
 void BossBattleScene::update(const InputState& input)
@@ -107,7 +104,7 @@ void BossBattleScene::draw()
 			const int chipNo = groundData::bossGround[y][x];
 
 			if (chipNo == 1) {
-				DrawGraph(x * chipSize + offset.x, (y - 1) * chipSize + 5, signboardHandle, true);
+				DrawRotaGraph(x * chipSize + offset.x, (y - 1) * chipSize + 22,1.5f,0.0f, signboardHandle, true);
 				//my::myDrawRectRotaGraph(x * 32 + offset.x, y * 32 + 10, imgX * 40, 200, 40, 40, 3.0f, 0.0f, enemyHandle, true, true);
 			}
 		}
@@ -158,6 +155,7 @@ void BossBattleScene::bossAppearanceUpdate(const InputState& input)
 		}
 		else {
 			if (--startTime == 0) {
+				PlayMusic("data/music/Battle-ricercare.mp3",DX_PLAYTYPE_LOOP);
 				updateFunc = &BossBattleScene::normalUpdate;
 			}
 		}
@@ -167,6 +165,11 @@ void BossBattleScene::bossAppearanceUpdate(const InputState& input)
 
 void BossBattleScene::normalUpdate(const InputState& input)
 {
+
+	if (musicVolume < 120) {
+		musicVolume++;
+		SetVolumeMusic(musicVolume);
+	}
 
 	if (player->isEnable()) {
 		player->update(offset, input);
@@ -226,22 +229,28 @@ void BossBattleScene::fadeInUpdate(const InputState& input)
 
 void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 {
-	soundVolume--;
-	ChangeVolumeSoundMem(soundVolume, mainSound);
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new Gameover(manager_,input,2));
+		StopMusic();
 		return;
 	}
 }
 
 void BossBattleScene::clearFadeOutUpdate(const InputState& input)
 {
-	soundVolume--;
-	ChangeVolumeSoundMem(soundVolume, mainSound);
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new GameClear(manager_));
+		StopMusic();
 		return;
 	}
 }

@@ -46,6 +46,7 @@ private:
 	int footstepSoundVolume = 130;
 	int soundCount = 20;
 	int soundVolume = 150;
+	int musicVolume = 0;
 
 	float truckPos = 0;
 
