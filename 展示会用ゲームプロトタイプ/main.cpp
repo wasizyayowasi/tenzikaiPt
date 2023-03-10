@@ -21,8 +21,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//window名設定
 	SetMainWindowText(Game::kTitleText);
 
-	//画面サイズの設定
-	SetGraphMode(Game::kScreenWidth,Game::kScreenHeight, Game::kScreenDepth);
+	//if (Game::kWindowMode) {
+		//画面サイズの設定
+		SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kScreenDepth);
+	//}
+	//else {
+		//画面サイズの設定
+	//	SetGraphMode(640, 400, Game::kScreenDepth);
+	//}
 
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{

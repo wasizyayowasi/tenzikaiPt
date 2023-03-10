@@ -194,8 +194,6 @@ void PlayerThrowinAttack::draw(int handle, Vec2 offset)
 
 void PlayerThrowinAttack::bossDraw(int handle, Vec2 offset)
 {
-	DrawFormatString(1000, 600, 0xffffff, "%f : %f", flyingObjectPos.x + offset.x, flyingObjectPos.y + 10);
-
 	DrawString(flyingObjectPos.x + offset.x, flyingObjectPos.y - 10, "’e", 0xffffff);
 	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y - 100, 10.0f, angle, handle, true, playerDirections);
 }

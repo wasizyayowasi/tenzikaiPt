@@ -105,7 +105,6 @@ void BossBattleScene::draw()
 
 			if (chipNo == 1) {
 				DrawRotaGraph(x * chipSize + offset.x, (y - 1) * chipSize + 22,1.5f,0.0f, signboardHandle, true);
-				//my::myDrawRectRotaGraph(x * 32 + offset.x, y * 32 + 10, imgX * 40, 200, 40, 40, 3.0f, 0.0f, enemyHandle, true, true);
 			}
 		}
 	}
@@ -117,8 +116,6 @@ void BossBattleScene::draw()
 		bossMove = true;
 		player->draw(offset);
 	}
-
-	DrawFormatString(1100, 1000, 0xffffff, "%f", offset.x);
 
 	if (bossEnemy->isEnable()) {
 		bossEnemy->BossDraw(offset);

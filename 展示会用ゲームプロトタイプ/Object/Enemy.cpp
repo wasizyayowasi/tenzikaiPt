@@ -466,9 +466,6 @@ void Enemy::normalDraw(Vec2 offset)
 {
 	Vec2 pos = enemyPos + offset;
 	
-	//DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
-	//DrawString(pos.x, pos.y - 15, "“G", 0xffffff);
-
 	if (windJump) {
 		if (--windTime == 0) {
 			windImgX++;
@@ -504,9 +501,6 @@ void Enemy::BossDraw(Vec2 offset)
 	Vec2 pos = enemyPos + offset;
 
 	inversion = false;
-
-	DrawCircle(pos.x, pos.y, 200, 0xff0000, false);
-	DrawString(pos.x, pos.y - 15, "“G", 0xffffff);
 
 	motion->draw(enemyPos, handle, inversion, offset,50.0f);
 

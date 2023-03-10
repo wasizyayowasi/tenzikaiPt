@@ -149,9 +149,6 @@ void KeyConfigScene::draw()
 	//キーコンフィグメッセージ
 	DrawString(pw_width + 10, pw_height + 10, "KeyConfig...", 0xffffaa);
 
-
-	DrawFormatString(1000, 200, 0xffffff, "%d", keySelectNum % 7);
-
 	//丸パクリ
 	{
 	//constexpr int pw_width = 450;							//キーコンフィグ枠の幅
