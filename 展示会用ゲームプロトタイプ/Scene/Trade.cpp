@@ -12,10 +12,13 @@ Trade::Trade(SceneManager& manager, const InputState& input, Player* dPlayer, in
 {
 	purchaseChoiceTable[PurchaseChoice::kau] = "”ƒ‚¤";
 	purchaseChoiceTable[PurchaseChoice::yameru] = "‚â‚ß‚Æ‚­";
+
+	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 }
 
 Trade::~Trade()
 {
+	DeleteSoundMem(uiSound);
 }
 
 void Trade::update(const InputState& input)
@@ -23,9 +26,13 @@ void Trade::update(const InputState& input)
 	const int nameCount = purchaseChoiceTable.size();
 
 	if (input.isTriggered(InputType::left)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 	}
 	else if (input.isTriggered(InputType::right)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
 	}
 	

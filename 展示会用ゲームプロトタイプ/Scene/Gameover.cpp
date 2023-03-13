@@ -13,6 +13,8 @@ Gameover::Gameover(SceneManager& manager, const InputState& input, int num):Scen
 {
 	handle = my::myLoadGraph("data/objectGraph/player.png");
 	lightHandle = my::myLoadGraph("data/objectGraph/light.png");
+	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
+	uiSound2 = LoadSoundMem("data/soundEffect/ui4.mp3");
 
 	gameOverChoiceTable[GameOverChoice::continueMain] = "continue";
 	gameOverChoiceTable[GameOverChoice::end] = "end";
@@ -24,8 +26,9 @@ Gameover::Gameover(SceneManager& manager, const InputState& input, int num):Scen
 	{
 	}
 	
-	fontHandle = CreateFontToHandle("Silver", 32, 9, -1);
-	fontHandle2 = CreateFontToHandle("Silver", 48, 9, -1);
+	fontHandle = CreateFontToHandle("Silver", 48, 9, -1);
+	fontHandle2 = CreateFontToHandle("Silver", 64, 9, -1);
+	fontHandle3 = CreateFontToHandle("Silver", 128, 9, -1);
 }
 
 Gameover::~Gameover()
@@ -34,6 +37,9 @@ Gameover::~Gameover()
 	DeleteGraph(lightHandle);
 	DeleteFontToHandle(fontHandle);
 	DeleteFontToHandle(fontHandle2);
+	DeleteFontToHandle(fontHandle3);
+	DeleteSoundMem(uiSound);
+	DeleteSoundMem(uiSound2);
 }
 
 void Gameover::update(const InputState& input)
@@ -43,17 +49,17 @@ void Gameover::update(const InputState& input)
 
 void Gameover::draw()
 {
-	DrawString(0, 0, "Gameover", 0xffffff);
-	DrawString(0, 15, "press to enter", 0xffffff);
+	
+	constexpr int pw_width = Game::kScreenWidth / 2 - 200;	
+	constexpr int pw_height = Game::kScreenHeight / 2 - 200;
+	constexpr int pw_start_x = Game::kScreenWidth / 2 + 200;
+	constexpr int pw_start_y = Game::kScreenHeight / 2 + 200;
 
+	int titleFontSize = GetDrawStringWidthToHandle("GAME OVER", strlen("GAME OVER"), fontHandle3);
+	DrawStringToHandle(Game::kScreenWidth / 2 - titleFontSize / 2, 200, "GAME OVER", 0x740A00, fontHandle3);
 
-	constexpr int pw_width = Game::kScreenWidth / 2 - 200;						//ポーズ枠の幅
-	constexpr int pw_height = Game::kScreenHeight / 2 - 200;						//ポーズ枠の高さ
-	constexpr int pw_start_x = Game::kScreenWidth / 2 + 200;	//ポーズ枠に左
-	constexpr int pw_start_y = Game::kScreenHeight / 2 + 200;	//ポーズ枠上
-
-	auto y = Game::kScreenHeight / 2 + 200;
-	int x = Game::kScreenWidth / 2;
+	auto y = Game::kScreenHeight / 2 + 300;
+	int x = Game::kScreenWidth / 2 + 10;
 	int idx = 0;
 	bool isInputtypeSelected = false;
 	for (const auto& name : gameOverChoiceTable) {
@@ -68,6 +74,7 @@ void Gameover::draw()
 			offset = 10;
 			isInputtypeSelected = true;
 			color = 0xffff00;
+			fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, fontHandle2);
 			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, fontHandle2);
 		}
 		else {
@@ -78,12 +85,12 @@ void Gameover::draw()
 		++idx;
 	}
 
-	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 - 100, 5.0f, 0.0f, lightHandle, true);
+	DrawRotaGraph(Game::kScreenWidth / 2 - 5, Game::kScreenHeight / 2, 5.0f, 0.0f, lightHandle, true);
 	if (updateFunc_ == &Gameover::normalUpdate) {
-		motion->deadDraw({ Game::kScreenWidth / 2,Game::kScreenHeight / 2 + 50 }, handle, false);
+		motion->deadDraw({ Game::kScreenWidth / 2 - 10,Game::kScreenHeight / 2 + 150 }, handle, false);
 	}
 	else if(updateFunc_ == &Gameover::continueFadeOutUpdate) {
-		motion->resuscitationDraw({ Game::kScreenWidth / 2,Game::kScreenHeight / 2 + 50 }, handle, false);
+		motion->resuscitationDraw({ Game::kScreenWidth / 2 - 10,Game::kScreenHeight / 2 + 150 }, handle, false);
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
@@ -112,9 +119,13 @@ void Gameover::normalUpdate(const InputState& input)
 	const int nameCount = gameOverChoiceTable.size();
 
 	if (input.isTriggered(InputType::up)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 	}
 	else if (input.isTriggered(InputType::down)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
 	}
 
@@ -122,6 +133,8 @@ void Gameover::normalUpdate(const InputState& input)
 	if (currentInputIndex == 0) {
 		if (input.isTriggered(InputType::next))
 		{
+			ChangeVolumeSoundMem(180, uiSound2);
+			PlaySoundMem(uiSound2, DX_PLAYTYPE_BACK);
 			updateFunc_ = &Gameover::continueFadeOutUpdate;
 		}
 	}

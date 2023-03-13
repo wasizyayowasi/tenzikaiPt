@@ -39,6 +39,7 @@ private:
 	int guiHandle = -1;
 	int repairHandle = -1;
 	int coinHandle = -1;
+	int uiSound = -1;
 	
 	int fontHandle = -1;
 

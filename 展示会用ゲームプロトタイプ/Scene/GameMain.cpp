@@ -27,8 +27,13 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	repairHandle = my::myLoadGraph("data/objectGraph/repair.png");
 	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
+	rockHandle = my::myLoadGraph("data/objectGraph/rock.png");
 	
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
+
+	LPCSTR UIfontPath = "data/other/Silver.ttf";
+	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
+	UIFontHandle = CreateFontToHandle("Silver", 48, 9, -1);
 
 	player = new Player(0);
 	hp = new ObjectHp;
@@ -57,10 +62,12 @@ GameMain::~GameMain()
 	DeleteGraph(guiHandle);
 	DeleteGraph(hacheteHandle);
 	DeleteGraph(hpHandle);
+	DeleteGraph(rockHandle);
 	DeleteGraph(repairHandle);
 	DeleteGraph(coinHandle);
 	DeleteGraph(truckHandle);
 	DeleteGraph(tempScreenH);
+	DeleteFontToHandle(UIFontHandle);
 
 	DeleteSoundMem(mainSound);
 	DeleteSoundMem(footstepSound);
@@ -108,7 +115,7 @@ void GameMain::init()
 			space[i]->enemySetPlayer(enemyHandle, coinHandle);
 			waveHp += space[i]->returnHp();
 		}
-		hp->setObjectMaxHp(waveHp);
+		hp->setWaveHp(waveHp);
 	}
 	else {
 		for (int i = 0; i < wave - 1; i++) {
@@ -133,13 +140,20 @@ void GameMain::draw()
 	//フィールドの描画
 	field->draw(offset,1);
 
-	hp->waveHpDraw({Game::kScreenWidth / 4,100});
+	if (quakeCount < 1) {
+		hp->waveHpDraw({ Game::kScreenWidth / 4,100 });
+		int waveFontSize = GetDrawFormatStringWidthToHandle(UIFontHandle, "%dウェーブ( %d / %d )", wave, wave, maxWave);
+		DrawFormatStringToHandle(Game::kScreenWidth / 2 - waveFontSize / 2 + 2, 32, 0x000000, UIFontHandle, "%dウェーブ( %d / %d )", wave, wave, maxWave);
+		DrawFormatStringToHandle(Game::kScreenWidth / 2 - waveFontSize / 2, 30, 0xffffff, UIFontHandle, "%dウェーブ( %d / %d )", wave, wave, maxWave);
+	}
 
 	//空間の描画
-	if (!EndOfRaid) {
-		for (int i = 0; i < wave; i++) {
-			if (space[i]->isEnable()) {
-				space[i]->draw(offset);
+	if (startWave) {
+		if (!EndOfRaid) {
+			for (int i = 0; i < wave; i++) {
+				if (space[i]->isEnable()) {
+					space[i]->draw(offset);
+				}
 			}
 		}
 	}
@@ -158,6 +172,18 @@ void GameMain::draw()
 
 	if (updateFunc == &GameMain::fadeInUpdate) {
 		DrawGraph(truckPos, 643, truckHandle, true);
+	}
+
+	if (!hitRock) {
+		if (quakeCount >= 3) {
+			if (!player->rockCollision({ player->getPos().x,player->getPos().y - rockHeight })) {
+				DrawRotaGraph(player->getPos().x + offset.x, player->getPos().y - rockHeight, 2.0f, 0.0f, rockHandle, true, false);
+				rockHeight -= 1.5f;
+			}
+			else {
+				hitRock = true;
+			}
+		}
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
@@ -184,6 +210,15 @@ void GameMain::fadeInUpdate(const InputState& input)
 
 void GameMain::normalUpdate(const InputState& input)
 {
+	if (!startWave && !(clearCount >= 2)) {
+		if (!(hp->chargeHp())) {
+			startWave = false;
+		}
+		else {
+			startWave = true;
+		}
+	}
+
 	waveHp = 0;
 
 	if (musicVolume < 180) {
@@ -199,7 +234,9 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 	}
 	
-	hp->setObjectHp(waveHp);
+	if (startWave) {
+		hp->setObjectHp(waveHp);
+	}
 
 	//プレイヤーの更新
 	if (player->isEnable()) {
@@ -214,12 +251,14 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 	}
 
-	if (player->isEnable()) {
-		//空間の更新
-		if (!EndOfRaid) {
-			for (int i = 0; i < wave; i++) {
-				if (space[i]->isEnable()) {
-					space[i]->update(offset);
+	if (startWave) {
+		if (player->isEnable()) {
+			//空間の更新
+			if (!EndOfRaid) {
+				for (int i = 0; i < wave; i++) {
+					if (space[i]->isEnable()) {
+						space[i]->update(offset);
+					}
 				}
 			}
 		}
@@ -241,12 +280,16 @@ void GameMain::normalUpdate(const InputState& input)
 		for (int i = 0; i < wave; i++) {
 			if (!space[i]->isEnable()) {
 				waveCount++;
+				if (waveCount > 3) {
+					waveCount = 3;
+				}
 			}
 		}
 	}
 
 	if (wave == waveCount) {
 		wave++;
+		startWave = false;
 		init();
 	}
 

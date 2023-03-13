@@ -627,7 +627,7 @@ void Field::draw(Vec2 offset, int num)
 
 			for (int y = 0; y < bgNumY + 1; y++) {
 
-				const int chipNo = groundData::tutorialGround[y][x];
+				const int chipNo = groundData::titleGround[y][x];
 
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));

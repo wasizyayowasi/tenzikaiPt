@@ -31,6 +31,7 @@ private:
 	int bottanHandle = -1;
 	int keyHandle = -1;
 	int tempHandle = -1;
+	int uiSound = -1;
 
 	int imgX = 1;
 	int imgY = 2;

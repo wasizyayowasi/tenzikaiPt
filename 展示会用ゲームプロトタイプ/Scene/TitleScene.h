@@ -55,6 +55,8 @@ private:
 	int UIfontHandle = -1;
 	int UIfontHandle2 = -1;
 	int bottanHandle = -1;
+	int uiSound = -1;
+	int uiSound2 = -1;
 
 	int imgX = 2;
 	int imgY = 1;

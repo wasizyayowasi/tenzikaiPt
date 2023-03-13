@@ -10,6 +10,7 @@ KeyConfigScene::KeyConfigScene(SceneManager& manager, const InputState& input):S
 	handle = my::myLoadGraph("data/GUIGraph/huti.png");
 	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan.png");
 	tempHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
+	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
 
@@ -39,6 +40,7 @@ KeyConfigScene::~KeyConfigScene()
 	DeleteGraph(handle);
 	DeleteGraph(tempHandle);
 	DeleteGraph(bottanHandle);
+	DeleteSoundMem(uiSound);
 }
 
 void KeyConfigScene::update(const InputState& input)
@@ -58,9 +60,13 @@ void KeyConfigScene::firstUpdate(const InputState& input)
 		const int nameCount = input.inputNameTable.size() + 2;
 
 		if (input.isTriggered(InputType::up)) {
+			ChangeVolumeSoundMem(160, uiSound);
+			PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 			currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 		}
 		else if (input.isTriggered(InputType::down)) {
+			ChangeVolumeSoundMem(160, uiSound);
+			PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 			currentInputIndex = (currentInputIndex + 1) % nameCount;
 		}
 		keySelectNum = currentInputIndex;

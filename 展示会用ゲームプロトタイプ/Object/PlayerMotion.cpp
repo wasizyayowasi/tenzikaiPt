@@ -18,6 +18,8 @@ PlayerMotion::~PlayerMotion()
 
 void PlayerMotion::update(int num)
 {
+	endMotionMove = false;
+
 	imgX = (imgX + 1) % (frameSpeed * maxImgX);
 
 	switch (num) {
@@ -80,16 +82,16 @@ void PlayerMotion::ascend()
 //‰º‚é
 void PlayerMotion::getOff()
 {
-	frameSpeed = 8;
+	frameSpeed = 6;
 	imgX = (imgX - 1) % (frameSpeed * maxImgX);
 }
 
 //‹ßÚUŒ‚
 void PlayerMotion::attack()
 {
-	frameSpeed = 15;
-	if (imgX - 1 > maxImgX) {
-		imgY++;
+	frameSpeed = 8;
+	if (newImgX + 1 == maxImgX) {
+		endMotionMove = true;
 	}
 }
 
@@ -102,7 +104,7 @@ void PlayerMotion::damege()
 void PlayerMotion::death()
 {
 	frameSpeed = 10;
-	if (imgY == 4 && newImgX == 1150) {
+	if (imgY == 4 && newImgX == 10) {
 		isEnabled = true;
 	}
 }
@@ -110,8 +112,8 @@ void PlayerMotion::death()
 void PlayerMotion::draw(Vec2 playerPos, int handle, bool trun, Vec2 offset)
 {
 	Vec2 pos = playerPos + offset;
-	newImgX = (imgX / frameSpeed) * assetSizeX;
-	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, newImgX, imgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
+	newImgX = (imgX / frameSpeed);
+	my::myDrawRectRotaGraph(pos.x + 15, pos.y + 15, newImgX * assetSizeX, imgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
 }
 
 void PlayerMotion::resuscitationDraw(Vec2 playerPos, int handle, bool trun)
@@ -150,5 +152,6 @@ void PlayerMotion::deathDraw(Vec2 playerPos, int handle, bool trun)
 
 	my::myDrawRectRotaGraph(playerPos.x + 15, playerPos.y + 15, deathImgX * assetSizeX, deathImgY * assetSizeY, assetSizeX, assetSizeY, 2.0f, 0.0f, handle, true, trun);
 }
+
 
 

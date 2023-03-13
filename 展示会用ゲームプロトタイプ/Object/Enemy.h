@@ -103,6 +103,8 @@ private:
 
 	int steamVentTime = 20;
 
+	int stopOverTime = 60;
+
 	Vec2 enemyPos = {800.0f,600.0f};
 	Vec2 deathPos = { 0.0f,0.0f };
 	Vec2 vec = {-1.0f,0.0f};
@@ -110,6 +112,7 @@ private:
 
 	Vec2 targetPlayer = { 0.0f,0.0f };
 	Vec2 targetPlayer2 = { 0.0f,0.0f };
+	Vec2 targetGround = { 0.0f,0.0f };
 
 	Player* player;
 	ObjectHp* hp;

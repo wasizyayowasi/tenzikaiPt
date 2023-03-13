@@ -15,6 +15,7 @@ Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int 
 	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
 
 	fontHandle = CreateFontToHandle("Silver", 64, 9, -1);
+	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 
 	shopTable[ProductList::heart] = "ハート";
 	shopTable[ProductList::block] = "修復アイテム";
@@ -27,6 +28,7 @@ Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int 
 
 Shop::~Shop()
 {
+	DeleteSoundMem(uiSound);
 	DeleteFontToHandle(fontHandle);
 }
 
@@ -35,9 +37,13 @@ void Shop::update(const InputState& input)
 	const int nameCount = shopTable.size() + 1;
 
 	if (input.isTriggered(InputType::up)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 	}
 	else if (input.isTriggered(InputType::down)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
 	}
 

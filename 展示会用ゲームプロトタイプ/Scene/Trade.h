@@ -24,6 +24,8 @@ public:
 
 	int setBuy() { return buy; }
 private:
+	int uiSound = -1;
+
 	int amount = 0;
 	int textNum = 0;
 	int textDisplayTime = 0;

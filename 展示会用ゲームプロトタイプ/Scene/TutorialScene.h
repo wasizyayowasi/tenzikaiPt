@@ -5,6 +5,7 @@
 
 class Player;
 class Field;
+class GimmicField;
 class Enemy;
 class BugSpace;
 
@@ -77,6 +78,7 @@ private:
 	int imgY2 = 3;
 
 	std::shared_ptr<Field> field;
+	std::shared_ptr<GimmicField> gimmicField;
 	std::shared_ptr<Enemy> enemy;
 	std::shared_ptr<BugSpace> space;
 

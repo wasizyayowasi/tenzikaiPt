@@ -26,11 +26,14 @@ private:
 	int fadeTimer = fadeInterval;
 	int fadeValue = 255;
 
+	bool hitRock = false;
+
 	float quakeY = 0;
 	int tempScreenH;
 	int quakeTimer = 0;
 	int quakeCount = 0;
 
+	int rockHandle = -1;
 	int enemyHandle = -1;
 	int repairHandle = -1;
 	int hpHandle = -1;
@@ -39,6 +42,7 @@ private:
 	int guiHandle = -1;
 	int coinHandle = -1;
 	int truckHandle = -1;
+	int UIFontHandle = -1;
 	
 	int mainSound = -1;
 	int footstepSound = -1;
@@ -49,6 +53,8 @@ private:
 	int musicVolume = 0;
 
 	float truckPos = 0;
+
+	float rockHeight = 100;
 
 	int scrollX = 0;
 
@@ -75,7 +81,7 @@ private:
 
 	int waveHp = 0;
 	int maxWave = 3;
-	int wave = 1;
+	int wave = 3;
 	int waveCount = 0;
 
 	bool configured = false;
@@ -86,6 +92,8 @@ private:
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 
+	bool startWave = false;
+
 	void fadeInUpdate(const InputState& input);
 	void normalUpdate(const InputState& input);
 	void gameoverFadeOutUpdate(const InputState& input);
@@ -93,6 +101,7 @@ private:
 
 	Vec2 offset;
 	Vec2 pos;
+
 	Player* player;
 	ObjectHp* hp;
 

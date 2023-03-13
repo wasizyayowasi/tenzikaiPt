@@ -26,6 +26,9 @@ private:
 	int lightHandle = -1;
 	int fontHandle = -1;
 	int fontHandle2 = -1;
+	int fontHandle3 = -1;
+	int uiSound = -1;
+	int uiSound2 = -1;
 
 	int musicVolume = 0;
 

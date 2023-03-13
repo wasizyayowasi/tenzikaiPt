@@ -8,6 +8,7 @@ class ObjectHp;
 class PlayerMotion;
 class InputState;
 class Inventory;
+class GimmicField;
 
 class Player
 {
@@ -74,6 +75,10 @@ public:
 	bool returnFlyingisEnabled();
 
 	bool returnEnemyHit() { return enemyHit; }
+
+	void setMovementRestrictions(int limitNum) { movementRestrictions = limitNum; }
+
+	bool rockCollision(Vec2 pos);
 private:
 	//èäéùÉAÉCÉeÉÄ
 	int money = 0;
@@ -89,15 +94,16 @@ private:
 	int repairHandle = -1;
 	int coinHandle = -1;
 	int smokeHandle = -1;
-
-	int fontHandle = -1;
-
-	int sceneNum = 0;
-
+	int dieSound = -1;
+	int cureSound = -1;
+	int damageSound = -1;
 	int attackSound = -1;
 	int coinSound = -1;
 	int walkSound = -1;
 	int throwSound = -1;
+	int fontHandle = -1;
+
+	int sceneNum = 0;
 
 	int soundCount = 1;
 
@@ -151,13 +157,17 @@ private:
 
 	int chipNo3 = 0;
 
+	float movementRestrictions = 0.0f;
+
 	int coinDisplayTime = 0;
 	static constexpr int fadeInterval = 60;
 	int fadeValue = 255;
 
-	ObjectHp* hp;
-	PlayerMotion* motion;
-	Inventory* inventory;
+	std::shared_ptr<ObjectHp> hp;
+	std::shared_ptr<PlayerMotion> motion;
+	std::shared_ptr<Inventory> inventory;
+
+	std::shared_ptr<GimmicField> gimmicField;
 
 	Vec2 playerPos = {400.0f,700.0f};
 	Vec2 vec = { 0.0f,10.0f };

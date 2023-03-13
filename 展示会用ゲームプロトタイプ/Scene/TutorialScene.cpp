@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "GameMain.h"
 #include "Pause.h"
+#include "../GimmicField.h"
 
 TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), updateFunc(&TutorialScene::fadeInUpdate)
 {
@@ -33,6 +34,7 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	player->init();
 
 	field = std::make_shared<Field>();
+	gimmicField = std::make_shared<GimmicField>();
 
 	enemy = std::make_shared<Enemy>(1);
 
@@ -197,6 +199,7 @@ void TutorialScene::update(const InputState& input)
 void TutorialScene::draw()
 {
 	field->draw(offset,0);
+	gimmicField->draw(offset);
 
 	DrawFormatString(600, 300, 0xffffff, "%d", musicVolume);
 	if (enemy->isEnable()) {

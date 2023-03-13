@@ -26,6 +26,11 @@ public:
 
 	int returnMotionNum() { return imgX; }
 	bool returnContinue() { return isContinue; }
+
+	void resetImgX() { imgX = 0; }
+
+	bool returnEndMotion() { return endMotionMove; }
+
 private:
 	int newImgX = 0;
 
@@ -33,6 +38,7 @@ private:
 	int deadImgY = 4;
 	int deathImgX = 0;
 	int deathImgY = 4;
+	bool endMotionMove = false;;
 	int time = 8;
 
 	int imgX = 0;

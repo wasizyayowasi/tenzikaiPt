@@ -6,37 +6,37 @@ InputState::InputState()
 	//次へ
 	defaultMapTable[InputType::next] = { {InputCategory::keybd,KEY_INPUT_RETURN},
 										{InputCategory::pad,PAD_INPUT_1},
-										{InputCategory::mouse,MOUSE_INPUT_LEFT} };//スタートボタン
+										{InputCategory::mouse,MOUSE_INPUT_LEFT} };
 	//前へ
-	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_1 },
+	defaultMapTable[InputType::nextItem] = { {InputCategory::keybd,KEY_INPUT_E },
 										{InputCategory::pad,PAD_INPUT_6} };
+	//変更
+	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_Q},
+										  {InputCategory::pad,PAD_INPUT_5} };
 	//キーコンフィグ
 	defaultMapTable[InputType::attack] = { {InputCategory::keybd,KEY_INPUT_X},
-										   {InputCategory::pad,PAD_INPUT_2} };//左ショルダー
+										   {InputCategory::pad,PAD_INPUT_2} };
 	//弾
 	defaultMapTable[InputType::shot] = { {InputCategory::keybd,KEY_INPUT_C},
-										  {InputCategory::pad,PAD_INPUT_C} };//弾
-
+										  {InputCategory::pad,PAD_INPUT_C} };
+	//戻る
 	defaultMapTable[InputType::prev] = { {InputCategory::keybd,KEY_INPUT_F},
-										  {InputCategory::pad,PAD_INPUT_4} };//弾
-	//変更
-	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_2},
-										  {InputCategory::pad,PAD_INPUT_5} };//右ショルダー
+										  {InputCategory::pad,PAD_INPUT_4} };
 	//ポーズ
 	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_TAB},
-										 {InputCategory::pad,PAD_INPUT_7} };//セレクトボタン
+										 {InputCategory::pad,PAD_INPUT_7} };
 	//上
 	defaultMapTable[InputType::up] = { {InputCategory::keybd,KEY_INPUT_UP},
-									  {InputCategory::pad,PAD_INPUT_UP} };//上
+									  {InputCategory::pad,PAD_INPUT_UP} };
 	//下
 	defaultMapTable[InputType::down] = { {InputCategory::keybd,KEY_INPUT_DOWN},
-										{InputCategory::pad,PAD_INPUT_DOWN} };//下
+										{InputCategory::pad,PAD_INPUT_DOWN} };
 	//左
 	defaultMapTable[InputType::left] = { {InputCategory::keybd,KEY_INPUT_LEFT},
-										{InputCategory::pad,PAD_INPUT_LEFT} };//左
+										{InputCategory::pad,PAD_INPUT_LEFT} };
 	//右
 	defaultMapTable[InputType::right] = { {InputCategory::keybd,KEY_INPUT_RIGHT},
-									  {InputCategory::pad,PAD_INPUT_RIGHT} };//右
+									  {InputCategory::pad,PAD_INPUT_RIGHT} };
 
 
 

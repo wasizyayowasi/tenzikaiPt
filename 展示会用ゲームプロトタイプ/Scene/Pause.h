@@ -23,6 +23,9 @@ public:
 	void draw();
 
 private:
+	int uiSound = -1;
+	int uiSound2 = -1;
+
 	int titleFont = -1;
 	int fontHandle = -1;
 	int titleFont2 = -1;

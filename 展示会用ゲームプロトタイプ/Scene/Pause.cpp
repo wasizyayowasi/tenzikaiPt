@@ -13,6 +13,9 @@ Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager)
 	choiceTable[Choice::title] = "ƒ^ƒCƒgƒ‹‚Ö";
 	choiceTable[Choice::prev] = "–ß‚é";
 
+	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
+	uiSound2 = LoadSoundMem("data/soundEffect/ui4.mp3");
+
 	LPCSTR fontPath = "data/other/CompassPro.ttf";
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
 
@@ -34,6 +37,8 @@ Pause::~Pause()
 	DeleteFontToHandle(titleFont);
 	DeleteFontToHandle(fontHandle2);
 	DeleteFontToHandle(titleFont2);
+	DeleteSoundMem(uiSound);
+	DeleteSoundMem(uiSound2);
 }
 
 void Pause::update(const InputState& input)
@@ -47,18 +52,25 @@ void Pause::update(const InputState& input)
 
 	
 	if (input.isTriggered(InputType::up)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 	}
 	else if (input.isTriggered(InputType::down)) {
+		ChangeVolumeSoundMem(160, uiSound);
+		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
 	}
 	
 	if (input.isTriggered(InputType::next)) {
+		ChangeVolumeSoundMem(180, uiSound2);
+		PlaySoundMem(uiSound2, DX_PLAYTYPE_BACK);
 		switch (currentInputIndex) {
 		case 0:
 			manager_.pushScene(new KeyConfigScene(manager_, input));
 			break;
 		case 1:
+			StopMusic();
 			manager_.changeScene(new TitleScene (manager_));
 			return;
 		case 2:
@@ -92,7 +104,7 @@ void Pause::draw()
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2, Game::kScreenHeight / 5, "P  R  O  J  E  C  T", 0xffffff, titleFont);
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2, Game::kScreenHeight / 5 + 32, "VIKING", 0xffffff, titleFont2);
 
-	auto y = Game::kScreenHeight / 2 + 80;
+	auto y = Game::kScreenHeight / 2 + 130;
 	
 	int idx = 0;
 	bool isInputtypeSelected = false;

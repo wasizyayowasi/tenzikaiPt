@@ -97,6 +97,9 @@ void BugSpace::update(Vec2 offset)
 			player->setMotion(false);
 		}
 	}
+	else {
+		player->setMotion(false);
+	}
 	
 
 	hp->setObjectHp(maxHp);
@@ -120,7 +123,7 @@ void BugSpace::update(Vec2 offset)
 		}
 	}
 
-	if (maxHp < 1) {
+	if (maxHp < 0) {
 		player->consumption();
 		isEnabled = false;
 		player->setMotion(false);

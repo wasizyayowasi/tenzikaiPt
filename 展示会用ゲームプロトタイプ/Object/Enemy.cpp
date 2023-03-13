@@ -359,7 +359,7 @@ void Enemy::normalUpdate(Vec2 offset)
 	}
 
 	//ˆÚ“®
-	if (motionNum != 3) {
+	//if (motionNum != 3) {
 		if (!stop) {
 			if (landing) {
 				if (enemyHp > 0) {
@@ -367,7 +367,7 @@ void Enemy::normalUpdate(Vec2 offset)
 				}
 			}
 		}
-	}
+	//}
 
 	//UŒ‚
 	if (!player->beHidden()) {
@@ -383,12 +383,6 @@ void Enemy::normalUpdate(Vec2 offset)
 						sleepTime = 60;
 					}
 				}
-				else {
-					if (vec.x == 0.0f) {
-						vec.x = 3.0f;
-						attackRange = false;
-					}
-				}
 			}
 			else {
 				if (targetPlayer.length() < 30) {
@@ -399,12 +393,6 @@ void Enemy::normalUpdate(Vec2 offset)
 					if (--sleepTime < 0) {
 						player->damege(inversion);
 						sleepTime = 60;
-					}
-				}
-				else {
-					if (vec.x == 0.0f) {
-						vec.x = 3.0f;
-						attackRange = false;
 					}
 				}
 			}
@@ -460,6 +448,14 @@ void Enemy::normalUpdate(Vec2 offset)
 
 	//Œ»ó‚ÌHP‚ðÝ’è‚·‚é
 	hp->setObjectHp(enemyHp);
+
+	if (vec.x == 0.0f) {
+		if (--stopOverTime > 0) {
+			vec.x = 3.0f;
+			stopOverTime = 60;
+			attackRange = false;
+		}
+	}
 }
 
 void Enemy::normalDraw(Vec2 offset)
