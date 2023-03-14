@@ -10,12 +10,16 @@
 BugSpace::BugSpace()
 {
 	spaceHandle = my::myLoadGraph("data/objectGraph/portal2.png");
+	breakSound = LoadSoundMem("data/soundEffect/break.mp3");
+	breakSound2 = LoadSoundMem("data/soundEffect/break2.mp3");
 
 }
 
 BugSpace::~BugSpace()
 {
 	DeleteGraph(spaceHandle);
+	DeleteSoundMem(breakSound);
+	DeleteSoundMem(breakSound2);
 	delete hp;
 }
 
@@ -42,31 +46,17 @@ void BugSpace::tutorialUpdate(Vec2 offset)
 {
 	if (player->repairSpace(spacePos, offset)) {
 		if (player->returnSpaceHpDisplay()) {
-			if (--time < 0) {
-				player->setMotion(true);
-				maxHp--;
-				time = 10;
-			}
+			ChangeVolumeSoundMem(150, breakSound);
+			PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
+			player->setMotion(true);
+			maxHp -= 0.008;
 		}
 		else {
 			player->setMotion(false);
 		}
 	}
 
-
 	hp->setObjectHp(maxHp);
-
-
-	/*if (--enemySpawnTime < 0) {
-		for (auto& enemy : enemy) {
-			if (!enemy->isEnable()) {
-				enemy->dispatch({ spacePos.x + 50,spacePos.y + 40 });
-				enemySpawnTime = enemySpawnInterval;
-				enemySpawnInterval -= 10;
-				break;
-			}
-		}
-	}*/
 
 	for (auto& enemy : enemy) {
 		if (enemy->isEnable()) {
@@ -74,7 +64,9 @@ void BugSpace::tutorialUpdate(Vec2 offset)
 		}
 	}
 
-	if (maxHp < 1) {
+	if (maxHp < 0) {
+		ChangeVolumeSoundMem(150, breakSound2);
+		PlaySoundMem(breakSound2, DX_PLAYTYPE_BACK);
 		player->consumption();
 		isEnabled = false;
 		player->setMotion(false);
@@ -87,18 +79,14 @@ void BugSpace::update(Vec2 offset)
 
 	if (player->repairSpace(spacePos, offset)) {
 		if (player->returnSpaceHpDisplay()) {
-			if (--time < 0) {
-				player->setMotion(true);
-				maxHp--;
-				time = 10;
-			}
+			ChangeVolumeSoundMem(150, breakSound);
+			PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
+			player->setMotion(true);
+			maxHp -= 0.008;
 		}
 		else {
 			player->setMotion(false);
 		}
-	}
-	else {
-		player->setMotion(false);
 	}
 	
 
@@ -124,6 +112,8 @@ void BugSpace::update(Vec2 offset)
 	}
 
 	if (maxHp < 0) {
+		ChangeVolumeSoundMem(150, breakSound2);
+		PlaySoundMem(breakSound2, DX_PLAYTYPE_BACK);
 		player->consumption();
 		isEnabled = false;
 		player->setMotion(false);

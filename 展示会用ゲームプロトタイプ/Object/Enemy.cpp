@@ -41,6 +41,7 @@ void Enemy::tutorialUpdate(Vec2 offset)
 	if (chipNo == 0) {
 		if (filedCollision(underfootChipNoX, underfootChipNoY)) {
 			updateFunc = &Enemy::updateDescent;
+			return;
 		}
 	}
 
@@ -123,8 +124,12 @@ void Enemy::tutorialUpdate(Vec2 offset)
 		vec.x = 0.0f;
 	}
 	//¶‚Ì•Ç”½ŽË
-	if (enemyPos.x > 1000) {
+	if (enemyPos.x > 1000 && enemyPos.x < 2300) {
 		enemyPos.x = 2200;
+		inversion = true;
+	}
+	if (enemyPos.x > 2600) {
+		enemyPos.x = 3070;
 		inversion = true;
 	}
 
@@ -373,7 +378,7 @@ void Enemy::normalUpdate(Vec2 offset)
 	if (!player->beHidden()) {
 		if (enemyHp > 0) {
 			if (!inversion) {
-				if (targetPlayer.length() < 70) {
+				if (targetPlayer.length() < 60) {
 					attackRange = true;
 					vec.x = 0.0f;
 					motionNum = 2;
@@ -385,7 +390,7 @@ void Enemy::normalUpdate(Vec2 offset)
 				}
 			}
 			else {
-				if (targetPlayer.length() < 30) {
+				if (targetPlayer.length() < 20) {
 					attackRange = true;
 					vec.x = 0.0f;
 					motionNum = 2;

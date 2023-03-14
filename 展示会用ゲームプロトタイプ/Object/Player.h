@@ -8,7 +8,6 @@ class ObjectHp;
 class PlayerMotion;
 class InputState;
 class Inventory;
-class GimmicField;
 
 class Player
 {
@@ -79,6 +78,7 @@ public:
 	void setMovementRestrictions(int limitNum) { movementRestrictions = limitNum; }
 
 	bool rockCollision(Vec2 pos);
+
 private:
 	//所持アイテム
 	int money = 0;
@@ -118,7 +118,7 @@ private:
 	bool bat2 = false;
 
 	//無敵時間
-	int ultimateTimer_ = 0;
+	int ultimateTimer = 0;
 
 	//次へのシーン切り替え
 	bool gameoverScene = false;
@@ -167,9 +167,7 @@ private:
 	std::shared_ptr<PlayerMotion> motion;
 	std::shared_ptr<Inventory> inventory;
 
-	std::shared_ptr<GimmicField> gimmicField;
-
-	Vec2 playerPos = {400.0f,700.0f};
+	Vec2 playerPos = {200.0f,700.0f};
 	Vec2 vec = { 0.0f,10.0f };
 
 	std::shared_ptr<PlayerThrowinAttack> flyingObject;

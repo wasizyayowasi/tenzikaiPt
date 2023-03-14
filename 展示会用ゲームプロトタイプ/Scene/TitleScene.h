@@ -73,6 +73,8 @@ private:
 	bool enemiesGo = false;
 	Vec2 shift = {120.0f,800.0f};
 
+	int ultimateTimer = 0;
+
 	std::map<choice, std::string> sceneTable;
 
 	std::shared_ptr<Enemy> enemy;

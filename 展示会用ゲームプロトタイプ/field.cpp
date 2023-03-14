@@ -106,7 +106,7 @@ void Field::draw(Vec2 offset, int num)
 			}
 		}
 
-		DrawRotaGraph(3635 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(2510 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 
 		for (int x = 0; x < tutorialNumX; x++) {
 

@@ -77,7 +77,7 @@ void Inventory::draw()
 		DrawRotaGraph(InventoryX + 32, InventoryY + 32 + mPosY, 1.3f, 5.6f, hacheteHandle, true, false);
 	}
 	if (repairBlock > 0) {
-		DrawRotaGraph(InventoryX + 96, InventoryY + 38 + bPosY, 1.0f, 0.0f, repairHandle, true, false);
+		DrawRotaGraph(InventoryX + 96, InventoryY + 32 + bPosY, 1.0f, 0.0f, repairHandle, true, false);
 		DrawFormatString(Game::kScreenWidth / 2 + 8, 993 + bPosY, 0x000000, "x%d", repairBlock);
 	}
 	if (recoveryItem > 0) {

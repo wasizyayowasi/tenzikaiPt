@@ -21,14 +21,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//window名設定
 	SetMainWindowText(Game::kTitleText);
 
-	//if (Game::kWindowMode) {
-		//画面サイズの設定
-		SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kScreenDepth);
-	//}
-	//else {
-		//画面サイズの設定
-	//	SetGraphMode(640, 400, Game::kScreenDepth);
-	//}
+	//画面サイズの設定
+	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kScreenDepth);
+	
 
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{
@@ -43,11 +38,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	InputState input;
 	SceneManager sceneManager;
 	sceneManager.changeScene(new TitleScene(sceneManager));
-//	sceneManager.changeScene(new GameMain(sceneManager));
-//	sceneManager.changeScene(new TutorialScene(sceneManager));
-//	sceneManager.changeScene(new BossBattleScene(sceneManager));
-//	sceneManager.changeScene(new Gameover(sceneManager,input,1));
-//	sceneManager.changeScene(new GameClear(sceneManager));
 
 	while (ProcessMessage() == 0) {
 
@@ -60,12 +50,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		sceneManager.update(input);
 		sceneManager.draw();
-
-		auto fps = GetFPS();//Frame Per Second;
-		auto drawcall = GetDrawCallCount();//描画命令数
-
-		DrawFormatString(10, 10, 0xffffff, "FPS = %2.2f", fps);
-		DrawFormatString(10, 30, 0xffffff, "DC = %d", drawcall);
 		
 		//裏画面を表画面に切り替える
 		ScreenFlip();

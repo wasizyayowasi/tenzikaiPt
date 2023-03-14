@@ -37,11 +37,13 @@ public:
 
 	Vec2 setCoinPos();
 
-	int returnHp() { return maxHp; }
+	float returnHp() { return maxHp; }
 
 private:
 	int handle = -1;
 	int time = 0;
+	int breakSound = -1;
+	int breakSound2 = -1;
 
 	int imgX = 0;
 	int imgY = 0;
@@ -51,7 +53,7 @@ private:
 	int enemySpawnTime = 0;
 	int enemySpawnInterval = 600;
 
-	int maxHp = 10;
+	float maxHp = 10;
 
 	int num = 0;
 

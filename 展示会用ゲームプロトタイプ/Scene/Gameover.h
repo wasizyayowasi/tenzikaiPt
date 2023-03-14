@@ -40,6 +40,8 @@ private:
 
 	int fontSize = 0;
 
+	int ultimateTimer = 0;
+
 	int currentInputIndex;//現在選択中のインデックス
 
 	unsigned int FadeColor = 0x000000;//フェード色黒

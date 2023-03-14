@@ -7,7 +7,7 @@ public:
 	ObjectHp();
 	virtual ~ObjectHp();
 
-	void setObjectHp(int obJectHp);
+	void setObjectHp(float obJectHp);
 	void setWaveHp(int obJectMaxHp);
 	void setObjectMaxHp(int obJectMaxHp);
 
@@ -27,7 +27,7 @@ private:
 	float tempHp = 0.0f;
 	int deathHpHandle = -1;
 
-	int hp = 0;
+	float hp = 0.0f;
 	float displayHp = 0.0f;
 	int maxHp = 0;
 };

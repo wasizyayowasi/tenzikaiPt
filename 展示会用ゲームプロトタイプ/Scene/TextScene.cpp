@@ -168,9 +168,9 @@ void TextScene::draw()
 	case 3:
 		
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//èÊéZçáê¨
-		DrawBox(3200 + offset.x, 570, 3700 + offset.x, 720, 0x000000, true);
+		DrawBox(3200 + offset.x, 570, 3600 + offset.x, 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//í èÌï`âÊÇ…ñﬂÇ∑
-		DrawBox(3200 + offset.x, 570, 3700 + offset.x, 720, 0xffffff, false);
+		DrawBox(3200 + offset.x, 570, 3600 + offset.x, 720, 0xffffff, false);
 
 		switch (textCount) {
 		case 0:

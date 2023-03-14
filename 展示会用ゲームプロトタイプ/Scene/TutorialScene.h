@@ -5,7 +5,6 @@
 
 class Player;
 class Field;
-class GimmicField;
 class Enemy;
 class BugSpace;
 
@@ -45,6 +44,10 @@ private:
 	int bottanHandle3 = -1;
 	int truckHandle = -1;
 	int arrowHandle = -1;
+	int descriptionHandle = -1;
+	int descriptionHandle2 = -1;
+	int descriptionHandle3 = -1;
+	int fontHandle = -1;
 
 	int personNum = 0;
 	int count = 1;
@@ -78,7 +81,6 @@ private:
 	int imgY2 = 3;
 
 	std::shared_ptr<Field> field;
-	std::shared_ptr<GimmicField> gimmicField;
 	std::shared_ptr<Enemy> enemy;
 	std::shared_ptr<BugSpace> space;
 

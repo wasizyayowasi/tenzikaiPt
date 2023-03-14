@@ -11,7 +11,7 @@ ObjectHp::~ObjectHp()
 {
 }
 
-void ObjectHp::setObjectHp(int obJectHp)
+void ObjectHp::setObjectHp(float obJectHp)
 {
 	hp = obJectHp;
 	displayHp = hp;
@@ -35,6 +35,7 @@ void ObjectHp::draw(Vec2 pos, Vec2 offset)
 {
 	pos = pos + offset;
 
+	DrawBox(pos.x - 2, pos.y - 25, pos.x + maxHp * 10 + 2, pos.y - 13, 0x999999, true);
 	DrawBox(pos.x, pos.y - 23, pos.x + maxHp * 10, pos.y - 15, 0x000000, true);
 	if (static_cast<float>(hp) < tempHp) {
 		tempHp -= decreaseHp;
@@ -47,7 +48,7 @@ void ObjectHp::draw(Vec2 pos, Vec2 offset)
 		tempHp = 0.0f;
 	}
 	DrawBoxAA(pos.x, pos.y - 23.0f, pos.x + tempHp * 10, pos.y - 15.0f, 0xDAC290, true);
-	DrawBox(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 15, 0x9B003F, true);
+	DrawBoxAA(pos.x, pos.y - 23, pos.x + hp * 10, pos.y - 15, 0x9B003F, true);
 }
 
 void ObjectHp::playerHpDraw(int handle)
@@ -74,8 +75,7 @@ void ObjectHp::waveHpDraw(Vec2 pos)
 	if (tempHp <= displayHp) {
 		decreaseHp = 0.08f;
 	}
-	DrawBoxAA(pos.x, pos.y - 30.0f, pos.x + tempHp * magnification, pos.y - 10.0f, 0xDAC290, true);
-	DrawBox(pos.x, pos.y - 30, pos.x + displayHp * magnification, pos.y - 10, 0x9B003F, true);
+	DrawBoxAA(pos.x, pos.y - 30, pos.x + displayHp * magnification, pos.y - 10, 0x9B003F, true);
 
 }
 

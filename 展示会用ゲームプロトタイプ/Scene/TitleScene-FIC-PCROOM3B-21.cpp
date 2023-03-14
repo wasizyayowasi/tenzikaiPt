@@ -9,19 +9,12 @@
 #include "../DrawFunctions.h"
 #include "../Scene/BossBattleScene.h"
 #include "../field.h"
-#include <algorithm>
-
-namespace {
-	constexpr int ultimateFrames = 120;
-}
 
 TitleScene::TitleScene(SceneManager& manager):SceneBase(manager),updateFunc_(&TitleScene::fadeInUpdate)
 {
 	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
 	soundHandle = LoadSoundMem("data/soundEffect/Wind-Synthetic_Ambi02-1.mp3");
 	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan1.png");
-	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
-	uiSound2 = LoadSoundMem("data/soundEffect/ui4.mp3");
 
 	LPCSTR fontPath = "data/other/CompassPro.ttf";
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
@@ -31,8 +24,8 @@ TitleScene::TitleScene(SceneManager& manager):SceneBase(manager),updateFunc_(&Ti
 	
 	fontHandle = CreateFontToHandle("CompassPro", 64, -1, -1);
 	fontHandle2 = CreateFontToHandle("CompassPro", 200, -1, -1);
-	UIfontHandle = CreateFontToHandle("Silver", 48, 9, -1);
-	UIfontHandle2 = CreateFontToHandle("Silver", 64, 9, -1);
+	UIfontHandle = CreateFontToHandle("Silver", 32, 9, -1);
+	UIfontHandle2 = CreateFontToHandle("Silver", 48, 9, -1);
 
 	titleWidth = GetDrawStringWidthToHandle("P  R  O  J  E  C  T", strlen("P  R  O  J  E  C  T"), fontHandle);
 	titleWidth2 = GetDrawStringWidthToHandle("VIKING", strlen("VIKING"), fontHandle2);
@@ -58,8 +51,6 @@ TitleScene::~TitleScene()
 	DeleteGraph(enemyHandle);
 	DeleteGraph(bottanHandle);
 	DeleteSoundMem(soundHandle);
-	DeleteSoundMem(uiSound);
-	DeleteSoundMem(uiSound2);
 	DeleteFontToHandle(fontHandle);
 	DeleteFontToHandle(fontHandle2);
 	DeleteFontToHandle(UIfontHandle);
@@ -116,9 +107,6 @@ void TitleScene::update(const InputState& input)
 	if (enemy->isEnable()) {
 		enemy->update({ 0.0f,0.0f });
 	}
-
-	ultimateTimer = (std::max)(ultimateTimer - 1, 0);
-
 	(this->*updateFunc_)(input);
 }
 
@@ -168,20 +156,13 @@ void TitleScene::choiceScene(const InputState& input)
 	const int nameCount = sceneTable.size();
 
 	if (input.isTriggered(InputType::up)) {
-		ChangeVolumeSoundMem(160, uiSound);
-		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
 	}
 	else if (input.isTriggered(InputType::down)) {
-		ChangeVolumeSoundMem(160, uiSound);
-		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
 	}
 
 	if (input.isTriggered(InputType::next)) {
-		ultimateTimer = ultimateFrames;
-		ChangeVolumeSoundMem(180, uiSound2);
-		PlaySoundMem(uiSound2, DX_PLAYTYPE_BACK);
 		if (currentInputIndex == 0) {
 			updateFunc_ = &TitleScene::fadeOutUpdateTutorial;
 			return;
@@ -229,18 +210,7 @@ void TitleScene::choiceSceneDraw()
 			if (currentInputIndex == 3) {
 				color = 0x44ff44;
 			}
-
-			if (ultimateTimer > 0) {
-				if ((ultimateTimer / 4) % 2 == 0) {
-					
-				}
-				else {
-					DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle2);
-				}
-			}
-			else {
-				DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle2);
-			}
+			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle2);
 		}
 		else {
 			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, UIfontHandle);

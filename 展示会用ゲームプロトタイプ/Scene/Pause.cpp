@@ -6,6 +6,11 @@
 #include "../game.h"
 #include "KeyConfigScene.h"
 #include "TitleScene.h"
+#include "../DrawFunctions.h"
+
+namespace {
+	int graphSize = 16;;
+}
 
 Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager),inputState(input)
 {
@@ -15,6 +20,7 @@ Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager)
 
 	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 	uiSound2 = LoadSoundMem("data/soundEffect/ui4.mp3");
+	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan1.png");
 
 	LPCSTR fontPath = "data/other/CompassPro.ttf";
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
@@ -39,6 +45,7 @@ Pause::~Pause()
 	DeleteFontToHandle(titleFont2);
 	DeleteSoundMem(uiSound);
 	DeleteSoundMem(uiSound2);
+	DeleteGraph(bottanHandle);
 }
 
 void Pause::update(const InputState& input)
@@ -84,6 +91,14 @@ void Pause::update(const InputState& input)
 		return;
 	}
 
+	if (--time == 0) {
+		imgX++;
+		time = 8;
+	}
+
+	if (imgX > 5) {
+		imgX = 2;
+	}
 }
 
 void Pause::draw()
@@ -104,7 +119,7 @@ void Pause::draw()
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth / 2, Game::kScreenHeight / 5, "P  R  O  J  E  C  T", 0xffffff, titleFont);
 	DrawStringToHandle(Game::kScreenWidth / 2 - titleWidth2 / 2, Game::kScreenHeight / 5 + 32, "VIKING", 0xffffff, titleFont2);
 
-	auto y = Game::kScreenHeight / 2 + 130;
+	auto y = Game::kScreenHeight / 2 + 180;
 	
 	int idx = 0;
 	bool isInputtypeSelected = false;
@@ -134,5 +149,11 @@ void Pause::draw()
 		++idx;
 	}
 
-	
+	DrawStringToHandle(50,Game::kScreenHeight - 55,"Œˆ’è",0xffffff,fontHandle);
+	DrawStringToHandle(180, Game::kScreenHeight - 55, "–ß‚é", 0xffffff, fontHandle);
+	imgY = 1;
+	DrawRectRotaGraph(20, Game::kScreenHeight - 50, imgX * graphSize, imgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true,false);
+	imgY = 2;
+	DrawRectRotaGraph(150, Game::kScreenHeight - 50, imgX * graphSize, imgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+
 }

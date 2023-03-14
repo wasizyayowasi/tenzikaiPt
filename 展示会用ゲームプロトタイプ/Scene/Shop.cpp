@@ -117,7 +117,7 @@ void Shop::draw()
 	tempMoney = std::to_string(player->setMoneyPossessed());
 	int tempWidth = GetDrawStringWidthToHandle(tempMoney.c_str(), strlen(tempMoney.c_str()), fontHandle);
 	coinWidth = (((coinWidth + 96) - coinWidth) / 2 - tempWidth / 2) + coinWidth - 48;
-	DrawFormatStringToHandle(coinWidth, 160, 0xffffff, fontHandle, "%d", player->setMoneyPossessed());
+	DrawFormatStringToHandle(coinWidth, 150, 0xffffff, fontHandle, "%d", player->setMoneyPossessed());
 
 	
 

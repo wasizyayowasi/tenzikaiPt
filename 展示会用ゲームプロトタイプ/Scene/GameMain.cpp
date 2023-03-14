@@ -232,8 +232,8 @@ void GameMain::normalUpdate(const InputState& input)
 				waveHp += space[i]->returnHp();
 			}
 		}
-	}
-	
+	}	
+
 	if (startWave) {
 		hp->setObjectHp(waveHp);
 	}

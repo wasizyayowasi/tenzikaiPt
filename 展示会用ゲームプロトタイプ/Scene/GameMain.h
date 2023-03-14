@@ -79,9 +79,9 @@ private:
 
 	int spacePosNum[3];
 
-	int waveHp = 0;
+	float waveHp = 0.0f;
 	int maxWave = 3;
-	int wave = 3;
+	int wave = 1;
 	int waveCount = 0;
 
 	bool configured = false;

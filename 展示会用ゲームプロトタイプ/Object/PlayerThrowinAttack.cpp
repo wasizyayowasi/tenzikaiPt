@@ -186,9 +186,6 @@ void PlayerThrowinAttack::bossUpdate(Vec2 offset)
 
 void PlayerThrowinAttack::draw(int handle, Vec2 offset)
 {
-	//DrawBox(14900 + offset.x, 700, 15000 + offset.x, 800, 0xffffff, true);
-
-	DrawString(flyingObjectPos.x + offset.x, flyingObjectPos.y - 10, "’e", 0xffffff);
 	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y + 10,1.5f, angle,handle, true, playerDirections);
 }
 

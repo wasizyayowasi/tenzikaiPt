@@ -46,7 +46,7 @@ void GameClear::fadeInUpdate(const InputState& input)
 
 void GameClear::normalUpdate(const InputState& input)
 {
-	if (musicVolume < 80) {
+	if (musicVolume < 60) {
 		musicVolume++;
 		SetVolumeMusic(musicVolume);
 	}

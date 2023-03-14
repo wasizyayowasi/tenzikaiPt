@@ -5,10 +5,15 @@
 #include "../game.h"
 #include "../DrawFunctions.h"
 
+namespace {
+	int graphSize = 16;;
+}
+
 KeyConfigScene::KeyConfigScene(SceneManager& manager, const InputState& input):SceneBase(manager),inputState(input),currentInputIndex(0),updateFunc(&KeyConfigScene::firstUpdate)
 {
 	handle = my::myLoadGraph("data/GUIGraph/huti.png");
 	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan.png");
+	bottanHandle2 = my::myLoadGraph("data/GUIGraph/bottan1.png");
 	tempHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 
@@ -40,11 +45,22 @@ KeyConfigScene::~KeyConfigScene()
 	DeleteGraph(handle);
 	DeleteGraph(tempHandle);
 	DeleteGraph(bottanHandle);
+	DeleteGraph(bottanHandle2);
 	DeleteSoundMem(uiSound);
 }
 
 void KeyConfigScene::update(const InputState& input)
 {
+
+	if (--time == 0) {
+		moveImgX++;
+		time = 8;
+	}
+
+	if (moveImgX > 5) {
+		moveImgX = 2;
+	}
+
 	(this->*updateFunc)(input);
 }
 
@@ -155,58 +171,8 @@ void KeyConfigScene::draw()
 	//キーコンフィグメッセージ
 	DrawString(pw_width + 10, pw_height + 10, "KeyConfig...", 0xffffaa);
 
-	//丸パクリ
-	{
-	//constexpr int pw_width = 450;							//キーコンフィグ枠の幅
-	//constexpr int pw_height = 350;							//キーコンフィグ枠の高さ
-	//constexpr int pw_start_x = (640 - pw_width) / 2 + 50;	//キーコンフィグ枠に左
-	//constexpr int pw_start_y = (480 - pw_height) / 2 + 50;	//キーコンフィグ枠上
-
-		//auto y = pw_start_y + 30;
-	//int idx = 0;
-	//bool isInputtypeSelected = false;
-	//for (const auto& name : inputState.inputNameTable) {
-	//	int offset = 0;
-	//	unsigned int color = 0xffffff;
-
-
-
-	//	if (currentInputIndex == idx) {
-	//		offset = 10;
-	//		isInputtypeSelected = true;
-	//		if (isEditing) {
-	//			color = 0xff0000;
-	//		}
-	//		DrawString(pw_start_x + 10, y, "▶", 0xff0000);
-	//	}
-	//	//各キーの表示
-	//	int x = pw_start_x + 20 + offset;
-	//	DrawString(x, y, name.second.c_str(), color);
-
-
-	//	auto type = name.first;
-	//	auto it = inputState.tempMapTable.find(type);
-
-	//	x += 64;
-	//	DrawString(x, y, " : ", color);
-	//	x += 20;
-	//	for (const auto elem : it->second) {
-
-	//		if (elem.cat == InputCategory::keybd) {
-	//			DrawFormatString(x, y, color, "key = %d", elem.id);
-	//		}
-	//		else if (elem.cat == InputCategory::pad) {
-	//			DrawFormatString(x, y, color, "pad = %d", elem.id);
-	//		}
-	//		else if (elem.cat == InputCategory::mouse) {
-	//			DrawFormatString(x, y, color, "mse = %d", elem.id);
-	//		}
-	//		x += 100;
-	//	}
-	//	y += 18;
-	//	++idx;
-	//}
-	}
+	int size = GetDrawStringWidthToHandle("【変更したキーは確定後、変更されます】", strlen("【変更したキーは確定後、変更されます】"), subjectFontHandle);
+	DrawStringToHandle(Game::kScreenWidth / 2 - size / 2, 160, "【変更したキーは確定後、変更されます】", 0xff0000, subjectFontHandle);
 
 	auto y = pw_width;
 	int idx = 0;
@@ -271,14 +237,12 @@ void KeyConfigScene::draw()
 
 		
 		for (const auto elem : it->second) {
-
 			if (elem.cat == InputCategory::pad) {
 				bottanNum(elem.id);
-				//bottanSetWidth += 300;
 				my::myDrawRectRotaGraph(bottanSetWidth, bottanSetHeight, imgX * 16, (imgY) * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
 			}
-			
 		}
+
 		bottanSetHeight += 85;
 		++idx;
 	}
@@ -313,8 +277,13 @@ void KeyConfigScene::draw()
 	DrawStringToHandle(editingWidth, y, "キーリセット", keyColor, fontHandle);
 	}
 
-	
-	
+	DrawStringToHandle(50, Game::kScreenHeight - 55, "決定", 0xffffff, fontHandle);
+	DrawStringToHandle(180, Game::kScreenHeight - 55, "戻る", 0xffffff, fontHandle);
+	moveImgY = 1;
+	DrawRectRotaGraph(20, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY* graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle2, true, false);
+	moveImgY = 2;
+	DrawRectRotaGraph(150, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY* graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle2, true, false);
+
 }
 
 void KeyConfigScene::bottanNum(int num)

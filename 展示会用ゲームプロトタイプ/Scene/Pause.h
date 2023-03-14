@@ -26,6 +26,8 @@ private:
 	int uiSound = -1;
 	int uiSound2 = -1;
 
+	int bottanHandle = -1;
+
 	int titleFont = -1;
 	int fontHandle = -1;
 	int titleFont2 = -1;
@@ -34,7 +36,13 @@ private:
 	int titleWidth2 = 0;
 	int fontSize = 0;
 
+	int imgX = 2;
+	int imgY = 0;
+	int time = 8;
+
 	int currentInputIndex;//現在選択中のインデックス
+
+	int ultimateTimer = 0;
 
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;

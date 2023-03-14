@@ -5,7 +5,6 @@
 #include "ObjectHp.h"
 #include "Inventory.h"
 #include "../field.h"
-#include "../GimmicField.h"
 
 #include "../DrawFunctions.h"
 #include "../InputState.h"
@@ -18,7 +17,7 @@
 namespace {
 	constexpr float correctionSizeX = 14.0f;
 	constexpr float correctionSizeY = 74.0f;
-	constexpr int ultimate_frames = 120;
+	constexpr int ultimateFrames = 120;
 }
 
 Player::Player(int num) : sceneNum(num)
@@ -42,7 +41,6 @@ Player::Player(int num) : sceneNum(num)
 	hp = std::make_shared<ObjectHp>();
 	motion = std::make_shared<PlayerMotion>();
 	inventory = std::make_shared<Inventory>();
-	gimmicField = std::make_shared<GimmicField>();
 	flyingObject = std::make_shared<PlayerThrowinAttack>(sceneNum);
 	
 	hp->setObjectMaxHp(playerHp);
@@ -85,7 +83,7 @@ void Player::update(Vec2 offset, const InputState& input)
 		
 	}
 
-	ultimateTimer_ = (std::max)(ultimateTimer_ - 1, 0);
+	ultimateTimer = (std::max)(ultimateTimer - 1, 0);
 
 	(this->*updateFunc)(offset,input);
 
@@ -98,8 +96,8 @@ void Player::update(Vec2 offset, const InputState& input)
 		}
 	}
 	else if(sceneNum == 1) {
-		if (playerPos.x + 50 > Game::kScreenWidth * 3) {
-			playerPos.x = Game::kScreenWidth * 3 - 50;
+		if (playerPos.x + 50 > Game::kScreenWidth * 2) {
+			playerPos.x = Game::kScreenWidth * 2 - 50;
 		}
 	}
 	else {
@@ -163,57 +161,38 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 		updateFunc = &Player::updateDescent;
 	}
 
-	//つま先の配列番号を見る
-	int tiptoeChipNoY = (playerPos.y + chipSize * 2) / chipSize;
-
-	rightClosure = false;
-	leftClosure = false;
-
-	if (!playerDirections) {
-		int rightTiptoeChipNoX = (playerPos.x + correctionSizeX + chipSize) / chipSize;
-		if (gimmicField->examinationChip(tiptoeChipNoY,rightTiptoeChipNoX)) {
-			rightClosure = true;
-		}
-	}
-	else {
-		int leftTiptoeChipNoX = (playerPos.x + correctionSizeX - chipSize) / chipSize;
-		if (gimmicField->examinationChip(tiptoeChipNoY, leftTiptoeChipNoX)) {
-			leftClosure = true;
-		}
-	}
-
 	//移動
 	if (!push) {
 
 		if (input.isPressed(InputType::left)) {
-			if (!leftClosure) {
-				if (motionNum != 3) {
-					motionNum = 1;
-				}
-				if (--soundCount == 0) {
-					ChangeVolumeSoundMem(130, walkSound);
-					PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
-					soundCount = 20;
-				}
-				motion->update(motionNum);
-				playerPos.x -= 5;
-				playerDirections = true;
+			
+			if (motionNum != 3) {
+				motionNum = 1;
 			}
+			if (--soundCount == 0) {
+				ChangeVolumeSoundMem(130, walkSound);
+				PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+				soundCount = 20;
+			}
+			motion->update(motionNum);
+			playerPos.x -= 5;
+			playerDirections = true;
+			
 		}
 		else if (input.isPressed(InputType::right)) {
-			if (!rightClosure) {
-				if (motionNum != 3) {
-					motionNum = 1;
-				}
-				if (--soundCount == 0) {
-					ChangeVolumeSoundMem(130, walkSound);
-					PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
-					soundCount = 20;
-				}
-				motion->update(motionNum);
-				playerPos.x += 5;
-				playerDirections = false;
+			
+			if (motionNum != 3) {
+				motionNum = 1;
 			}
+			if (--soundCount == 0) {
+				ChangeVolumeSoundMem(130, walkSound);
+				PlaySoundMem(walkSound, DX_PLAYTYPE_BACK, true);
+				soundCount = 20;
+			}
+			motion->update(motionNum);
+			playerPos.x += 5;
+			playerDirections = false;
+			
 		}
 	}
 
@@ -527,6 +506,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	//移動
 	if (!push) {
 		if (input.isPressed(InputType::left)) {
+			
 			if (!(motionNum == 3)) {
 				motionNum = 1;
 			}
@@ -538,8 +518,10 @@ void Player::updateField(Vec2 offset, const InputState& input)
 			motion->update(motionNum);
 			playerPos.x -= 5;
 			playerDirections = true;
+			
 		}
 		else if (input.isPressed(InputType::right)) {
+			
 			if (!(motionNum == 3)) {
 				motionNum = 1;
 			}
@@ -551,24 +533,23 @@ void Player::updateField(Vec2 offset, const InputState& input)
 			motion->update(motionNum);
 			playerPos.x += 5;
 			playerDirections = false;
+			
 		}
 	}
 	
 
 	//近接攻撃
 	if (!push) {
-		if (!flyingObject->isEnable()) {
-			if (input.isTriggered(InputType::attack)) {
-				ChangeVolumeSoundMem(soundVolume, attackSound);
-				PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
-				motionNum = 3;
-				motion->resetImgX();
-				motion->update(motionNum);
-				proximityAttack = true;
-			}
-			else {
-				proximityAttack = false;
-			}
+		if (input.isTriggered(InputType::attack)) {
+			ChangeVolumeSoundMem(soundVolume, attackSound);
+			PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
+			motionNum = 3;
+			motion->resetImgX();
+			motion->update(motionNum);
+			proximityAttack = true;
+		}
+		else {
+			proximityAttack = false;
 		}
 	}
 
@@ -588,7 +569,6 @@ void Player::updateField(Vec2 offset, const InputState& input)
 		break;
 	case 1:
 		//修復タイマー
-		
 		if (repairBlock > 0) {
 			if (input.isPressed(InputType::shot)) {
 				spaceHpDisplay = true;
@@ -924,9 +904,7 @@ void Player::consumption()
 
 void Player::setMotion(bool start)
 {
-	
-	motionStart = start;
-	
+	motionStart = start;	
 }
 
 bool Player::returnFlyingisEnabled()
@@ -969,8 +947,8 @@ void Player::draw(Vec2 offset)
 		
 	}
 
-	if (ultimateTimer_ > 0) {
-		if ((ultimateTimer_ / 10) % 2 == 0) {
+	if (ultimateTimer > 0) {
+		if ((ultimateTimer / 10) % 2 == 0) {
 			return;
 		}
 	}
@@ -1014,7 +992,7 @@ bool Player::beHidden()
 
 void Player::damege(bool inversion)
 {
-	if (ultimateTimer_ <= 0) {
+	if (ultimateTimer <= 0) {
 		if (!inversion) {
 			playerPos.x += 30.0f;
 		}
@@ -1029,7 +1007,7 @@ void Player::damege(bool inversion)
 				PlaySoundMem(damageSound, DX_PLAYTYPE_BACK);
 			}
 		}
-		ultimateTimer_ = ultimate_frames;
+		ultimateTimer = ultimateFrames;
 	}
 
 }

@@ -12,7 +12,6 @@
 #include <algorithm>
 #include "GameMain.h"
 #include "Pause.h"
-#include "../GimmicField.h"
 
 TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), updateFunc(&TutorialScene::fadeInUpdate)
 {
@@ -28,13 +27,20 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	bottanHandle3 = my::myLoadGraph("data/GUIGraph/bottan3.png");
 	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
 	arrowHandle = my::myLoadGraph("data/GUIGraph/arrow.png");
+	descriptionHandle = my::myLoadGraph("data/fieldGraph/1.png");
+	descriptionHandle2 = my::myLoadGraph("data/fieldGraph/2.png");
+	descriptionHandle3 = my::myLoadGraph("data/fieldGraph/3.png");
+
+	LPCSTR fontPath = "data/other/Silver.ttf";
+	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
+
+	fontHandle = CreateFontToHandle("Silver", 48, 9, -1);
 
 	player = new Player(1);
 	player->setHandle(portionHandle, hacheteHandle, guiHandle, hpHandle, repairHandle, coinHandle);
 	player->init();
 
 	field = std::make_shared<Field>();
-	gimmicField = std::make_shared<GimmicField>();
 
 	enemy = std::make_shared<Enemy>(1);
 
@@ -46,6 +52,36 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	space->setPlayer(player);
 	enemy->setPlayer(player, enemyHandle, coinHandle);
 	shopperHandle = field->setHandle();
+
+	{
+		targetPlayer = { 0.0f,0.0f };
+		targetPlayer.x = player->getPos().x + 25 - 850;
+		targetPlayer.y = player->getPos().y + 44 - 780;
+
+		targetPlayer2 = { 0.0f,0.0f };
+		targetPlayer2.x = player->getPos().x + 25 - 2100;
+		targetPlayer2.y = player->getPos().y + 44 - 780;
+
+		targetPlayer3 = { 0.0f,0.0f };
+		targetPlayer3.x = player->getPos().x + 25 - 2500;
+		targetPlayer3.y = player->getPos().y + 44 - 780;
+
+		targetPlayer4 = { 0.0f,0.0f };
+		targetPlayer4.x = player->getPos().x + 25 - 3000;
+		targetPlayer4.y = player->getPos().y + 44 - 300;
+
+		targetPlayer5 = { 0.0f,0.0f };
+		targetPlayer5.x = player->getPos().x + 25 - 3500;
+		targetPlayer5.y = player->getPos().y + 44 - 780;
+
+		targetPlayer6 = { 0.0f,0.0f };
+		targetPlayer6.x = player->getPos().x + 25 - 3000;
+		targetPlayer6.y = player->getPos().y + 44 - 780;
+
+		targetPlayer7 = { 0.0f,0.0f };
+		targetPlayer7.x = player->getPos().x + 25 - 3635;
+		targetPlayer7.y = player->getPos().y + 44 - 780;
+	}
 }
 
 TutorialScene::~TutorialScene()
@@ -63,6 +99,10 @@ TutorialScene::~TutorialScene()
 	DeleteGraph(bottanHandle3);
 	DeleteGraph(truckHandle);
 	DeleteGraph(arrowHandle);
+	DeleteGraph(descriptionHandle);
+	DeleteGraph(descriptionHandle2);
+	DeleteGraph(descriptionHandle3);
+	DeleteFontToHandle(fontHandle);
 }
 
 void TutorialScene::update(const InputState& input)
@@ -106,13 +146,14 @@ void TutorialScene::update(const InputState& input)
 	(this->*updateFunc)(input);
 
 	if (updateFunc == &TutorialScene::normalUpdate) {
+
 		{
 			targetPlayer = { 0.0f,0.0f };
 			targetPlayer.x = player->getPos().x + 25 - 850;
 			targetPlayer.y = player->getPos().y + 44 - 780;
 
 			targetPlayer2 = { 0.0f,0.0f };
-			targetPlayer2.x = player->getPos().x + 25 - 1800;
+			targetPlayer2.x = player->getPos().x + 25 - 2100;
 			targetPlayer2.y = player->getPos().y + 44 - 780;
 
 			targetPlayer3 = { 0.0f,0.0f };
@@ -132,7 +173,7 @@ void TutorialScene::update(const InputState& input)
 			targetPlayer6.y = player->getPos().y + 44 - 780;
 
 			targetPlayer7 = { 0.0f,0.0f };
-			targetPlayer7.x = player->getPos().x + 25 - 3635;
+			targetPlayer7.x = player->getPos().x + 25 - 2520;
 			targetPlayer7.y = player->getPos().y + 44 - 780;
 		}
 
@@ -151,7 +192,7 @@ void TutorialScene::update(const InputState& input)
 			case 0:
 				if (textCount == 0) {
 					if (targetPlayer.length() < 200) {
-						manager_.pushScene(new TextScene(manager_, input, 0, offset, bottanHandle));
+						//manager_.pushScene(new TextScene(manager_, input, 0, offset, bottanHandle));
 						textCount = 1;
 					}
 				}
@@ -159,7 +200,7 @@ void TutorialScene::update(const InputState& input)
 			case 1:
 				if (textCount == 1) {
 					if (targetPlayer2.length() < 200) {
-						manager_.pushScene(new TextScene(manager_, input, 1, offset, bottanHandle));
+						//manager_.pushScene(new TextScene(manager_, input, 1, offset, bottanHandle));
 						textCount = 2;
 					}
 				}
@@ -167,7 +208,7 @@ void TutorialScene::update(const InputState& input)
 			case 2:
 				if (textCount == 2) {
 					if (targetPlayer3.length() < 200) {
-						manager_.pushScene(new TextScene(manager_, input, 2, offset, bottanHandle));
+						//manager_.pushScene(new TextScene(manager_, input, 2, offset, bottanHandle));
 						textCount = 3;
 					}
 				}
@@ -199,25 +240,52 @@ void TutorialScene::update(const InputState& input)
 void TutorialScene::draw()
 {
 	field->draw(offset,0);
-	gimmicField->draw(offset);
 
-	DrawFormatString(600, 300, 0xffffff, "%d", musicVolume);
+	if (player->getPos().x < 500) {
+		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
+		DrawBox(300, 50, 1620, 520, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
+		DrawBox(300, 50, 1620, 520, 0xffffff, false);
+		DrawRotaGraph(Game::kScreenWidth / 2 - 30, Game::kScreenHeight / 2 - 280, 6.0f, 0.0f, descriptionHandle3, true);
+		int size = GetDrawStringWidthToHandle("方向キー 又は 左スティックで移動", strlen("方向キー 又は 左スティックで移動"), fontHandle);
+		DrawStringToHandle(Game::kScreenWidth / 2 - size / 2, 460, "方向キー 又は 左スティックで移動", 0xffffff, fontHandle);
+	}
+
+	if (targetPlayer.length() < 200 && personNum == 1) {
+		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
+		DrawBox(300, 50, 1620, 520, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
+		DrawBox(300, 50, 1620, 520, 0xffffff, false);
+		DrawRotaGraph(Game::kScreenWidth / 2 + 70, Game::kScreenHeight / 2 - 280, 6.0f, 0.0f, descriptionHandle, true);
+		DrawStringToHandle(Game::kScreenWidth / 2 + 30, 350, "押している間", 0xffffff, fontHandle);
+		DrawStringToHandle(Game::kScreenWidth / 2 + 20, 400, "敵から隠れます", 0xffffff, fontHandle);
+	}
+
+	if (targetPlayer2.length() < 200 && personNum == 2) {
+		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
+		DrawBox(300, 50, 1620, 520, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
+		DrawBox(300, 50, 1620, 520, 0xffffff, false);
+		DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 - 240,6.0f,0.0f, descriptionHandle2, true);
+		DrawStringToHandle(Game::kScreenWidth / 2, 400, "or", 0xffffff, fontHandle);
+		DrawStringToHandle(580, 460, "斬りつける", 0xffffff, fontHandle);
+		DrawStringToHandle(Game::kScreenWidth / 2 + 250, 460, "投擲", 0xffffff, fontHandle);
+	}
+
 	if (enemy->isEnable()) {
 		enemy->draw(offset);
 	}
-	else {
-		if (targetPlayer7.length() < 300) {
-			if (player->setMoneyPossessed() > 0) {
-				textDraw(0);
-			}
+	
+	if (targetPlayer7.length() < 300) {
+		if (player->setMoneyPossessed() > 0) {
+			textDraw(0);
 		}
 	}
+	
 
 	if (targetPlayer4.length() < 200) {
-		if (player->returnRepair() > 0) {
-			textDraw(2);
-			count--;
-		}
+		textDraw(2);
+		count--;
 	}
 
 	if (space->isEnable()) {
@@ -230,16 +298,6 @@ void TutorialScene::draw()
 
 	//店員
 	switch (personNum) {
-	case 0:
-		textUpdate = true;
-		DrawRotaGraph(850 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
-		break;
-	case 1:
-		DrawRotaGraph(1800 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
-		break;
-	case 2:
-		DrawRotaGraph(2500 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
-		break;
 	case 3:
 		DrawRotaGraph(3400 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
 		break;
@@ -281,7 +339,7 @@ void TutorialScene::fadeInUpdate(const InputState& input)
 void TutorialScene::normalUpdate(const InputState& input)
 {
 
-	int x = (3635) / chipSize;
+	int x = (2520) / chipSize;
 	int y = (780) / chipSize;
 
 	if (player->shopCollision(x, y, offset)) {
@@ -292,9 +350,6 @@ void TutorialScene::normalUpdate(const InputState& input)
 		}
 	}
 
-	if (player->returnFlyingisEnabled()); {
-		textDraw(5);
-	}
 
 	Vec2 targetOffset{};
 
@@ -337,12 +392,12 @@ void TutorialScene::textDraw(int num)
 			imgX = 2;
 		}
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
-		DrawBox(3180 + offset.x, 570, 3450 + offset.x, 720, 0x000000, true);
+		DrawBox(2370 + offset.x, 570, 2653 + offset.x, 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
-		DrawBox(3180 + offset.x, 570, 3450 + offset.x, 720, 0xffffff, false);
-		DrawString(3205 + offset.x, 620, "お金を拾って買い物をしよう", 0xffffff);
+		DrawBox(2370 + offset.x, 570, 2653 + offset.x, 720, 0xffffff, false);
+		DrawString(2405 + offset.x, 620, "お金を拾って買い物をしよう", 0xffffff);
 
-		DrawRectRotaGraph(3310 + offset.x, 670, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
+		DrawRectRotaGraph(2510 + offset.x, 670, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
 		break;
 	case 1:
 
@@ -373,6 +428,12 @@ void TutorialScene::textDraw(int num)
 			imgX = 2;
 		}
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
+		DrawBox(2870 + offset.x, 20, 3250 + offset.x, 60, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
+		DrawBox(2870 + offset.x, 20, 3250 + offset.x, 60, 0xffffff, false);
+		DrawString(2990 + offset.x, 35, "ゲートを破壊しよう", 0xff0000);
+
+		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
 		DrawBox(2870 + offset.x, 70, 3250 + offset.x, 220, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
 		DrawBox(2870 + offset.x, 70, 3250 + offset.x, 220, 0xffffff, false);
@@ -383,6 +444,8 @@ void TutorialScene::textDraw(int num)
 		DrawRectRotaGraph(3110 + offset.x, 140, imgX2 * 16, imgY2 * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
 		DrawRectRotaGraph(2930 + offset.x, 190, imgX * 16, (imgY - 2) * 16, 16, 16, 2.0f, 0.0f, bottanHandle, true, false);
 		DrawString(2950 + offset.x, 180, "を押している間、アイテムを使用", 0xffffff);
+
+		
 		break;
 	}
 }

@@ -29,12 +29,17 @@ public:
 private:
 	int handle = -1;
 	int bottanHandle = -1;
+	int bottanHandle2 = -1;
 	int keyHandle = -1;
 	int tempHandle = -1;
 	int uiSound = -1;
 
 	int imgX = 1;
 	int imgY = 2;
+
+	int moveImgX = 2;
+	int moveImgY = 0;
+	int time = 8;
 
 	int subjectFontHandle = -1;
 	int fontHandle = -1;

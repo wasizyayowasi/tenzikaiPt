@@ -9,6 +9,10 @@
 #include "../Object/PlayerMotion.h"
 #include "../DrawFunctions.h"
 
+namespace {
+	constexpr int ultimateFrames = 120;
+}
+
 Gameover::Gameover(SceneManager& manager, const InputState& input, int num):SceneBase(manager),updateFunc_(&Gameover::fadeInUpdate), inputState(input),sceneNum(num)
 {
 	handle = my::myLoadGraph("data/objectGraph/player.png");
@@ -44,6 +48,7 @@ Gameover::~Gameover()
 
 void Gameover::update(const InputState& input)
 {
+	ultimateTimer = (std::max)(ultimateTimer - 1, 0);
 	(this->*updateFunc_)(input);
 }
 
@@ -75,7 +80,19 @@ void Gameover::draw()
 			isInputtypeSelected = true;
 			color = 0xffff00;
 			fontSize = GetDrawStringWidthToHandle(name.second.c_str(), font, fontHandle2);
-			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, fontHandle2);
+
+			if (ultimateTimer > 0) {
+				if ((ultimateTimer / 4) % 2 == 0) {
+
+				}
+				else {
+					DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, fontHandle2);
+				}
+			}
+			else {
+				DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, fontHandle2);
+			}
+
 		}
 		else {
 			DrawStringToHandle(x - fontSize / 2, y, name.second.c_str(), color, fontHandle);
@@ -133,6 +150,7 @@ void Gameover::normalUpdate(const InputState& input)
 	if (currentInputIndex == 0) {
 		if (input.isTriggered(InputType::next))
 		{
+			ultimateTimer = ultimateFrames;
 			ChangeVolumeSoundMem(180, uiSound2);
 			PlaySoundMem(uiSound2, DX_PLAYTYPE_BACK);
 			updateFunc_ = &Gameover::continueFadeOutUpdate;
@@ -141,6 +159,7 @@ void Gameover::normalUpdate(const InputState& input)
 	if (currentInputIndex == 1) {
 		if (input.isTriggered(InputType::next))
 		{
+			ultimateTimer = ultimateFrames;
 			updateFunc_ = &Gameover::fadeOutUpdate;
 		}
 	}
