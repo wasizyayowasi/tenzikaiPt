@@ -15,6 +15,7 @@ public:
 	void rolling();
 	
 	void death();
+	void bossDeath();
 	void attack();
 
 	void draw(Vec2 enemyPos,int handle,bool trun,Vec2 offset,float scale);
@@ -24,6 +25,8 @@ private:
 
 	int imgX = 0;
 	int imgY = 6;
+
+	int interval = 8;
 
 	int maxImgX = 0;
 

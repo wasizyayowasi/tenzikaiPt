@@ -22,6 +22,8 @@ public:
 	virtual void update(const InputState& input)override;
 	void draw();
 
+	void bottanNum(int num);
+
 private:
 	int uiSound = -1;
 	int uiSound2 = -1;
@@ -39,6 +41,12 @@ private:
 	int imgX = 2;
 	int imgY = 0;
 	int time = 8;
+
+	int moveImgX = 2;
+	int moveImgY = 0;
+
+	int nextId = 0;
+	int prevId = 0;
 
 	int currentInputIndex;//現在選択中のインデックス
 

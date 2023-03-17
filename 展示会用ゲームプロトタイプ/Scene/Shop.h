@@ -29,6 +29,8 @@ public:
 
 	void update(const InputState& input);
 	void draw();
+
+	void bottanNum(int num);
 private:
 	int timer = 0;
 	int moneyPossessed = 0;
@@ -40,8 +42,19 @@ private:
 	int repairHandle = -1;
 	int coinHandle = -1;
 	int uiSound = -1;
+	int bottanHandle = -1;
 	
 	int fontHandle = -1;
+
+	int imgX = 2;
+	int imgY = 0;
+	int time = 8;
+
+	int moveImgX = 2;
+	int moveImgY = 0;
+
+	int nextId = 0;
+	int prevId = 0;
 
 	int currentInputIndex = 0;//現在選択中のインデックス
 	//入力一時テーブル

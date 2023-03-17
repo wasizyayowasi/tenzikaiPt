@@ -36,7 +36,7 @@ void GameClear::draw()
 
 void GameClear::fadeInUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast<int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (--fadeTimer == 0) {
 		updateFunc = &GameClear::normalUpdate;
 		PlayMusic("data/music/suzume.mp3", DX_PLAYTYPE_LOOP);

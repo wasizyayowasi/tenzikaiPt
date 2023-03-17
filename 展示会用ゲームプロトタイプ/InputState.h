@@ -32,10 +32,17 @@ struct InputInfo {
 };
 
 class KeyConfigScene;
+class Pause;
+class Shop;
+class GameMain;
+class BossBattleScene;
+class TutorialScene;
 
 class InputState
 {
 	friend KeyConfigScene;
+	friend Pause;
+	friend Shop;
 public:
 	InputState();
 

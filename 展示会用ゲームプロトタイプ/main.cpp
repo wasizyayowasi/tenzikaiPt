@@ -18,6 +18,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	//windowÉÇÅ[ÉhÇÃê›íË
 	ChangeWindowMode(Game::kWindowMode);
 
+	SetWindowSizeChangeEnableFlag(true);
+
 	//windowñºê›íË
 	SetMainWindowText(Game::kTitleText);
 

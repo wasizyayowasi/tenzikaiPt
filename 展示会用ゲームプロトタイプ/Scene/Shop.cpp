@@ -6,7 +6,9 @@
 #include "Trade.h"
 #include "../Object/Player.h"
 
-
+namespace {
+	int graphSize = 16;;
+}
 
 Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int pHandle, int gHandle,int hHandle, int rHandle,int cHandle) : SceneBase(manager), inputState(input), player(dPlayer),portionHandle(pHandle),guiHandle(gHandle), hpHandle(hHandle),repairHandle(rHandle), coinHandle(cHandle)
 {
@@ -16,6 +18,7 @@ Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int 
 
 	fontHandle = CreateFontToHandle("Silver", 64, 9, -1);
 	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
+	bottanHandle = LoadGraph("data/GUIGraph/bottan.png");
 
 	shopTable[ProductList::heart] = "ハート";
 	shopTable[ProductList::block] = "修復アイテム";
@@ -30,6 +33,7 @@ Shop::~Shop()
 {
 	DeleteSoundMem(uiSound);
 	DeleteFontToHandle(fontHandle);
+	DeleteGraph(bottanHandle);
 }
 
 void Shop::update(const InputState& input)
@@ -85,6 +89,15 @@ void Shop::update(const InputState& input)
 	if (input.isTriggered(InputType::prev)) {
 		manager_.popScene();
 		return;
+	}
+
+	if (--time == 0) {
+		moveImgX++;
+		time = 8;
+	}
+
+	if (moveImgX > 6) {
+		moveImgX = 3;
 	}
 }
 
@@ -218,4 +231,98 @@ void Shop::draw()
 	DrawBox(shopkeeperWidth, shopkeeperHeight, shopkeeperX, shopkeeperY, 0xffffff, false);
 	DrawBox(goodsWidth, goodsHeight, goodsX + 50, goodsY, 0xffffff, false);
 	DrawBox(goodsWidth + 300, goodsHeight, shopkeeperX, goodsY, 0xffffff, false);
+
+	DrawStringToHandle(Game::kScreenWidth - 200, Game::kScreenHeight - 55, "決定", 0xffffff, fontHandle);
+	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "戻る", 0xffffff, fontHandle);
+
+
+	for (const auto& name : inputState.inputNameTable) {
+		int bottanSetWidth = (Game::kScreenWidth / 2 + 200);
+		auto type = name.first;
+		auto it = inputState.tempMapTable.find(type);
+
+		for (const auto elem : it->second) {
+			if (type == InputType::next && elem.cat == InputCategory::pad) {
+				nextId = elem.id;
+			}
+			if (type == InputType::prev && elem.cat == InputCategory::pad) {
+				prevId = elem.id;
+			}
+		}
+	}
+
+	bottanNum(nextId);
+	moveImgY = imgY;
+	DrawRectRotaGraph(Game::kScreenWidth - 230, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+
+	bottanNum(prevId);
+	moveImgY = imgY;
+	DrawRectRotaGraph(Game::kScreenWidth - 100, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+}
+
+void Shop::bottanNum(int num)
+{
+	switch (num) {
+		//X
+	case 64:
+		imgX = 1;
+		imgY = 2;
+		break;
+		//A
+	case 16:
+		imgX = 1;
+		imgY = 3;
+		break;
+		//Y
+	case 128:
+		imgX = 1;
+		imgY = 4;
+		break;
+		//B
+	case 32:
+		imgX = 1;
+		imgY = 5;
+		break;
+		//上
+	case 8:
+		imgX = 8;
+		imgY = 5;
+		break;
+		//下
+	case 1:
+		imgX = 9;
+		imgY = 5;
+		break;
+		//左
+	case 2:
+		imgX = 8;
+		imgY = 6;
+		break;
+		//右	
+	case 4:
+		imgX = 9;
+		imgY = 6;
+		break;
+		//LT
+	case 256:
+		imgX = 21;
+		imgY = 5;
+		break;
+		//RT
+	case 512:
+		imgX = 21;
+		imgY = 6;
+		break;
+		//BACK
+	case 1024:
+		imgX = 10;
+		imgY = 13;
+		break;
+		//start
+	case 2048:
+		imgX = 10;
+		imgY = 14;
+		break;
+
+	}
 }

@@ -30,6 +30,9 @@ TutorialScene::TutorialScene(SceneManager& manager) : SceneBase(manager), update
 	descriptionHandle = my::myLoadGraph("data/fieldGraph/1.png");
 	descriptionHandle2 = my::myLoadGraph("data/fieldGraph/2.png");
 	descriptionHandle3 = my::myLoadGraph("data/fieldGraph/3.png");
+	descriptionHandle4 = my::myLoadGraph("data/fieldGraph/4.png");
+
+	GetGraphSize(descriptionHandle4, &graphWidth, &graphHeight);
 
 	LPCSTR fontPath = "data/other/Silver.ttf";
 	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
@@ -102,6 +105,7 @@ TutorialScene::~TutorialScene()
 	DeleteGraph(descriptionHandle);
 	DeleteGraph(descriptionHandle2);
 	DeleteGraph(descriptionHandle3);
+	DeleteGraph(descriptionHandle4);
 	DeleteFontToHandle(fontHandle);
 }
 
@@ -118,7 +122,7 @@ void TutorialScene::update(const InputState& input)
 
 	player->update(offset, input);
 
-	if (player->getPos().x > 1000) {
+	if (player->getPos().x > 1500) {
 		enemy->setPos(2200);
 	}
 
@@ -324,6 +328,11 @@ void TutorialScene::draw()
 	if (checkFlyingObject) {
 		DrawString(Game::kScreenWidth / 2 - 130, 900, "投げたものはちゃんと拾いましょう", 0xffffff);
 	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
+	//画面全体を真っ黒に塗りつぶす
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, fadeColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void TutorialScene::fadeInUpdate(const InputState& input)
@@ -358,9 +367,9 @@ void TutorialScene::normalUpdate(const InputState& input)
 	{
 		targetOffset.x = 0;
 	}
-	if (targetOffset.x < -field->getTutorialWidth() + Game::kScreenWidth + 16)
+	if (targetOffset.x < -field->getTutorialWidth() + Game::kScreenWidth)
 	{
-		targetOffset.x = -field->getTutorialWidth() + Game::kScreenWidth + 16;
+		targetOffset.x = -field->getTutorialWidth() + Game::kScreenWidth;
 	}
 
 
@@ -445,7 +454,13 @@ void TutorialScene::textDraw(int num)
 		DrawRectRotaGraph(2930 + offset.x, 190, imgX * 16, (imgY - 2) * 16, 16, 16, 2.0f, 0.0f, bottanHandle, true, false);
 		DrawString(2950 + offset.x, 180, "を押している間、アイテムを使用", 0xffffff);
 
-		
+		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//乗算合成
+		DrawBox(3040 - graphWidth * 2 - 50 + offset.x, 480, 3040 + graphWidth * 2 + 50 + offset.x, 650 + graphHeight * 2 - 30, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//通常描画に戻す
+		DrawBox(3040 - graphWidth * 2 - 50 + offset.x, 480, 3040 + graphWidth * 2 + 50 + offset.x, 650 + graphHeight * 2 - 30, 0xffffff, false);
+		DrawRotaGraph(3040 + offset.x, 670, 4.0f, 0.0f, descriptionHandle4, true);
+		DrawString(3310 + offset.x, 520, "破壊", 0xff0000);
+
 		break;
 	}
 }

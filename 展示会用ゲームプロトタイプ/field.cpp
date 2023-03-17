@@ -15,6 +15,8 @@ Field::Field()
 	objectHandle = my::myLoadGraph("data/FieldGraph/Props-01.png");
 	buildingHandle2 = my::myLoadGraph("data/FieldGraph/Buildings2.png");
 	backgroundHandle = my::myLoadGraph("data/FieldGraph/BaseColor.png");
+	backgroundHandle2 = my::myLoadGraph("data/FieldGraph/BaseColor2.png");
+	backgroundHandle3 = my::myLoadGraph("data/FieldGraph/BaseColor3.png");
 	shopperHandle = my::myLoadGraph("data/objectGraph/shop.png");
 	backBuildingHandle = my::myLoadGraph("data/FieldGraph/BackgroundProps1.png");
 	
@@ -32,6 +34,8 @@ Field::~Field()
 	DeleteGraph(objectHandle);
 	DeleteGraph(buildingHandle2);
 	DeleteGraph(backgroundHandle);
+	DeleteGraph(backgroundHandle2);
+	DeleteGraph(backgroundHandle3);
 	DeleteGraph(shopperHandle);
 	DeleteGraph(backBuildingHandle);
 }
@@ -46,7 +50,7 @@ void Field::draw(Vec2 offset, int num)
 	//チュートリアル
 	case 0:
 	{
-		DrawRotaGraph(1920, 540, 2.0f, 0.0f, backgroundHandle, true, false);
+		DrawRotaGraph(1920, 540, 2.0f, 0.0f, backgroundHandle2, true, false);
 
 		//最奥の背景
 		for (int x = 0; x < 49; x++) {
@@ -400,7 +404,6 @@ void Field::draw(Vec2 offset, int num)
 				int graphY = (chipNo / chipNumX(buildingGraphWidth)) * graphChipSize;
 
 				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle, true, false);
-
 			}
 		}
 	}
@@ -557,6 +560,8 @@ void Field::draw(Vec2 offset, int num)
 	//タイトル
 	case 3:
 	{
+		DrawRotaGraph(1920, 540, 2.0f, 0.0f, backgroundHandle3, true, false);
+
 		for (int x = 0; x < 49; x++) {
 
 			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f);

@@ -16,18 +16,22 @@
 #include "../Object/ObjectHp.h"
 #include <cassert>
 
+namespace {
+	int graphSize = 16;;
+}
 
 GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameMain::fadeInUpdate)
 {
 	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
 	hpHandle = LoadGraph("data/objectGraph/heart.png");
 	portionHandle = my::myLoadGraph("data/objectGraph/portion.png");
-	hacheteHandle = my::myLoadGraph("data/objectGraph/machete.png");
+	macheteHandle = my::myLoadGraph("data/objectGraph/machete.png");
 	guiHandle = my::myLoadGraph("data/GUIGraph/GUI.png");
 	repairHandle = my::myLoadGraph("data/objectGraph/repair.png");
 	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 	truckHandle = my::myLoadGraph("data/objectGraph/truck.png");
 	rockHandle = my::myLoadGraph("data/objectGraph/rock.png");
+	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan.png");
 	
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
@@ -37,7 +41,7 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 
 	player = new Player(0);
 	hp = new ObjectHp;
-	player->setHandle(portionHandle, hacheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
+	player->setHandle(portionHandle, macheteHandle,guiHandle,hpHandle,repairHandle,coinHandle);
 
 	for (int i = 0; i < maxWave; i++) {
 		space.push_back(std::make_shared<BugSpace>());
@@ -60,13 +64,15 @@ GameMain::~GameMain()
 	DeleteGraph(enemyHandle);
 	DeleteGraph(portionHandle);
 	DeleteGraph(guiHandle);
-	DeleteGraph(hacheteHandle);
+	DeleteGraph(macheteHandle);
 	DeleteGraph(hpHandle);
 	DeleteGraph(rockHandle);
 	DeleteGraph(repairHandle);
 	DeleteGraph(coinHandle);
 	DeleteGraph(truckHandle);
 	DeleteGraph(tempScreenH);
+	DeleteGraph(bottanHandle);
+
 	DeleteFontToHandle(UIFontHandle);
 
 	DeleteSoundMem(mainSound);
@@ -158,15 +164,13 @@ void GameMain::draw()
 		}
 	}
 
-	if (updateFunc != &GameMain::fadeInUpdate) {
+	if (updateFunc != &GameMain::fadeInUpdate && !bossWave) {
 		//プレイヤーの描画
-		if (quakeCount > 3) {
-			if (quakeTimer > -120) {
-				nextScene = player->updateSwoon(offset);
-			}
+		if (!hitRock) {
+			player->draw(offset);
 		}
 		else {
-			player->draw(offset);
+			bossWave = player->updateSwoon(offset);
 		}
 	}
 
@@ -175,7 +179,7 @@ void GameMain::draw()
 	}
 
 	if (!hitRock) {
-		if (quakeCount >= 3) {
+		if (updateFunc == &GameMain::gameClearIntroduction) {
 			if (!player->rockCollision({ player->getPos().x,player->getPos().y - rockHeight })) {
 				DrawRotaGraph(player->getPos().x + offset.x, player->getPos().y - rockHeight, 2.0f, 0.0f, rockHandle, true, false);
 				rockHeight -= 1.5f;
@@ -186,6 +190,10 @@ void GameMain::draw()
 		}
 	}
 
+	if (quakeCount >= 3 && quakeTimer < 0) {
+		nextScene = true;
+	}
+
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
 	//画面全体を真っ黒に塗りつぶす
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
@@ -194,6 +202,15 @@ void GameMain::draw()
 	SetDrawScreen(DX_SCREEN_BACK);
 	DrawGraph(0, quakeY, tempScreenH, false);
 
+}
+
+void GameMain::gameClearIntroduction(const InputState& input)
+{
+	if (hitRock) {
+		if (bossWave) {
+			updateFunc = &GameMain::bossBattleSceneFadeOutUpdate;
+		}
+	}
 }
 
 void GameMain::fadeInUpdate(const InputState& input)
@@ -211,7 +228,7 @@ void GameMain::fadeInUpdate(const InputState& input)
 void GameMain::normalUpdate(const InputState& input)
 {
 	if (!startWave && !(clearCount >= 2)) {
-		if (!(hp->chargeHp())) {
+		if (!(hp->chargeHp(wave))) {
 			startWave = false;
 		}
 		else {
@@ -306,7 +323,7 @@ void GameMain::normalUpdate(const InputState& input)
 	}
 
 	if (nextScene) {
-		updateFunc = &GameMain::bossBattleSceneFadeOutUpdate;
+		updateFunc = &GameMain::gameClearIntroduction;
 	}
 
 	if (quakeCount == 1) {
@@ -337,9 +354,9 @@ void GameMain::normalUpdate(const InputState& input)
 		{
 			targetOffset.x = 0;
 		}
-		if (targetOffset.x < -field->getWidth() + Game::kScreenWidth + 16)
+		if (targetOffset.x < -field->getWidth() + Game::kScreenWidth)
 		{
-			targetOffset.x = -field->getWidth() + Game::kScreenWidth + 16;
+			targetOffset.x = -field->getWidth() + Game::kScreenWidth;
 		}
 		offset = targetOffset;
 	}
@@ -388,4 +405,3 @@ void GameMain::bossBattleSceneFadeOutUpdate(const InputState& input)
 		return;
 	}
 }
-

@@ -46,12 +46,18 @@ public:
 
 	int returnDeath() { return death; }
 
-	void setPos(int width) { enemyPos.x = width; }
+	void setPos(float width) { enemyPos.x = width; }
+
+	float returHp() { return enemyHp; }
 private:
 	float jump = -3.0f;
 
 	int hitHandle = -1;
 	int windHandle = -1;
+	int hitSound = -1;
+	int deathSound = -1;
+
+	int soundVolume = 150;
 
 	int bunderfootChipNoX = 0;
 	int bunderfootChipNoY = 0;
@@ -78,13 +84,17 @@ private:
 	int handle = -1;
 	int coinHandle = -1;
 
+	int coinUpdateTime = 10;
+
 	int moveCount = 0;
 
 	int count = 0;
 
 	int motionNum = 0;
 
-	int enemyHp = 9;
+	int checkSound = 0;
+
+	float enemyHp = 9;
 	int hpDisplayTime = 120;
 
 	bool inversion = true;
@@ -108,6 +118,7 @@ private:
 	Vec2 enemyPos = {800.0f,600.0f};
 	Vec2 deathPos = { 0.0f,0.0f };
 	Vec2 vec = {-1.0f,0.0f};
+	Vec2 coinVec = { 0.0f,0.2f };
 	Vec2 jumpVec = { -1.0f, 0.0f };
 
 	Vec2 targetPlayer = { 0.0f,0.0f };

@@ -21,6 +21,8 @@ public:
 	void update(const InputState& input);
 	void draw();
 
+	void gameClearIntroduction(const InputState& input);
+	
 private:
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;
@@ -38,7 +40,8 @@ private:
 	int repairHandle = -1;
 	int hpHandle = -1;
 	int portionHandle = -1;
-	int hacheteHandle = -1;
+	int macheteHandle = -1;
+	int bottanHandle = -1;
 	int guiHandle = -1;
 	int coinHandle = -1;
 	int truckHandle = -1;
@@ -81,7 +84,7 @@ private:
 
 	float waveHp = 0.0f;
 	int maxWave = 3;
-	int wave = 1;
+	int wave = 3;
 	int waveCount = 0;
 
 	bool configured = false;
@@ -89,10 +92,17 @@ private:
 	bool nextScene = false;
 
 	bool EndOfRaid = false;
+	bool bossWave = false;
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 
 	bool startWave = false;
+
+	int imgX = 0;
+	int imgY = 0;
+	int time = 0;
+
+	Vec2 enemyPos = { 0,0 };
 
 	void fadeInUpdate(const InputState& input);
 	void normalUpdate(const InputState& input);

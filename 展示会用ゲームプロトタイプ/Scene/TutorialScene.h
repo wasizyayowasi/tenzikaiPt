@@ -30,6 +30,7 @@ private:
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;
 	float fadeValue = 255;//•‹éŒ`‚ÌƒuƒŒƒ“ƒh‹ï‡
+	int fadeColor = 0x000000;
 
 	int enemyHandle = -1;
 	int repairHandle = -1;
@@ -47,7 +48,11 @@ private:
 	int descriptionHandle = -1;
 	int descriptionHandle2 = -1;
 	int descriptionHandle3 = -1;
+	int descriptionHandle4 = -1;
 	int fontHandle = -1;
+
+	int graphWidth = 0;
+	int graphHeight = 0;
 
 	int personNum = 0;
 	int count = 1;

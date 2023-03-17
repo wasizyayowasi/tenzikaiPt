@@ -47,6 +47,7 @@ private:
 	void fadeOutUpdateGameMain(const InputState& input);
 	void fadeOutUpdateTutorial(const InputState& input);
 	void fadeOutUpdateBoss(const InputState& input);
+	void fadeOutUpdateDemo(const InputState& input);
 
 	int soundHandle = -1;
 	int soundVolume = 150;
@@ -75,6 +76,8 @@ private:
 
 	int ultimateTimer = 0;
 
+	int demoSceneTimer = 9;
+
 	std::map<choice, std::string> sceneTable;
 
 	std::shared_ptr<Enemy> enemy;
@@ -83,6 +86,6 @@ private:
 	std::array<std::shared_ptr<Enemy>, 16> enemies;
 
 	//update用メンバ関数ポインタ
-	void (TitleScene::* updateFunc_)(const InputState& input);
+	void (TitleScene::* updateFunc)(const InputState& input);
 };
 

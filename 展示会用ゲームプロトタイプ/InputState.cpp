@@ -24,7 +24,7 @@ InputState::InputState()
 										  {InputCategory::pad,PAD_INPUT_4} };
 	//É|Å[ÉY
 	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_TAB},
-										 {InputCategory::pad,PAD_INPUT_7} };
+										 {InputCategory::pad,PAD_INPUT_8} };
 	//è„
 	defaultMapTable[InputType::up] = { {InputCategory::keybd,KEY_INPUT_UP},
 									  {InputCategory::pad,PAD_INPUT_UP} };

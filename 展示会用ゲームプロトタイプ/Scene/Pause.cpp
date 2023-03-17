@@ -12,7 +12,7 @@ namespace {
 	int graphSize = 16;;
 }
 
-Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager),inputState(input)
+Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager),inputState(input), currentInputIndex(0)
 {
 	choiceTable[Choice::keyConfig] = "キーコンフィグ";
 	choiceTable[Choice::title] = "タイトルへ";
@@ -20,7 +20,7 @@ Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager)
 
 	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 	uiSound2 = LoadSoundMem("data/soundEffect/ui4.mp3");
-	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan1.png");
+	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan.png");
 
 	LPCSTR fontPath = "data/other/CompassPro.ttf";
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
@@ -55,7 +55,7 @@ void Pause::update(const InputState& input)
 		return;
 	}
 
-	const int nameCount = choiceTable.size();
+	const int nameCount = static_cast<int>(choiceTable.size());
 
 	
 	if (input.isTriggered(InputType::up)) {
@@ -92,12 +92,12 @@ void Pause::update(const InputState& input)
 	}
 
 	if (--time == 0) {
-		imgX++;
+		moveImgX++;
 		time = 8;
 	}
 
-	if (imgX > 5) {
-		imgX = 2;
+	if (moveImgX > 6) {
+		moveImgX = 3;
 	}
 }
 
@@ -149,11 +149,98 @@ void Pause::draw()
 		++idx;
 	}
 
-	DrawStringToHandle(50,Game::kScreenHeight - 55,"決定",0xffffff,fontHandle);
-	DrawStringToHandle(180, Game::kScreenHeight - 55, "戻る", 0xffffff, fontHandle);
-	imgY = 1;
-	DrawRectRotaGraph(20, Game::kScreenHeight - 50, imgX * graphSize, imgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true,false);
-	imgY = 2;
-	DrawRectRotaGraph(150, Game::kScreenHeight - 50, imgX * graphSize, imgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+	DrawStringToHandle(Game::kScreenWidth - 200, Game::kScreenHeight - 55, "決定", 0xffffff, fontHandle);
+	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "戻る", 0xffffff, fontHandle);
 
+
+	for (const auto& name : inputState.inputNameTable) {
+		int bottanSetWidth = (Game::kScreenWidth / 2 + 200);
+		auto type = name.first;
+		auto it = inputState.tempMapTable.find(type);
+
+		for (const auto elem : it->second) {
+			if (type == InputType::next && elem.cat == InputCategory::pad) {
+				nextId = elem.id;
+			}
+			if (type == InputType::prev && elem.cat == InputCategory::pad) {
+				prevId = elem.id;
+			}
+		}
+	}
+
+	bottanNum(nextId);
+	moveImgY = imgY;
+	DrawRectRotaGraph(Game::kScreenWidth - 230, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+
+	bottanNum(prevId);
+	moveImgY = imgY;
+	DrawRectRotaGraph(Game::kScreenWidth - 100, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+
+}
+
+void Pause::bottanNum(int num)
+{
+	switch (num) {
+		//X
+	case 64:
+		imgX = 1;
+		imgY = 2;
+		break;
+		//A
+	case 16:
+		imgX = 1;
+		imgY = 3;
+		break;
+		//Y
+	case 128:
+		imgX = 1;
+		imgY = 4;
+		break;
+		//B
+	case 32:
+		imgX = 1;
+		imgY = 5;
+		break;
+		//上
+	case 8:
+		imgX = 8;
+		imgY = 5;
+		break;
+		//下
+	case 1:
+		imgX = 9;
+		imgY = 5;
+		break;
+		//左
+	case 2:
+		imgX = 8;
+		imgY = 6;
+		break;
+		//右	
+	case 4:
+		imgX = 9;
+		imgY = 6;
+		break;
+		//LT
+	case 256:
+		imgX = 21;
+		imgY = 5;
+		break;
+		//RT
+	case 512:
+		imgX = 21;
+		imgY = 6;
+		break;
+		//BACK
+	case 1024:
+		imgX = 10;
+		imgY = 13;
+		break;
+		//start
+	case 2048:
+		imgX = 10;
+		imgY = 14;
+		break;
+
+	}
 }

@@ -13,22 +13,29 @@
 #include "DxLib.h"
 #include <cassert>
 
+namespace {
+	constexpr int particleNum = 256;
+}
+
 BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),updateFunc(&BossBattleScene::fadeInUpdate)
 {
 
 	enemyHandle = my::myLoadGraph("data/objectGraph/enemy.png");
 	hpHandle = my::myLoadGraph("data/objectGraph/heart.png");
 	portionHandle = my::myLoadGraph("data/objectGraph/portion.png");
-	hacheteHandle = my::myLoadGraph("data/objectGraph/machete.png");
+	macheteHandle = my::myLoadGraph("data/objectGraph/machete.png");
 	guiHandle = my::myLoadGraph("data/GUIGraph/GUI.png");
 	repairHandle = my::myLoadGraph("data/objectGraph/repair.png");
 	coinHandle = my::myLoadGraph("data/objectGraph/CopperCoin.png");
 	signboardHandle = my::myLoadGraph("data/objectGraph/kb.png");
 
+
+	cheerSound = LoadSoundMem("data/soundEffect/cheer.mp3");
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
 
+
 	player = new Player(2);
-	player->setHandle(portionHandle, hacheteHandle, guiHandle, hpHandle, repairHandle, coinHandle);
+	player->setHandle(portionHandle, macheteHandle, guiHandle, hpHandle, repairHandle, coinHandle);
 	player->init();
 	player->setPos({Game::kScreenWidth / 2,760});
 
@@ -44,21 +51,39 @@ BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),upd
 	GetScreenState(&sw, &sh, &bit);
 	tempScreenH = MakeScreen(sw, sh);
 	assert(tempScreenH >= 0);
+
+	effectScreen = MakeScreen(Game::kScreenWidth, Game::kScreenHeight, true);
+
+	pos[particleNum];
+	vec[particleNum];
+
+	for (int i = 0; i < particleNum; i++)
+	{
+		pos[i].x = GetRand(Game::kScreenWidth);
+		pos[i].y = -GetRand(Game::kScreenHeight);
+
+		vec[i].x = 0.0f;
+		vec[i].y = GetRand(20) + 20;
+		vec[i].y /= 10.0f;
+	}
 }
 
 BossBattleScene::~BossBattleScene()
 {
 	delete player;
 	DeleteGraph(enemyHandle);
+	DeleteGraph(hpHandle);
 	DeleteGraph(portionHandle);
 	DeleteGraph(guiHandle);
-	DeleteGraph(hacheteHandle);
-	DeleteGraph(hpHandle);
+	DeleteGraph(macheteHandle);
 	DeleteGraph(repairHandle);
 	DeleteGraph(coinHandle);
 	DeleteGraph(tempScreenH);
+	DeleteGraph(signboardHandle);
+	DeleteGraph(tempScreenH);
+	DeleteGraph(effectScreen);
 
-	DeleteSoundMem(mainSound); 
+	DeleteSoundMem(cheerSound);
 	DeleteSoundMem(footstepSound);
 }
 
@@ -82,10 +107,11 @@ void BossBattleScene::update(const InputState& input)
 
 void BossBattleScene::draw()
 {
+
 	//加工用スクリーンハンドルをセット
 	SetDrawScreen(tempScreenH);
 	ClearDrawScreen();
-	
+
 	field->draw(offset,2);
 
 	for (int x = 0; x < bossNumX; x++) {
@@ -120,7 +146,7 @@ void BossBattleScene::draw()
 	if (bossEnemy->isEnable()) {
 		bossEnemy->BossDraw(offset);
 	}
-	
+
 	if (--ImgTime == 0) {
 		imgX++;
 		ImgTime = 4;
@@ -132,6 +158,14 @@ void BossBattleScene::draw()
 	SetDrawScreen(DX_SCREEN_BACK);
 	DrawGraph(0, quakeY, tempScreenH, false);
 
+	if (!bossEnemy->isEnable()) {
+		particleDraw();
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
+	//画面全体を真っ黒に塗りつぶす
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, fadeColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void BossBattleScene::bossAppearanceUpdate(const InputState& input)
@@ -196,10 +230,10 @@ void BossBattleScene::normalUpdate(const InputState& input)
 	offset = targetOffset * 0.5f + offset * 0.5f;
 
 	if (!bossEnemy->isEnable()) {
-		updateFunc = &BossBattleScene::clearFadeOutUpdate;
+		updateFunc = &BossBattleScene::clearUpdate;
 	}
 
-	if (bossEnemy->isEnable()) {
+	if (bossEnemy->returHp()) {
 		if (--soundCount == 0) {
 			quakeTimer = 100;
 			quakeY = 10.0f;
@@ -213,6 +247,62 @@ void BossBattleScene::normalUpdate(const InputState& input)
 		manager_.pushScene(new Pause(manager_, input));
 	}
 
+}
+
+void BossBattleScene::particleUpdate()
+{
+	for (int i = 0; i < particleNum; i++)
+	{
+		pos[i] += vec[i];
+		if (pos[i].y > Game::kScreenHeight)
+		{
+			pos[i].x = GetRand(Game::kScreenWidth);
+			pos[i].y = 0.0f;
+
+			vec[i].x = 0.0f;
+			vec[i].y = GetRand(20) + 20;
+			vec[i].y /= 10.0f;
+		}
+	}
+	sinRate += 0.05f;
+}
+
+void BossBattleScene::particleDraw()
+{
+	// draw
+	SetDrawScreen(effectScreen);
+	ClearDrawScreen();
+	BeginAADraw();
+	for (int i = 0; i < particleNum; i++)
+	{
+		float rate = (vec[i].length() / 4.0f);
+		//	DrawCircleAA(pos[i].x, pos[i].y, 4 * rate, 32, 0x808020, true);
+			// 遠くのもの(落下速度が遅いもの)は小さく、暗く描画する
+		DrawCircleAA(pos[i].x, pos[i].y, 4 * rate, 32, GetColor(0 * rate, 79 * rate, 128 * rate), true);
+	}
+	EndAADraw();
+	SetDrawScreen(DX_SCREEN_BACK);
+	
+	//加算合成する
+	SetDrawBlendMode(DX_BLENDMODE_ADD, 192);
+
+	DrawGraph(0, 0, effectScreen, true);
+
+	//画面をぼかす
+	GraphFilter(effectScreen, DX_GRAPH_FILTER_GAUSS, 16, 800);
+	for (int i = 0; i < 8; i++)
+	{
+		DrawGraph(GetRand(4) - 2, GetRand(4) - 2, effectScreen, false);
+	}
+
+	GraphFilter(effectScreen, DX_GRAPH_FILTER_GAUSS, 32, 2400);
+	for (int i = 0; i < 8; i++)
+	{
+		DrawGraph(GetRand(8) - 4, GetRand(8) - 4, effectScreen, false);
+	}
+	//元に戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	
 }
 
 void BossBattleScene::fadeInUpdate(const InputState& input)
@@ -240,15 +330,32 @@ void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 
 void BossBattleScene::clearFadeOutUpdate(const InputState& input)
 {
-	if (musicVolume > 1) {
-		musicVolume--;
-		SetVolumeMusic(musicVolume);
-	}
 	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new GameClear(manager_));
 		StopMusic();
 		return;
+	}
+}
+
+void BossBattleScene::clearUpdate(const InputState& input)
+{
+	if (musicVolume > 1) {
+		musicVolume--;
+		SetVolumeMusic(musicVolume);
+	}
+
+	if (--cheerTime == 0) {
+		PlaySoundMem(cheerSound, DX_PLAYTYPE_BACK);
+		cheerTime = 240;
+	}
+	
+	if (--cheerCount == 0) {
+		updateFunc = &BossBattleScene::clearFadeOutUpdate;
+	}
+
+	if (!bossEnemy->isEnable()) {
+		particleUpdate();
 	}
 }
 

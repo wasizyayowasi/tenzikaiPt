@@ -8,7 +8,7 @@ class Enemy;
 class ObjectHp;
 
 namespace {
-	constexpr int enemyNum = 5;
+	constexpr int enemyNum = 6;
 }
 
 class BugSpace
@@ -44,6 +44,7 @@ private:
 	int time = 0;
 	int breakSound = -1;
 	int breakSound2 = -1;
+	int soundTime = 90;
 
 	int imgX = 0;
 	int imgY = 0;

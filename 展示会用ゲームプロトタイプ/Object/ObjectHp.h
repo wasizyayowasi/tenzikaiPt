@@ -9,7 +9,7 @@ public:
 
 	void setObjectHp(float obJectHp);
 	void setWaveHp(int obJectMaxHp);
-	void setObjectMaxHp(int obJectMaxHp);
+	void setObjectMaxHp(float obJectMaxHp);
 
 	void draw(Vec2 pos,Vec2 offset);
 	void playerHpDraw(int handle);
@@ -18,7 +18,7 @@ public:
 	int returnMaxHp() { return maxHp; }
 	float returnTempHp() { return tempHp; }
 
-	bool chargeHp();
+	bool chargeHp(int num);
 private:
 	int magnification = 0;
 

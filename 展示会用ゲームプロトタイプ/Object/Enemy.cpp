@@ -9,10 +9,14 @@
 #include "../DrawFunctions.h"
 #include <algorithm>
 
-Enemy::Enemy(int num) : sceneNum(num)
+Enemy::Enemy(int num) : sceneNum(num),drawFunc(&Enemy::normalDraw),updateFunc(&Enemy::updateDescent)
 {
 	hitHandle = my::myLoadGraph("data/effect/hit.png");
 	windHandle = my::myLoadGraph("data/objectGraph/Wind.png");
+	hitSound = LoadSoundMem("data/soundEffect/hit.mp3");
+	deathSound = LoadSoundMem("data/soundEffect/enemy3.mp3");
+
+	player = nullptr;
 
 	hp = new ObjectHp;
 	motion = new EnemyMotion;
@@ -25,16 +29,19 @@ Enemy::Enemy(int num) : sceneNum(num)
 Enemy::~Enemy()
 {
 	delete hp;
+	delete motion;
 	DeleteGraph(hitHandle);
 	DeleteGraph(windHandle);
+	DeleteSoundMem(hitSound);
+	DeleteSoundMem(deathSound);
 }
 
 void Enemy::tutorialUpdate(Vec2 offset)
 {
 	vec.y = 0.0f;
 
-	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
-	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+	int underfootChipNoX = static_cast<int>(enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = static_cast<int>(enemyPos.y + chipSize) / chipSize;
 
 	const int chipNo = groundData::tutorialGround[underfootChipNoY][underfootChipNoX];
 
@@ -48,7 +55,7 @@ void Enemy::tutorialUpdate(Vec2 offset)
 	motionNum = 0;
 
 	//HPÇ™Ç»Ç≠Ç»ÇËéÄñSÇµÇΩèÍçá
-	if (hp->returnTempHp() == 0.0f) {
+	if (hp->returnTempHp() <= 0.0f) {
 		motionNum = 3;
 	}
 
@@ -119,17 +126,19 @@ void Enemy::tutorialUpdate(Vec2 offset)
 		}
 	}
 
-	//âEÇÃï«îΩéÀ
+	//í‚é~
 	if (enemyPos.x > 2200) {
 		vec.x = 0.0f;
-	}
-	//ç∂ÇÃï«îΩéÀ
-	if (enemyPos.x > 1000 && enemyPos.x < 2300) {
-		enemyPos.x = 2200;
 		inversion = true;
 	}
-	if (enemyPos.x > 2600) {
-		enemyPos.x = 3070;
+
+	//ç∂ÇÃï«îΩéÀ
+	if (enemyPos.x < 600) {
+		vec.x = 3.0f;
+		inversion = false;
+	}
+	if (enemyPos.x > 1100 && enemyPos.x < 1400) {
+		vec.x = -3.0f;
 		inversion = true;
 	}
 
@@ -144,6 +153,8 @@ void Enemy::tutorialUpdate(Vec2 offset)
 
 	//ìäù±Ç™ìñÇΩÇ¡ÇΩèÍçáÇÃèàóù
 	if (player->enemyAttack(enemyPos, offset)) {
+		ChangeVolumeSoundMem(soundVolume, hitSound);
+		PlaySoundMem(hitSound, DX_PLAYTYPE_BACK);
 		enemyHp = 0;
 		hpDisplay = true;
 	}
@@ -152,6 +163,8 @@ void Enemy::tutorialUpdate(Vec2 offset)
 	if (enemyHp > 0) {
 		if (--coolTime < 0) {
 			if (player->proximityAttackCollision(enemyPos)) {
+				ChangeVolumeSoundMem(soundVolume, hitSound);
+				PlaySoundMem(hitSound, DX_PLAYTYPE_BACK);
 				enemyHp -= 3;
 				hpDisplay = true;
 				coolTime = 23;
@@ -202,7 +215,7 @@ void Enemy::BossUpdate(Vec2 offset)
 	
 	//HPÇ™Ç»Ç≠Ç»ÇËéÄñSÇµÇΩèÍçá
 	if (enemyHp == 0) {
-		motionNum = 3;
+		motionNum = 4;
 	}
 	
 	if (motion->dead()) {
@@ -222,14 +235,21 @@ void Enemy::BossUpdate(Vec2 offset)
 		}
 	}
 
-	if (player->bossEnemyAttack(enemyPos, offset)) {
-		enemyHp = 0;
+	if (enemyHp > 0) {
+		if (player->bossEnemyAttack(enemyPos, offset)) {
+			ChangeVolumeSoundMem(180, deathSound);
+			PlaySoundMem(deathSound, DX_PLAYTYPE_BACK);
+			enemyHp = 0;
+		}
 	}
 
-	if (landing) {
-		motion->update(motionNum,1);
-	}
+	checkSound = CheckSoundMem(deathSound);
 
+	if (checkSound != 1) {
+		if (landing) {
+			motion->update(motionNum, 1);
+		}
+	}
 }
 
 void Enemy::normalUpdate(Vec2 offset)
@@ -267,7 +287,7 @@ void Enemy::normalUpdate(Vec2 offset)
 			}
 			windJump = true;
 			updateFunc = &Enemy::jumpUpdate;
-			steamVentTime = GetRand(30);
+			steamVentTime = GetRand(40);
 			return;
 		}
 	}
@@ -277,7 +297,7 @@ void Enemy::normalUpdate(Vec2 offset)
 	motionNum = 0;
 
 	//HPÇ™Ç»Ç≠Ç»ÇËéÄñSÇµÇΩèÍçá
-	if (hp->returnTempHp() == 0.0f) {
+	if (hp->returnTempHp() <= 0.0f) {
 		motionNum = 3;
 	}
 
@@ -406,17 +426,21 @@ void Enemy::normalUpdate(Vec2 offset)
 
 	//ìäù±Ç™ìñÇΩÇ¡ÇΩèÍçáÇÃèàóù
 	if (player->enemyAttack(enemyPos, offset)) {
+		ChangeVolumeSoundMem(soundVolume, hitSound);
+		PlaySoundMem(hitSound, DX_PLAYTYPE_BACK);
 		enemyHp = 0;
 		hpDisplay = true;
 	}
 
 	//ÉvÉåÉCÉÑÅ[ÇÃãﬂê⁄çUåÇÇ∆ÇÃìñÇΩÇËîªíË
-	if (enemyHp > 0) {
+	if (enemyHp > 0.0f) {
 		if (--coolTime < 0) {
 			if (player->proximityAttackCollision(enemyPos)) {
+				ChangeVolumeSoundMem(soundVolume, hitSound);
+				PlaySoundMem(hitSound, DX_PLAYTYPE_BACK);
 				enemyHp -= 3;
 				hpDisplay = true;
-				coolTime = 23;
+				coolTime = 20;
 				time = 4;
 				vec.x = 0.0f;
 				damageStopTime = 20;
@@ -508,6 +532,8 @@ void Enemy::BossDraw(Vec2 offset)
 	if (hpDisplay) {
 		hp->draw(enemyPos, offset);
 	}
+
+	DrawFormatString(0, 0, 0xffffff, "%d", checkSound);
 }
 
 void Enemy::titleUpdate(Vec2 offset)
@@ -572,6 +598,13 @@ void Enemy::jumpUpdate(Vec2 offset)
 
 void Enemy::coinUpdate(Vec2 offset)
 {
+	if (--coinUpdateTime == 0) {
+		coinVec.y = -coinVec.y;
+		coinUpdateTime = 50;
+	}
+
+	enemyPos.y += coinVec.y;
+
 	if (player->coinCollision(enemyPos,offset)) {
 		isEnabled = false;
 	}
@@ -596,17 +629,14 @@ void Enemy::updateDescent(Vec2 offset)
 			const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
 			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-				if (filedCollision(underfootChipNoX, underfootChipNoY)) {
-					landing = true;
-					updateFunc = &Enemy::normalUpdate;
-				}
+				landing = true;
+				updateFunc = &Enemy::normalUpdate;
 			}
 		}
 		break;
 	case 1:
 		for (int i = 0; i < 1; i++) {
 			const int chipNo = groundData::tutorialGround[underfootChipNoY][underfootChipNoX];
-
 			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 				landing = true;
 				updateFunc = &Enemy::tutorialUpdate;
@@ -616,12 +646,9 @@ void Enemy::updateDescent(Vec2 offset)
 	case 2:
 		for (int i = 0; i < 1; i++) {
 			const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
-
 			if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
-				if (filedCollision(underfootChipNoX, underfootChipNoY)) {
-					landing = true;
-					updateFunc = &Enemy::normalUpdate;
-				}
+				landing = true;
+				updateFunc = &Enemy::normalUpdate;
 			}
 		}
 		break;

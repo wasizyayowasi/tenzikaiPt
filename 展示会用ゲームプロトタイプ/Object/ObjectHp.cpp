@@ -9,6 +9,7 @@ ObjectHp::ObjectHp()
 
 ObjectHp::~ObjectHp()
 {
+	DeleteGraph(deathHpHandle);
 }
 
 void ObjectHp::setObjectHp(float obJectHp)
@@ -23,7 +24,7 @@ void ObjectHp::setWaveHp(int obJectMaxHp)
 	magnification = 1000 / maxHp;
 }
 
-void ObjectHp::setObjectMaxHp(int obJectMaxHp)
+void ObjectHp::setObjectMaxHp(float obJectMaxHp)
 {
 	maxHp = obJectMaxHp;
 	tempHp = maxHp;
@@ -79,11 +80,23 @@ void ObjectHp::waveHpDraw(Vec2 pos)
 
 }
 
-bool ObjectHp::chargeHp()
+bool ObjectHp::chargeHp(int num)
 {
 	if (displayHp <= maxHp) {
-		displayHp += 0.1f;
-		tempHp += 0.1f;
+		switch (num) {
+		case 1:
+			displayHp += 0.03f;
+			tempHp += 0.1f;
+			break;
+		case 2:
+			displayHp += 0.05f;
+			tempHp += 0.1f;
+			break;
+		case 3:
+			displayHp += 0.1f;
+			tempHp += 0.1f;
+			break;
+		}
 		return false;
 	}
 	return true;

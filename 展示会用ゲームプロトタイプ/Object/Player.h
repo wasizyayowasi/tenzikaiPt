@@ -63,7 +63,7 @@ public:
 	void consumption();
 
 	void setHandle(int pHandle, int mHandle,int gHandle,int hHandle,int rHandle,int cHandle) { portionHandle = pHandle, macheteHandle = mHandle,guiHandle = gHandle,hpHandle = hHandle,repairHandle = rHandle,coinHandle = cHandle; }
-	int returnHp() { return playerHp; }
+	int returnHp();
 
 	void setMotion(bool start);
 
@@ -75,14 +75,14 @@ public:
 
 	bool returnEnemyHit() { return enemyHit; }
 
-	void setMovementRestrictions(int limitNum) { movementRestrictions = limitNum; }
+	//void setMovementRestrictions(float limitNum) { movementRestrictions = limitNum; }
 
 	bool rockCollision(Vec2 pos);
 
 private:
 	//所持アイテム
-	int money = 0;
-	int repairBlock = 0;
+	int money = 3000;
+	int repairBlock = 2;
 	int recoveryItem = 0;
 
 	//グラフィックハンドル
@@ -102,12 +102,15 @@ private:
 	int walkSound = -1;
 	int throwSound = -1;
 	int fontHandle = -1;
+	int ladderSound = -1;
 
 	int sceneNum = 0;
 
 	int soundCount = 1;
 
 	int soundVolume = 150;
+
+	int soundTime = 1;
 
 	//スモークの画像の類
 	int imgX = 0;

@@ -57,8 +57,8 @@ void KeyConfigScene::update(const InputState& input)
 		time = 8;
 	}
 
-	if (moveImgX > 5) {
-		moveImgX = 2;
+	if (moveImgX > 6) {
+		moveImgX = 3;
 	}
 
 	(this->*updateFunc)(input);
@@ -277,12 +277,32 @@ void KeyConfigScene::draw()
 	DrawStringToHandle(editingWidth, y, "キーリセット", keyColor, fontHandle);
 	}
 
-	DrawStringToHandle(50, Game::kScreenHeight - 55, "決定", 0xffffff, fontHandle);
-	DrawStringToHandle(180, Game::kScreenHeight - 55, "戻る", 0xffffff, fontHandle);
-	moveImgY = 1;
-	DrawRectRotaGraph(20, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY* graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle2, true, false);
-	moveImgY = 2;
-	DrawRectRotaGraph(150, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY* graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle2, true, false);
+	DrawStringToHandle(Game::kScreenWidth - 200, Game::kScreenHeight - 55, "決定", 0xffffff, fontHandle);
+	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "戻る", 0xffffff, fontHandle);
+	
+
+	for (const auto& name : inputState.inputNameTable) {
+		int bottanSetWidth = (Game::kScreenWidth / 2 + 200);
+		auto type = name.first;
+		auto it = inputState.inputMapTable.find(type);
+
+		for (const auto elem : it->second) {
+			if (type == InputType::next && elem.cat == InputCategory::pad) {
+				nextId = elem.id;
+			}
+			if (type == InputType::prev && elem.cat == InputCategory::pad) {
+				prevId = elem.id;
+			}
+		}
+	}
+
+	bottanNum(nextId);
+	moveImgY = imgY;
+	DrawRectRotaGraph(Game::kScreenWidth - 230, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY* graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
+
+	bottanNum(prevId);
+	moveImgY = imgY;
+	DrawRectRotaGraph(Game::kScreenWidth - 100, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY* graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
 
 }
 

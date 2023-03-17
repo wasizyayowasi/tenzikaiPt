@@ -714,6 +714,8 @@ private:
 	int buildingHandle2 = -1;
 	int objectHandle = -1;
 	int backgroundHandle = -1;
+	int backgroundHandle2 = -1;
+	int backgroundHandle3 = -1;
 	int backBuildingHandle = -1;
 
 	int groundGraphWidth = 0;

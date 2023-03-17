@@ -50,6 +50,9 @@ private:
 	int X = 0;
 	int keySelectNum = 0;
 
+	int nextId = 0;
+	int prevId = 0;
+
 	int currentInputIndex;//現在選択中のインデックス
 	//入力一時テーブル
 

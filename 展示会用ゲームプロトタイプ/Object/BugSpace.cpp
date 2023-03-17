@@ -12,7 +12,6 @@ BugSpace::BugSpace()
 	spaceHandle = my::myLoadGraph("data/objectGraph/portal2.png");
 	breakSound = LoadSoundMem("data/soundEffect/break.mp3");
 	breakSound2 = LoadSoundMem("data/soundEffect/break2.mp3");
-
 }
 
 BugSpace::~BugSpace()
@@ -38,18 +37,21 @@ void BugSpace::init(int setX, int setY)
 		enemy = std::make_shared<Enemy>(0);
 	}
 
-	spacePos.x = setX * chipSize;
-	spacePos.y = setY * chipSize;
+	spacePos.x = static_cast<float>(setX * chipSize);
+	spacePos.y = static_cast<float>(setY * chipSize);
 }
 
 void BugSpace::tutorialUpdate(Vec2 offset)
 {
 	if (player->repairSpace(spacePos, offset)) {
 		if (player->returnSpaceHpDisplay()) {
-			ChangeVolumeSoundMem(150, breakSound);
-			PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(150, breakSound);
+				PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
+				soundTime = 85;
+			}
 			player->setMotion(true);
-			maxHp -= 0.008;
+			maxHp -= static_cast<float>(0.008);
 		}
 		else {
 			player->setMotion(false);
@@ -79,10 +81,13 @@ void BugSpace::update(Vec2 offset)
 
 	if (player->repairSpace(spacePos, offset)) {
 		if (player->returnSpaceHpDisplay()) {
-			ChangeVolumeSoundMem(150, breakSound);
-			PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(150, breakSound);
+				PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
+				soundTime = 80;
+			}
 			player->setMotion(true);
-			maxHp -= 0.008;
+			maxHp -= static_cast<float>(0.008);
 		}
 		else {
 			player->setMotion(false);
@@ -98,7 +103,7 @@ void BugSpace::update(Vec2 offset)
 				if (!enemy->isEnable()) {
 					enemy->dispatch({ spacePos.x + 50,spacePos.y + 40 });
 					enemySpawnTime = enemySpawnInterval;
-					enemySpawnInterval -= 20;
+					enemySpawnInterval -= 30;
 					break;
 				}
 			}
@@ -112,7 +117,7 @@ void BugSpace::update(Vec2 offset)
 	}
 
 	if (maxHp < 0) {
-		ChangeVolumeSoundMem(150, breakSound2);
+		ChangeVolumeSoundMem(180, breakSound2);
 		PlaySoundMem(breakSound2, DX_PLAYTYPE_BACK);
 		player->consumption();
 		isEnabled = false;
@@ -132,7 +137,7 @@ void BugSpace::draw(Vec2 offset)
 		imgX = 0;
 	}
 
-	DrawRectRotaGraph(spacePos.x + offset.x + 50, spacePos.y + offset.y + 50, imgX * 100, imgY * 100, 100, 100, 3.0f, 0.0f, spaceHandle, true, false);
+	DrawRectRotaGraphF(spacePos.x + offset.x + 50, spacePos.y + offset.y + 50, imgX * 100, imgY * 100, 100, 100, 3.0f, 0.0f, spaceHandle, true, false);
 
 	if (player->repairSpace(spacePos,offset)) {
 		if (player->returnSpaceHpDisplay()) {

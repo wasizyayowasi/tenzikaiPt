@@ -171,7 +171,7 @@ void Gameover::fadeOutUpdate(const InputState& input)
 		musicVolume--;
 		SetVolumeMusic(musicVolume);
 	}
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new TitleScene(manager_));
 		StopMusic();
@@ -187,7 +187,7 @@ void Gameover::continueFadeOutUpdate(const InputState& input)
 	}
 
 	if (motion->returnContinue()) {
-		fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+		fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	}
 
 	if (motion->returnContinue()) {

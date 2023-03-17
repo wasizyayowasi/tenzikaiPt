@@ -35,6 +35,9 @@ void EnemyMotion::update(int num, int sceneNum)
 	case 3:
 		func = &EnemyMotion::death;
 		break;
+	case 4:
+		func = &EnemyMotion::bossDeath;
+		break;
 	}
 	//Šeƒ‚[ƒVƒ‡ƒ“‚Ì”‚ðŒˆ‚ß‚é
 	switch (imgY) {
@@ -143,6 +146,33 @@ void EnemyMotion::death()
 		imgY++;
 	}
 	if (imgY == 1 && imgX > maxImgX - 1 ) {
+		isEnabled = true;
+	}
+}
+
+void EnemyMotion::bossDeath()
+{
+	if (!(imgY == 0)) {
+		if (imgY == 1) {
+			imgY = 1;
+			maxImgX = 13;
+		}
+		else {
+			imgY = 0;
+		}
+	}
+
+
+	if (--updateTime == 0) {
+		imgX++;
+		updateTime = interval;
+	}
+	if (imgX > maxImgX) {
+		imgX = 0;
+		imgY++;
+		interval = 4;
+	}
+	if (imgY == 1 && imgX > maxImgX - 1) {
 		isEnabled = true;
 	}
 }

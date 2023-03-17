@@ -18,6 +18,8 @@ namespace {
 	constexpr float correctionSizeX = 14.0f;
 	constexpr float correctionSizeY = 74.0f;
 	constexpr int ultimateFrames = 120;
+
+	constexpr int soundWaitTime = 30;
 }
 
 Player::Player(int num) : sceneNum(num)
@@ -31,13 +33,13 @@ Player::Player(int num) : sceneNum(num)
 	dieSound = LoadSoundMem("data/soundEffect/die.wav");
 	cureSound = LoadSoundMem("data/soundEffect/cure.mp3");
 	damageSound = LoadSoundMem("data/soundEffect/damage.wav");
+	ladderSound = LoadSoundMem("data/soundEffect/ladder.mp3");
 
 	LPCSTR fontPath = "data/other/Silver.ttf";
 	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
 	
 	fontHandle = CreateFontToHandle("Silver", 64, 9, -1);
 
-	//hp = new ObjectHp;
 	hp = std::make_shared<ObjectHp>();
 	motion = std::make_shared<PlayerMotion>();
 	inventory = std::make_shared<Inventory>();
@@ -60,6 +62,9 @@ Player::~Player()
 	DeleteSoundMem(dieSound);
 	DeleteSoundMem(cureSound);
 	DeleteSoundMem(damageSound);
+	DeleteSoundMem(ladderSound);
+
+	DeleteFontToHandle(fontHandle);
 }
 
 void Player::init()
@@ -200,7 +205,7 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 	//‹ßÚUŒ‚
 	if (!push) {
 		if (input.isTriggered(InputType::attack)) {
-			ChangeVolumeSoundMem(soundVolume, attackSound);
+			ChangeVolumeSoundMem(soundVolume + 30, attackSound);
 			PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
 			motion->resetImgX();
 			motionNum = 3;
@@ -725,7 +730,11 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 	case 0:
 		//“o‚è‚«‚Á‚½Œã
 		if (input.isPressed(InputType::up)) {
-
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(soundVolume, ladderSound);
+				PlaySoundMem(ladderSound, DX_PLAYTYPE_BACK);
+				soundTime = soundWaitTime;
+			}
 			motionNum = 2;
 			playerPos.y -= 5;
 			motion->update(motionNum);
@@ -742,6 +751,11 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 
 		//‰º‚Á‚½‚Æ‚«
 		if (input.isPressed(InputType::down)) {
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(soundVolume, ladderSound);
+				PlaySoundMem(ladderSound, DX_PLAYTYPE_BACK);
+				soundTime = soundWaitTime;
+			}
 			motionNum = 2;
 			playerPos.y += 5;
 			motion->update(motionNum);
@@ -760,7 +774,11 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 	case 1:
 		//“o‚è‚«‚Á‚½Œã
 		if (input.isPressed(InputType::up)) {
-
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(soundVolume, ladderSound);
+				PlaySoundMem(ladderSound, DX_PLAYTYPE_BACK);
+				soundTime = soundWaitTime;
+			}
 			motionNum = 2;
 			playerPos.y -= 5;
 			motion->update(motionNum);
@@ -777,6 +795,11 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 
 		//‰º‚Á‚½‚Æ‚«
 		if (input.isPressed(InputType::down)) {
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(soundVolume, ladderSound);
+				PlaySoundMem(ladderSound, DX_PLAYTYPE_BACK);
+				soundTime = soundWaitTime;
+			}
 			motionNum = 2;
 			playerPos.y += 5;
 			motion->update(motionNum);
@@ -795,7 +818,11 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 	case 2:
 		//“o‚è‚«‚Á‚½Œã
 		if (input.isPressed(InputType::up)) {
-
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(soundVolume, ladderSound);
+				PlaySoundMem(ladderSound, DX_PLAYTYPE_BACK);
+				soundTime = soundWaitTime;
+			}
 			motionNum = 2;
 			playerPos.y -= 5;
 			motion->update(motionNum);
@@ -812,6 +839,11 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 
 		//‰º‚Á‚½‚Æ‚«
 		if (input.isPressed(InputType::down)) {
+			if (--soundTime == 0) {
+				ChangeVolumeSoundMem(soundVolume, ladderSound);
+				PlaySoundMem(ladderSound, DX_PLAYTYPE_BACK);
+				soundTime = soundWaitTime;
+			}
 			motionNum = 2;
 			playerPos.y += 5;
 			motion->update(motionNum);
@@ -829,19 +861,6 @@ void Player::updateLadder(Vec2 offset, const InputState& input)
 		}
 		break;
 	}
-
-	
-
-	
-
-	
-	//—Ž‰º
-	//chipNo3 = buildingData::building[underfootChipNoY + 1][underfootChipNoX];
-	//if (chipNo3 == 0) {
-	//	motionNum = 0;
-	//	motion->update(motionNum);
-	//	//updateFunc = &Player::updateDescent;
-	//}
 }
 
 void Player::updateDeath(Vec2 offset, const InputState& input)
@@ -900,6 +919,11 @@ void Player::setMoney(int amount)
 void Player::consumption()
 {
 	repairBlock--;
+}
+
+int Player::returnHp()
+{
+	return hp->returnMaxHp();
 }
 
 void Player::setMotion(bool start)
@@ -1057,12 +1081,12 @@ bool Player::proximityAttackCollision(const Vec2& pos)
 	if (proximityAttack) {
 		if (playerDirections) {
 			if (enemyLeft > playerPos.x + 20)			return false;
-			if (enemyRight < playerPos.x -  50)			return false;
+			if (enemyRight < playerPos.x - 60)			return false;
 			if (enemyTop > playerPos.y + 50)			return false;
 			if (enemyBottom < playerPos.y + 10)			return false;
 		}
 		else if (!playerDirections) {
-			if (enemyLeft > playerPos.x  + 80)			return false;
+			if (enemyLeft > playerPos.x + 90)			return false;
 			if (enemyRight < playerPos.x + 20)			return false;
 			if (enemyTop > playerPos.y + 50)			return false;
 			if (enemyBottom < playerPos.y + 10)			return false;

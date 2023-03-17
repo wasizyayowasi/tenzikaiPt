@@ -25,19 +25,25 @@ public:
 	void fadeInUpdate(const InputState& input);
 	//通常状態のupdate関数
 	void normalUpdate(const InputState& input);
+
+	void particleUpdate();
+	void particleDraw();
+
 	//フェードアウト時のupdate関数
 	void gameoverFadeOutUpdate(const InputState& input);
 	void clearFadeOutUpdate(const InputState& input);
+	void clearUpdate(const InputState& input);
 private:
 
 	int enemyHandle = -1;
 	int repairHandle = -1;
 	int hpHandle = -1;
 	int portionHandle = -1;
-	int hacheteHandle = -1;
+	int macheteHandle = -1;
 	int guiHandle = -1;
 	int coinHandle = -1;
 	int signboardHandle = -1;
+	int cheerSound = -1;
 
 	int mainSound = -1;
 	int collapseSound = -1;
@@ -46,15 +52,23 @@ private:
 	int soundCount = 20;
 	int musicVolume = 0;
 
+	float sinRate = 0.0f;
+	int effectScreen = -1;
+	Vec2 pos[257];
+	Vec2 vec[257];
+
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;
 	float fadeValue = 255;//黒矩形のブレンド具合
+	int fadeColor = 0x000000;
 
 	int imgX = 0;
 	int ImgTime = 4;
 	int startTime = 30;
 
 	bool bossMove = false;
+	int cheerCount = 720;
+	int cheerTime = 6;
 
 	float quakeY = 0;
 	int tempScreenH;
