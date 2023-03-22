@@ -29,7 +29,7 @@ private:
 
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;
-	float fadeValue = 255;//黒矩形のブレンド具合
+	int fadeValue = 255;//黒矩形のブレンド具合
 	int fadeColor = 0x000000;
 
 	int enemyHandle = -1;
@@ -54,7 +54,7 @@ private:
 	int graphWidth = 0;
 	int graphHeight = 0;
 
-	int personNum = 0;
+	int personNum = 3;
 	int count = 1;
 
 	bool buy = false;

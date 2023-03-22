@@ -55,7 +55,7 @@ void Field::draw(Vec2 offset, int num)
 		//ç≈âúÇÃîwåi
 		for (int x = 0; x < 49; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -72,19 +72,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 		//âúÇ©ÇÁìÒå¬ñ⁄ÇÃîwåi
 		for (int x = 0; x < 53; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -100,21 +100,21 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 
-		DrawRotaGraph(2510 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(static_cast < int>(2510 + offset.x), 780, 2.0f, 0.0f, shopperHandle, true);
 
 		for (int x = 0; x < tutorialNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -131,20 +131,20 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
 
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(groundGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(groundGraphWidth)) * graphChipSize);
 
 				
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, groundHandle, true, false);
 			
 			}
 		}
 
 		for (int x = 0; x < tutorialNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -160,19 +160,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(objectGraphWidth, objectGraphHeight));
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(objectGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(objectGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(objectGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(objectGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, objectHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, objectHandle, true, false);
 
 			}
 		}
 
 		for (int x = 0; x < tutorialNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -188,13 +188,13 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(buildingGraphWidth, buildingGraphHeight));
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(buildingGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(buildingGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(buildingGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(buildingGraphWidth)) * graphChipSize);
 
 				
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, buildingHandle, true, false);
 			}
 		}
 	}
@@ -207,7 +207,7 @@ void Field::draw(Vec2 offset, int num)
 		//ç≈âúÇÃîwåi
 		for (int x = 0; x < 49; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -224,19 +224,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
 				
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 		//âúÇ©ÇÁìÒå¬ñ⁄ÇÃîwåi
 		for (int x = 0; x < 53; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -252,23 +252,23 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 
 		//ìXàı
-		DrawRotaGraph(2130 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(static_cast < int>(2130 + offset.x), 780, 2.0f, 0.0f, shopperHandle, true);
 
 		//ínñ 
 		for (int x = 0; x < bgNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -285,19 +285,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
 
 				
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(groundGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(groundGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, groundHandle, true, false);
 
 			}
 		}
 		//åöï®
 		for (int x = 0; x < bgNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -313,19 +313,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(buildingGraphWidth, buildingGraphHeight));
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(buildingGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(buildingGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(buildingGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(buildingGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, buildingHandle, true, false);
 
 			}
 		}
 		//ÉIÉuÉWÉFÉNÉgóﬁ
 		for (int x = 0; x < bgNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -341,19 +341,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(objectGraphWidth, objectGraphHeight));
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(objectGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(objectGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(objectGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(objectGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, objectHandle, true, false);
-
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, objectHandle, true, false);
+				//DrawBox(x * 32 + offset.x, y * 32, x * 32 + chipSize + offset.x, y * 32 + chipSize, 0xff4444, false);
 			}
 		}
 		//ëïè¸ÇP
 		for (int x = 0; x < bgNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -369,20 +369,20 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(buildingGraphWidth2, buildingGraphHeight2));
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(buildingGraphWidth2)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(buildingGraphWidth2)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(buildingGraphWidth2)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(buildingGraphWidth2)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle2, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, buildingHandle2, true, false);
 
 			}
 		}
-		DrawString(2110 + offset.x, 660, "shop", 0xffffff);
+		DrawString(static_cast < int>(2110 + offset.x), 660, "shop", 0xffffff);
 		//ëïè¸2
 		for (int x = 0; x < bgNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -398,12 +398,12 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(buildingGraphWidth, buildingGraphHeight));
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(buildingGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(buildingGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(buildingGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(buildingGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, buildingHandle, true, false);
 			}
 		}
 	}
@@ -414,7 +414,7 @@ void Field::draw(Vec2 offset, int num)
 		//ç≈âúÇÃîwåi
 		for (int x = 0; x < 199; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -430,19 +430,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 		//âúÇ©ÇÁìÒå¬ñ⁄ÇÃîwåi
 		for (int x = 0; x < 215; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -458,19 +458,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, y * backGroundGraphChipSize + 24, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, static_cast<int>(y * backGroundGraphChipSize + 24), graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 		//ínñ 
 		for (int x = 0; x < bossNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -487,13 +487,13 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
 
 				
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(groundGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(groundGraphWidth)) * graphChipSize);
 				if (!(offset.x < -13430)) {
 					if (chipNo != 1) {
-						DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+						DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, groundHandle, true, false);
 					}
 				}
 			}
@@ -501,7 +501,7 @@ void Field::draw(Vec2 offset, int num)
 		//ínñ 
 		for (int x = 0; x < bossNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -518,19 +518,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
 
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(groundGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(groundGraphWidth)) * graphChipSize);
 				if (chipNo != 1) {
-					DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+					DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, groundHandle, true, false);
 				}
 			}
 		}
 		//åöï®
 		for (int x = 0; x < bossNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -547,12 +547,12 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(buildingGraphWidth, buildingGraphHeight));
 
 				
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(buildingGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(buildingGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(buildingGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(buildingGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, buildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, buildingHandle, true, false);
 			}
 		}
 	}
@@ -564,7 +564,7 @@ void Field::draw(Vec2 offset, int num)
 
 		for (int x = 0; x < 49; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f);
+			int posX = static_cast<int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.2f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -581,19 +581,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 		//âúÇ©ÇÁìÒå¬ñ⁄ÇÃîwåi
 		for (int x = 0; x < 53; x++) {
 
-			int posX = (x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (static_cast<int>(offset.x) * 0.4f);
+			int posX = static_cast <int>((x * backGroundGraphChipSize + backGroundGraphChipSize / 2) + (offset.x * 0.4f));
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -609,19 +609,19 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo >= 0);
 				assert(chipNo < chipNum(backBuildingWidth, backBuildingHeight));
 
-				int posY = y * backGroundGraphChipSize + backGroundGraphChipSize / 2;
+				int posY = static_cast<int>(y * backGroundGraphChipSize + backGroundGraphChipSize / 2);
 
-				int graphX = (chipNo % chipNumX(backBuildingWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(backBuildingWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(backBuildingWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(backBuildingWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 3.0f, 0.0f, backBuildingHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 3.0f, 0.0f, backBuildingHandle, true, false);
 
 			}
 		}
 
 		for (int x = 0; x < tutorialNumX; x++) {
 
-			int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+			int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 			if (posX > Game::kScreenWidth + chipSize) {
 				break;
@@ -638,12 +638,12 @@ void Field::draw(Vec2 offset, int num)
 				assert(chipNo < chipNum(groundGraphWidth, groundGraphHeight));
 
 
-				int posY = y * chipSize + graphChipSize;
+				int posY = static_cast<int>(y * chipSize + graphChipSize);
 
-				int graphX = (chipNo % chipNumX(groundGraphWidth)) * graphChipSize;
-				int graphY = (chipNo / chipNumX(groundGraphWidth)) * graphChipSize;
+				int graphX = static_cast<int>((chipNo % chipNumX(groundGraphWidth)) * graphChipSize);
+				int graphY = static_cast<int>((chipNo / chipNumX(groundGraphWidth)) * graphChipSize);
 
-				DrawRectRotaGraph(posX, posY, graphX, graphY, graphChipSize, graphChipSize, 2.0f, 0.0f, groundHandle, true, false);
+				DrawRectRotaGraph(posX, posY, graphX, graphY, static_cast<int>(graphChipSize), static_cast<int>(graphChipSize), 2.0f, 0.0f, groundHandle, true, false);
 
 			}
 		}
@@ -655,12 +655,12 @@ void Field::draw(Vec2 offset, int num)
 
 int Field::chipNumX(int width)
 {
-	return (width / graphChipSize);
+	return (width / static_cast<int>(graphChipSize));
 }
 
 int Field::chipNumY(int height)
 {
-	return (height / graphChipSize);
+	return (height / static_cast<int>(graphChipSize));
 }
 
 int Field::chipNum(int width, int height)

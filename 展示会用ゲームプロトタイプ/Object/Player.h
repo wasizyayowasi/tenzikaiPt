@@ -75,14 +75,12 @@ public:
 
 	bool returnEnemyHit() { return enemyHit; }
 
-	//void setMovementRestrictions(float limitNum) { movementRestrictions = limitNum; }
-
 	bool rockCollision(Vec2 pos);
 
 private:
 	//所持アイテム
-	int money = 3000;
-	int repairBlock = 2;
+	int money = 0;
+	int repairBlock = 0;
 	int recoveryItem = 0;
 
 	//グラフィックハンドル
@@ -106,10 +104,9 @@ private:
 
 	int sceneNum = 0;
 
+	//サウンド関連
 	int soundCount = 1;
-
 	int soundVolume = 150;
-
 	int soundTime = 1;
 
 	//スモークの画像の類

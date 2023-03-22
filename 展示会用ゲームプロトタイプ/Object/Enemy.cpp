@@ -168,6 +168,12 @@ void Enemy::tutorialUpdate(Vec2 offset)
 				enemyHp -= 3;
 				hpDisplay = true;
 				coolTime = 23;
+				if (inversion) {
+					enemyPos.x += 10.0f;
+				}
+				else {
+					enemyPos.x -= 10.0f;
+				}
 			}
 		}
 	}
@@ -256,8 +262,8 @@ void Enemy::normalUpdate(Vec2 offset)
 {
 	vec.y = 0.0f;
 
-	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
-	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+	int underfootChipNoX = static_cast<int>(enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = static_cast<int>(enemyPos.y + chipSize) / chipSize;
 
 	const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
@@ -292,14 +298,7 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
-	
-
 	motionNum = 0;
-
-	//HP‚ª‚È‚­‚È‚èŽ€–S‚µ‚½ê‡
-	if (hp->returnTempHp() <= 0.0f) {
-		motionNum = 3;
-	}
 
 	//ƒvƒŒƒCƒ„[‚ª‰B‚ê‚Ä‚¢‚é‚©
 	hidden = player->beHidden();
@@ -372,6 +371,11 @@ void Enemy::normalUpdate(Vec2 offset)
 		}
 	}
 
+	//HP‚ª‚È‚­‚È‚èŽ€–S‚µ‚½ê‡
+	if (hp->returnTempHp() <= 0.0f) {
+		motionNum = 3;
+	}
+
 	//‰E‚Ì•Ç”½ŽË
 	if (enemyPos.x > Game::kScreenWidth * 2 - 60) {
 		vec.x = -vec.x;
@@ -384,15 +388,13 @@ void Enemy::normalUpdate(Vec2 offset)
 	}
 
 	//ˆÚ“®
-	//if (motionNum != 3) {
-		if (!stop) {
-			if (landing) {
-				if (enemyHp > 0) {
-					enemyPos += vec;
-				}
+	if (!stop) {
+		if (landing) {
+			if (enemyHp > 0) {
+				enemyPos += vec;
 			}
 		}
-	//}
+	}
 
 	//UŒ‚
 	if (!player->beHidden()) {
@@ -444,6 +446,12 @@ void Enemy::normalUpdate(Vec2 offset)
 				time = 4;
 				vec.x = 0.0f;
 				damageStopTime = 20;
+				if (inversion) {
+					enemyPos.x += 10.0f;
+				}
+				else {
+					enemyPos.x -= 10.0f;
+				}
 			}
 		}
 	}
@@ -496,7 +504,7 @@ void Enemy::normalDraw(Vec2 offset)
 			windImgX++;
 			windTime = 8;
 		}
-		DrawRectRotaGraph(tempChipNoX * chipSize + 8 + offset.x, (tempChipNoY - 1) * chipSize - 10, windImgX * 48, 0, 48, 32, 2.0f, 4.6f, windHandle, true, false);
+		DrawRectRotaGraph(static_cast<int>(tempChipNoX * chipSize + 8 + offset.x), (tempChipNoY - 1) * chipSize - 10, windImgX * 48, 0, 48, 32, 2.0f, 4.6f, windHandle, true, false);
 		if (windImgX > 11) {
 			windImgX = 0;
 			windJump = false;
@@ -516,7 +524,7 @@ void Enemy::normalDraw(Vec2 offset)
 			imgX = 0;
 			time = 0;
 		}
-		my::myDrawRectRotaGraph(pos.x, pos.y, imgX * 40, 0, 40, 40, 1.5f, 0.0f, hitHandle, true, false);
+		my::myDrawRectRotaGraph(static_cast<int>(pos.x), static_cast<int>(pos.y), imgX * 40, 0, 40, 40, 1.5f, 0.0f, hitHandle, true, false);
 	}
 }
 
@@ -533,7 +541,6 @@ void Enemy::BossDraw(Vec2 offset)
 		hp->draw(enemyPos, offset);
 	}
 
-	DrawFormatString(0, 0, 0xffffff, "%d", checkSound);
 }
 
 void Enemy::titleUpdate(Vec2 offset)
@@ -550,11 +557,11 @@ void Enemy::titleUpdate(Vec2 offset)
 	if (landing) {
 		vec.y = jump;
 		if (jump < 0) {
-			jump += 0.3;
+			jump += 0.3f;
 		}
 	}
 
-	vec.y += 0.1;
+	vec.y += 0.1f;
 
 	if (enemyPos.x + 40 < 0) {
 		isEnabled = false;
@@ -582,14 +589,14 @@ void Enemy::jumpUpdate(Vec2 offset)
 
 	enemyPos += jumpVec;
 
-	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
-	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+	int underfootChipNoX = static_cast<int>(enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = static_cast<int>(enemyPos.y + chipSize) / chipSize;
 
 	for (int i = 0; i < 1; i++) {
 		const int chipNo = groundData::ground[underfootChipNoY][underfootChipNoX];
 
 		if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46||chipNo == 16||chipNo == 30) {
-			enemyPos.y = (underfootChipNoY - 1) * chipSize;
+			enemyPos.y = static_cast<float>(underfootChipNoY - 1) * chipSize;
 			landing = true;
 			updateFunc = &Enemy::normalUpdate;
 		}
@@ -612,7 +619,7 @@ void Enemy::coinUpdate(Vec2 offset)
 
 void Enemy::coinDraw(Vec2 offset)
 {
-	DrawGraph(enemyPos.x + offset.x, enemyPos.y + offset.y, coinHandle, true);
+	DrawGraphF(enemyPos.x + offset.x, enemyPos.y + offset.y, coinHandle, true);
 }
 
 void Enemy::updateDescent(Vec2 offset)
@@ -620,8 +627,8 @@ void Enemy::updateDescent(Vec2 offset)
 	vec.y = 1.0f;
 	enemyPos.y += vec.y * 4;
 
-	int underfootChipNoX = (enemyPos.x + 20) / chipSize;
-	int underfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+	int underfootChipNoX = static_cast<int>(enemyPos.x + 20) / chipSize;
+	int underfootChipNoY = static_cast<int>(enemyPos.y + chipSize) / chipSize;
 
 	switch (sceneNum) {
 	case 0:
@@ -653,8 +660,8 @@ void Enemy::updateDescent(Vec2 offset)
 		}
 		break;
 	case 3:
-		bunderfootChipNoX = (enemyPos.x + 20) / chipSize;
-		bunderfootChipNoY = (enemyPos.y + chipSize) / chipSize;
+		bunderfootChipNoX = static_cast<int>(enemyPos.x + 20) / chipSize;
+		bunderfootChipNoY = static_cast<int>(enemyPos.y + chipSize) / chipSize;
 
 		for (int i = 0; i < 1; i++) {
 			const int chipNo = groundData::tutorialGround[underfootChipNoY + 12][underfootChipNoX];
@@ -736,10 +743,10 @@ bool Enemy::isEnable() const
 bool Enemy::filedCollision(int x,int y)
 {
 
-	float filedLeft = x * chipSize;
-	float filedRight = x * chipSize + chipSize;
-	float filedTop = y * chipSize;
-	float filedBottom = y * chipSize + chipSize;
+	int filedLeft = x * chipSize;
+	int filedRight = x * chipSize + chipSize;
+	int filedTop = y * chipSize;
+	int filedBottom = y * chipSize + chipSize;
 
 	if (enemyPos.x + 15< filedLeft)		return false;
 	if (enemyPos.x > filedRight)		return false;

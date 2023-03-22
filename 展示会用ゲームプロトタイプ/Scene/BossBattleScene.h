@@ -14,8 +14,6 @@ public:
 	BossBattleScene(SceneManager& manager);
 	virtual ~BossBattleScene();
 
-	void init();
-
 	void update(const InputState& input);
 	void draw();
 
@@ -59,7 +57,7 @@ private:
 
 	static constexpr int fadeInterval = 60;
 	int fadeTimer = fadeInterval;
-	float fadeValue = 255;//黒矩形のブレンド具合
+	int fadeValue = 255;//黒矩形のブレンド具合
 	int fadeColor = 0x000000;
 
 	int imgX = 0;

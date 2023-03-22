@@ -166,7 +166,7 @@ void TitleScene::draw()
 	/*DrawRectRotaGraph(Game::kScreenWidth - 100, Game::kScreenHeight - 50, imgX * graphSize, imgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
 	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "åàíË", 0xffffff, UIfontHandle);*/
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
 	//âÊñ ëSëÃÇê^Ç¡çïÇ…ìhÇËÇ¬Ç‘Ç∑
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -182,11 +182,13 @@ void TitleScene::choiceScene(const InputState& input)
 		ChangeVolumeSoundMem(160, uiSound);
 		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;
+		demoSceneTimer = 600;
 	}
 	else if (input.isTriggered(InputType::down)) {
 		ChangeVolumeSoundMem(160, uiSound);
 		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
+		demoSceneTimer = 600;
 	}
 
 	if (input.isTriggered(InputType::next)) {
@@ -268,10 +270,10 @@ void TitleScene::choiceSceneDraw()
 
 void TitleScene::fadeInUpdate(const InputState& input)
 {
-	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	fadeValue = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (--fadeTimer_ == 0) {
 		updateFunc = &TitleScene::normalUpdate;
-		fadeValue_ = 0;
+		fadeValue = 0;
 		ChangeVolumeSoundMem(soundVolume, soundHandle);
 		PlaySoundMem(soundHandle, DX_PLAYTYPE_LOOP, true);
 	}
@@ -286,7 +288,7 @@ void TitleScene::fadeOutUpdateGameMain(const InputState& input)
 {
 	soundVolume--;
 	ChangeVolumeSoundMem(soundVolume, soundHandle);
-	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	fadeValue = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new GameMain(manager_));
 		return;
@@ -297,7 +299,7 @@ void TitleScene::fadeOutUpdateTutorial(const InputState& input)
 {
 	soundVolume--;
 	ChangeVolumeSoundMem(soundVolume, soundHandle);
-	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	fadeValue = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new TutorialScene(manager_));
 		return;
@@ -308,7 +310,7 @@ void TitleScene::fadeOutUpdateBoss(const InputState& input)
 {
 	soundVolume--;
 	ChangeVolumeSoundMem(soundVolume, soundHandle);
-	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	fadeValue = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new BossBattleScene(manager_));
 		return;
@@ -319,7 +321,7 @@ void TitleScene::fadeOutUpdateDemo(const InputState& input)
 {
 	soundVolume--;
 	ChangeVolumeSoundMem(soundVolume, soundHandle);
-	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	fadeValue = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (++fadeTimer_ == fade_interval) {
 		manager_.changeScene(new DemoScene(manager_));
 		return;

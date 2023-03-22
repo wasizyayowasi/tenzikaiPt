@@ -20,6 +20,8 @@ private:
 	int fadeTimer = fadeInterval;
 	int fadeValue = 255;
 
+	int ultimateTimer = 120;
+
 	unsigned int FadeColor = 0x000000;//フェード色黒
 
 	void fadeInUpdate(const InputState& input);

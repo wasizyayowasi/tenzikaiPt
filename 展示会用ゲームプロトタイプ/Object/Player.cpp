@@ -45,7 +45,7 @@ Player::Player(int num) : sceneNum(num)
 	inventory = std::make_shared<Inventory>();
 	flyingObject = std::make_shared<PlayerThrowinAttack>(sceneNum);
 	
-	hp->setObjectMaxHp(playerHp);
+	hp->setObjectMaxHp(static_cast<float>(playerHp));
 	updateFunc = &Player::updateDescent;
 }
 
@@ -76,7 +76,7 @@ void Player::update(Vec2 offset, const InputState& input)
 {
 	
 	inventory->update(input);
-	hp->setObjectHp(playerHp);
+	hp->setObjectHp(static_cast<float>(playerHp));
 
 	if (flyingObject->isEnable()) {
 		if (sceneNum != 2) {
@@ -125,11 +125,12 @@ void Player::tutorialUpdate(Vec2 offset, const InputState& input)
 	if (motionNum != 3 || motion->returnEndMotion()) {
 		motionNum = 0;
 	}
+
 	motion->update(motionNum);
 
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
-	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
+	int underfootChipNoX = static_cast<int>(playerPos.x + correctionSizeX) / chipSize;
+	int underfootChipNoY = static_cast<int>(playerPos.y + chipSize * 3) / chipSize;
 
 	//配列の中身を見る
 	int chipNo = buildingData::tutorialBuilding[underfootChipNoY][underfootChipNoX];
@@ -299,8 +300,8 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 	motion->update(motionNum);
 
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
-	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
+	int underfootChipNoX = static_cast<int>(playerPos.x + correctionSizeX) / chipSize;
+	int underfootChipNoY = static_cast<int>(playerPos.y + chipSize * 3) / chipSize;
 
 	//配列の中身を見る
 	int chipNo = buildingData::bossBuilding[underfootChipNoY][underfootChipNoX];
@@ -339,17 +340,17 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 
 
 	//つま先の配列番号を見る
-	int tiptoeChipNoY = (playerPos.y + chipSize * 2) / chipSize;
+	int tiptoeChipNoY = static_cast<int>(playerPos.y + chipSize * 2) / chipSize;
 
 	if (!playerDirections) {
-		int rightTiptoeChipNoX = (playerPos.x + correctionSizeX + chipSize) / chipSize;
+		int rightTiptoeChipNoX = static_cast<int>(playerPos.x + correctionSizeX + chipSize) / chipSize;
 		int chipNo2 = groundData::bossGround[tiptoeChipNoY][rightTiptoeChipNoX];
 		if (chipNo2 != 0) {
 			rightClosure = true;
 		}
 	}
 	else {
-		int leftTiptoeChipNoX = (playerPos.x + correctionSizeX - chipSize) / chipSize;
+		int leftTiptoeChipNoX = static_cast<int>(playerPos.x + correctionSizeX - chipSize) / chipSize;
 		int chipNo2 = groundData::bossGround[tiptoeChipNoY][leftTiptoeChipNoX];
 		if (chipNo2 != 0) {
 			leftClosure = true;
@@ -395,19 +396,16 @@ void Player::BossUpdate(Vec2 offset, const InputState& input)
 
 	//近接攻撃
 	if (!push) {
-		if (!flyingObject->isEnable()) {
-			if (input.isTriggered(InputType::attack)) {
-				ChangeVolumeSoundMem(soundVolume, attackSound);
-
-				PlaySoundMem(attackSound, DX_PLAYTYPE_NORMAL, true);
-				motionNum = 3;
-				motion->resetImgX();
-				motion->update(motionNum);
-				proximityAttack = true;
-			}
-			else {
-				proximityAttack = false;
-			}
+		if (input.isTriggered(InputType::attack)) {
+			ChangeVolumeSoundMem(soundVolume, attackSound);
+			PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
+			motionNum = 3;
+			motion->resetImgX();
+			motion->update(motionNum);
+			proximityAttack = true;
+		}
+		else {
+			proximityAttack = false;
 		}
 	}
 
@@ -472,8 +470,8 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	motion->update(motionNum);
 
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + correctionSizeX) /chipSize;
-	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
+	int underfootChipNoX = static_cast<int>(playerPos.x + correctionSizeX) /chipSize;
+	int underfootChipNoY = static_cast<int>(playerPos.y + chipSize * 3) / chipSize;
 
 	//配列の中身を見る
 	int chipNo = buildingData::building[underfootChipNoY][underfootChipNoX];
@@ -546,7 +544,7 @@ void Player::updateField(Vec2 offset, const InputState& input)
 	//近接攻撃
 	if (!push) {
 		if (input.isTriggered(InputType::attack)) {
-			ChangeVolumeSoundMem(soundVolume, attackSound);
+			ChangeVolumeSoundMem(soundVolume + 50, attackSound);
 			PlaySoundMem(attackSound, DX_PLAYTYPE_BACK, true);
 			motionNum = 3;
 			motion->resetImgX();
@@ -630,8 +628,8 @@ void Player::updateField(Vec2 offset, const InputState& input)
 void Player::updateDescent(Vec2 offset, const InputState& input)
 {
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + chipSize) / chipSize;
-	int underfootChipNoY = (playerPos.y + chipSize * 3) / chipSize;
+	int underfootChipNoX = static_cast<int>(playerPos.x + chipSize) / chipSize;
+	int underfootChipNoY = static_cast<int>(playerPos.y + chipSize * 3) / chipSize;
 
 	//降下
 	playerPos += vec;
@@ -648,7 +646,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46||chipNo == 16) {
 					if (playerFiledCollision(x, y)) {
 						if (playerPos.y + correctionSizeY > y * chipSize) {
-							playerPos.y = y * chipSize - 74;
+							playerPos.y = static_cast<float>(y * chipSize - 74);
 						}
 
 						updateFunc = &Player::updateField;
@@ -670,7 +668,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 					if (playerFiledCollision(x, y)) {
 						if (playerPos.y + correctionSizeY > y * chipSize) {
-							playerPos.y = y * chipSize - 74;
+							playerPos.y = static_cast<float>(y * chipSize - 74);
 						}
 
 						updateFunc = &Player::tutorialUpdate;
@@ -691,7 +689,7 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 				if (chipNo == 53 || chipNo == 60 || chipNo == 61 || chipNo == 31 || chipNo == 32 || chipNo == 45 || chipNo == 46) {
 					if (playerFiledCollision(x, y)) {
 						if (playerPos.y + correctionSizeY > y * chipSize) {
-							playerPos.y = y * chipSize - 74;
+							playerPos.y = static_cast<float>(y * chipSize - 74);
 						}
 
 						updateFunc = &Player::BossUpdate;
@@ -723,8 +721,8 @@ void Player::updateDescent(Vec2 offset, const InputState& input)
 void Player::updateLadder(Vec2 offset, const InputState& input)
 {
 	//足元の配列番号を見る
-	int underfootChipNoX = (playerPos.x + correctionSizeX) / chipSize;
-	int underfootChipNoY = (playerPos.y + chipSize * 2) / chipSize;
+	int underfootChipNoX = static_cast<int>(playerPos.x + correctionSizeX) / chipSize;
+	int underfootChipNoY = static_cast<int>(playerPos.y + chipSize * 2) / chipSize;
 
 	switch (sceneNum) {
 	case 0:
@@ -898,7 +896,7 @@ void Player::setItemControl(int num)
 {
 	switch (num) {
 	case 0:
-		hp->setObjectMaxHp(hp->returnMaxHp() + 1);
+		hp->setObjectMaxHp(static_cast<float>(hp->returnMaxHp() + 1));
 		break;
 	case 1:
 		repairBlock++;
@@ -945,7 +943,7 @@ void Player::draw(Vec2 offset)
 	inventory->draw();
 
 	if (--coinDisplayTime > 0) {
-		fadeValue = 255 * (static_cast<float>(coinDisplayTime) / static_cast<float>(fadeInterval));
+		fadeValue = static_cast < int>(255 * (static_cast<float>(coinDisplayTime) / static_cast<float>(fadeInterval)));
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
 
 		int coinWidth = Game::kScreenWidth - 64 * 2;
@@ -998,10 +996,10 @@ void Player::draw(Vec2 offset)
 	}
 
 	if (motionStart) {
-		DrawRectRotaGraph(playerPos.x + offset.x - 10, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
-		DrawRectRotaGraph(playerPos.x + offset.x + 30, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
-		DrawRectRotaGraph(playerPos.x + offset.x + 30, playerPos.y + 30, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
-		DrawRectRotaGraph(playerPos.x + offset.x - 10, playerPos.y + 30, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraphF(playerPos.x + offset.x - 10, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraphF(playerPos.x + offset.x + 30, playerPos.y, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraphF(playerPos.x + offset.x + 30, playerPos.y + 30, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
+		DrawRectRotaGraphF(playerPos.x + offset.x - 10, playerPos.y + 30, imgX * 100, imgY * 100, 100, 100, 1.0f, 0.0f, smokeHandle, true, false);
 	}
 }
 
@@ -1016,22 +1014,24 @@ bool Player::beHidden()
 
 void Player::damege(bool inversion)
 {
-	if (ultimateTimer <= 0) {
-		if (!inversion) {
-			playerPos.x += 30.0f;
-		}
-		else {
-			playerPos.x -= 30.0f;
-		}
-
-		if (playerHp > 0) {
-			playerHp--;
-			if (playerHp > 0) {
-				ChangeVolumeSoundMem(150, damageSound);
-				PlaySoundMem(damageSound, DX_PLAYTYPE_BACK);
+	if (updateFunc != &Player::updateLadder) {
+		if (ultimateTimer <= 0) {
+			if (!inversion) {
+				playerPos.x += 30.0f;
 			}
+			else {
+				playerPos.x -= 30.0f;
+			}
+
+			if (playerHp > 0) {
+				playerHp--;
+				if (playerHp > 0) {
+					ChangeVolumeSoundMem(150, damageSound);
+					PlaySoundMem(damageSound, DX_PLAYTYPE_BACK);
+				}
+			}
+			ultimateTimer = ultimateFrames;
 		}
-		ultimateTimer = ultimateFrames;
 	}
 
 }
@@ -1120,10 +1120,10 @@ bool Player::repairSpace(const Vec2& pos,Vec2 offset)
 
 bool Player::playerFiledCollision(int x,int y)
 {
-	float fieldLeft = x * chipSize;
-	float fieldRight = x * chipSize + chipSize;
-	float fieldTop = y * chipSize;
-	float fieldBottom = y * chipSize + chipSize;
+	int fieldLeft = x * chipSize;
+	int fieldRight = x * chipSize + chipSize;
+	int fieldTop = y * chipSize;
+	int fieldBottom = y * chipSize + chipSize;
 
 	if (playerPos.x + 15.0f < fieldLeft)				return false;
 	if (playerPos.x + correctionSizeX > fieldRight)		return false;
@@ -1136,10 +1136,10 @@ bool Player::playerFiledCollision(int x,int y)
 bool Player::objectCollision(int x,int y)
 {
 
-	float objectLeft = x * chipSize;
-	float objectRight = x * chipSize  + chipSize ;
-	float objectTop = y * chipSize;
-	float objectBottom = y * chipSize + chipSize;
+	int objectLeft = x * chipSize;
+	int objectRight = x * chipSize  + chipSize ;
+	int objectTop = y * chipSize;
+	int objectBottom = y * chipSize + chipSize;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
 	if (playerPos.x + correctionSizeX > objectRight)	return false;
@@ -1151,10 +1151,10 @@ bool Player::objectCollision(int x,int y)
 
 bool Player::ladderCollision(int x, int y)
 {
-	float objectLeft = x * chipSize ;
-	float objectRight = x * chipSize + chipSize;
-	float objectTop = y * chipSize;
-	float objectBottom = y * chipSize + chipSize;
+	int objectLeft = x * chipSize ;
+	int objectRight = x * chipSize + chipSize;
+	int objectTop = y * chipSize;
+	int objectBottom = y * chipSize + chipSize;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
 	if (playerPos.x + correctionSizeX > objectRight)	return false;
@@ -1186,10 +1186,10 @@ bool Player::coinCollision(Vec2 pos, Vec2 offset)
 
 bool Player::shopCollision(int x, int y, Vec2 offset)
 {
-	float objectLeft = x * chipSize - chipSize;
-	float objectRight = x * chipSize + chipSize * 2;
-	float objectTop = y * chipSize;
-	float objectBottom = y * chipSize + chipSize * 3;
+	int objectLeft = x * chipSize - chipSize;
+	int objectRight = x * chipSize + chipSize * 2;
+	int objectTop = y * chipSize;
+	int objectBottom = y * chipSize + chipSize * 3;
 
 	if (playerPos.x + 15.0f < objectLeft)				return false;
 	if (playerPos.x + correctionSizeX > objectRight)	return false;

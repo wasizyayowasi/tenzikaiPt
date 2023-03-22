@@ -181,54 +181,16 @@ void TutorialScene::update(const InputState& input)
 			targetPlayer7.y = player->getPos().y + 44 - 780;
 		}
 
-		if (textCount == 1) {
-			personNum = 1;
-		}
-		else if (textCount == 2) {
-			personNum = 2;
-		}
-		else if (textCount == 3) {
-			personNum = 3;
-		}
-
-		{
-			switch (textCount) {
-			case 0:
-				if (textCount == 0) {
-					if (targetPlayer.length() < 200) {
-						//manager_.pushScene(new TextScene(manager_, input, 0, offset, bottanHandle));
-						textCount = 1;
-					}
+		if (textCount == 0) {
+			if (!space->isEnable()) {
+				if (targetPlayer5.length() < 200) {
+					manager_.pushScene(new TextScene(manager_, input, 3, offset, bottanHandle));
+					textCount = 1;
 				}
-				break;
-			case 1:
-				if (textCount == 1) {
-					if (targetPlayer2.length() < 200) {
-						//manager_.pushScene(new TextScene(manager_, input, 1, offset, bottanHandle));
-						textCount = 2;
-					}
-				}
-				break;
-			case 2:
-				if (textCount == 2) {
-					if (targetPlayer3.length() < 200) {
-						//manager_.pushScene(new TextScene(manager_, input, 2, offset, bottanHandle));
-						textCount = 3;
-					}
-				}
-				break;
-			case 3:
-				if (!space->isEnable()) {
-					if (targetPlayer5.length() < 200) {
-						manager_.pushScene(new TextScene(manager_, input, 3, offset, bottanHandle));
-						textCount = 4;
-					}
-				}
-				break;
 			}
 		}
-
-		if (textCount == 4) {
+			
+		if (textCount == 1) {
 			if (player->getPos().x > 3650) {
 				updateFunc = &TutorialScene::clearFadeOutUpdate;
 			}
@@ -286,10 +248,11 @@ void TutorialScene::draw()
 		}
 	}
 	
-
-	if (targetPlayer4.length() < 200) {
-		textDraw(2);
-		count--;
+	if (space->isEnable()) {
+		if (targetPlayer4.length() < 200) {
+			textDraw(2);
+			count--;
+		}
 	}
 
 	if (space->isEnable()) {
@@ -303,12 +266,12 @@ void TutorialScene::draw()
 	//ìXàı
 	switch (personNum) {
 	case 3:
-		DrawRotaGraph(3400 + offset.x, 780, 2.0f, 0.0f, shopperHandle, true);
+		DrawRotaGraph(static_cast < int>(3400 + offset.x), 780, 2.0f, 0.0f, shopperHandle, true);
 		break;
 	}
 	
 	if (player->getPos().x > 3650) {
-		if (textCount == 4) {
+		if (textCount == 1) {
 			
 		}
 		else {
@@ -319,8 +282,8 @@ void TutorialScene::draw()
 		player->draw(offset);
 	}
 
-	if (textCount == 4) {
-		DrawGraph(truckPos + offset.x, 643,truckHandle,true);
+	if (textCount == 1) {
+		DrawGraph(static_cast <int>(truckPos + offset.x), 643,truckHandle,true);
 	}
 
 	bool checkFlyingObject = player->returnFlyingisEnabled();
@@ -337,7 +300,7 @@ void TutorialScene::draw()
 
 void TutorialScene::fadeInUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast <int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (--fadeTimer == 0) {
 		updateFunc = &TutorialScene::normalUpdate;
 		PlayMusic("data/music/Empty Streets.wav", DX_PLAYTYPE_LOOP);
@@ -369,7 +332,7 @@ void TutorialScene::normalUpdate(const InputState& input)
 	}
 	if (targetOffset.x < -field->getTutorialWidth() + Game::kScreenWidth)
 	{
-		targetOffset.x = -field->getTutorialWidth() + Game::kScreenWidth;
+		targetOffset.x = static_cast<float>( -field->getTutorialWidth() + Game::kScreenWidth);
 	}
 
 
@@ -382,7 +345,7 @@ void TutorialScene::clearFadeOutUpdate(const InputState& input)
 		SetVolumeMusic(musicVolume);
 	}
 
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	truckPos += 10;
 	if (++fadeTimer == fadeInterval) {
 		StopMusic();
@@ -401,19 +364,19 @@ void TutorialScene::textDraw(int num)
 			imgX = 2;
 		}
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//èÊéZçáê¨
-		DrawBox(2370 + offset.x, 570, 2653 + offset.x, 720, 0x000000, true);
+		DrawBox(static_cast < int>(2370 + offset.x), 570, static_cast < int>(2653 + offset.x), 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//í èÌï`âÊÇ…ñﬂÇ∑
-		DrawBox(2370 + offset.x, 570, 2653 + offset.x, 720, 0xffffff, false);
-		DrawString(2405 + offset.x, 620, "Ç®ã‡ÇèEÇ¡ÇƒîÉÇ¢ï®ÇÇµÇÊÇ§", 0xffffff);
+		DrawBox(static_cast < int>(2370 + offset.x), 570, static_cast < int>(2653 + offset.x), 720, 0xffffff, false);
+		DrawString(static_cast < int>(2405 + offset.x), 620, "Ç®ã‡ÇèEÇ¡ÇƒîÉÇ¢ï®ÇÇµÇÊÇ§", 0xffffff);
 
-		DrawRectRotaGraph(2510 + offset.x, 670, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
+		DrawRectRotaGraph(static_cast < int>(2510 + offset.x), 670, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
 		break;
 	case 1:
 
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//èÊéZçáê¨
-		DrawBox(2970 + offset.x, 570, 3170 + offset.x, 720, 0x000000, true);
+		DrawBox(static_cast < int>(2970 + offset.x), 570, static_cast < int>(3170 + offset.x), 720, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//í èÌï`âÊÇ…ñﬂÇ∑
-		DrawBox(2970 + offset.x, 570, 3170 + offset.x, 720, 0xffffff, false);
+		DrawBox(static_cast < int>(2970 + offset.x), 570, static_cast < int>(3170 + offset.x), 720, 0xffffff, false);
 
 		if (--time2 == 0) {
 			imgX++;
@@ -423,8 +386,8 @@ void TutorialScene::textDraw(int num)
 		if (imgX > 4) {
 			imgX = 0;
 		}
-		DrawString(3055 + offset.x, 680, "ìoÇÈ", 0xffffff);
-		DrawRectRotaGraph(3070 + offset.x, 635, imgX * 112, 0, 112, 153, 0.4f, 0.0f, arrowHandle, true, false);
+		DrawString(static_cast < int>(3055 + offset.x), 680, "ìoÇÈ", 0xffffff);
+		DrawRectRotaGraph(static_cast < int>(3070 + offset.x), 635, imgX * 112, 0, 112, 153, 0.4f, 0.0f, arrowHandle, true, false);
 		break;
 	case 2:
 		
@@ -437,29 +400,29 @@ void TutorialScene::textDraw(int num)
 			imgX = 2;
 		}
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//èÊéZçáê¨
-		DrawBox(2870 + offset.x, 20, 3250 + offset.x, 60, 0x000000, true);
+		DrawBox(static_cast < int>(2870 + offset.x), 20, static_cast < int>(3250 + offset.x), 60, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//í èÌï`âÊÇ…ñﬂÇ∑
-		DrawBox(2870 + offset.x, 20, 3250 + offset.x, 60, 0xffffff, false);
-		DrawString(2990 + offset.x, 35, "ÉQÅ[ÉgÇîjâÛÇµÇÊÇ§", 0xff0000);
+		DrawBox(static_cast < int>(2870 + offset.x), 20, static_cast < int>(3250 + offset.x), 60, 0xffffff, false);
+		DrawString(static_cast < int>(2990 + offset.x), 35, "ÉQÅ[ÉgÇîjâÛÇµÇÊÇ§", 0xff0000);
 
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//èÊéZçáê¨
-		DrawBox(2870 + offset.x, 70, 3250 + offset.x, 220, 0x000000, true);
+		DrawBox(static_cast < int>(2870 + offset.x), 70, static_cast < int>(3250 + offset.x), 220, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//í èÌï`âÊÇ…ñﬂÇ∑
-		DrawBox(2870 + offset.x, 70, 3250 + offset.x, 220, 0xffffff, false);
-		DrawString(2980 + offset.x, 95, "éËéùÇøÇêÿÇËë÷Ç¶ÇÊÇ§", 0xffffff);
+		DrawBox(static_cast < int>(2870 + offset.x), 70, static_cast < int>(3250 + offset.x), 220, 0xffffff, false);
+		DrawString(static_cast < int>(2980 + offset.x), 95, "éËéùÇøÇêÿÇËë÷Ç¶ÇÊÇ§", 0xffffff);
 
-		DrawRectRotaGraph(3010 + offset.x, 140, imgX2 * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
-		DrawString(3050 + offset.x, 150, "or", 0xffffff);
-		DrawRectRotaGraph(3110 + offset.x, 140, imgX2 * 16, imgY2 * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
-		DrawRectRotaGraph(2930 + offset.x, 190, imgX * 16, (imgY - 2) * 16, 16, 16, 2.0f, 0.0f, bottanHandle, true, false);
-		DrawString(2950 + offset.x, 180, "ÇâüÇµÇƒÇ¢ÇÈä‘ÅAÉAÉCÉeÉÄÇégóp", 0xffffff);
+		DrawRectRotaGraph(static_cast < int>(3010 + offset.x), 140, imgX2 * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
+		DrawString(static_cast < int>(3050 + offset.x), 150, "or", 0xffffff);
+		DrawRectRotaGraph(static_cast < int>(3110 + offset.x), 140, imgX2 * 16, imgY2 * 16, 16, 16, 3.0f, 0.0f, bottanHandle2, true, false);
+		DrawRectRotaGraph(static_cast < int>(2930 + offset.x), 190, imgX * 16, (imgY - 2) * 16, 16, 16, 2.0f, 0.0f, bottanHandle, true, false);
+		DrawString(static_cast < int>(2950 + offset.x), 180, "ÇâüÇµÇƒÇ¢ÇÈä‘ÅAÉAÉCÉeÉÄÇégóp", 0xffffff);
 
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//èÊéZçáê¨
-		DrawBox(3040 - graphWidth * 2 - 50 + offset.x, 480, 3040 + graphWidth * 2 + 50 + offset.x, 650 + graphHeight * 2 - 30, 0x000000, true);
+		DrawBox(static_cast < int>(3040 - graphWidth * 2 - 50 + offset.x), 480, static_cast < int>(3040 + graphWidth * 2 + 50 + offset.x), 650 + graphHeight * 2 - 30, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//í èÌï`âÊÇ…ñﬂÇ∑
-		DrawBox(3040 - graphWidth * 2 - 50 + offset.x, 480, 3040 + graphWidth * 2 + 50 + offset.x, 650 + graphHeight * 2 - 30, 0xffffff, false);
-		DrawRotaGraph(3040 + offset.x, 670, 4.0f, 0.0f, descriptionHandle4, true);
-		DrawString(3310 + offset.x, 520, "îjâÛ", 0xff0000);
+		DrawBox(static_cast < int>(3040 - graphWidth * 2 - 50 + offset.x), 480, static_cast < int>(3040 + graphWidth * 2 + 50 + offset.x), 650 + graphHeight * 2 - 30, 0xffffff, false);
+		DrawRotaGraph(static_cast <int>(3040 + offset.x), 670, 4.0f, 0.0f, descriptionHandle4, true);
+		DrawString(static_cast<int>(3310 + offset.x), 520, "îjâÛ", 0xff0000);
 
 		break;
 	}

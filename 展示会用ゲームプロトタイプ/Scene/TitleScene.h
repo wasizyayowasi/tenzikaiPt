@@ -33,7 +33,7 @@ public:
 private:
 	static constexpr int fade_interval = 60;
 	int fadeTimer_ = fade_interval;
-	int fadeValue_ = 255;//黒矩形のブレンド具合
+	int fadeValue = 255;//黒矩形のブレンド具合
 
 	unsigned int FadeColor = 0x000000;//フェード色黒
 
@@ -76,7 +76,7 @@ private:
 
 	int ultimateTimer = 0;
 
-	int demoSceneTimer = 9;
+	int demoSceneTimer = 900;
 
 	std::map<choice, std::string> sceneTable;
 

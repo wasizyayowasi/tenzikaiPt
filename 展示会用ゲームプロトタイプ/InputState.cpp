@@ -13,7 +13,7 @@ InputState::InputState()
 	//変更
 	defaultMapTable[InputType::prevItem] = { {InputCategory::keybd,KEY_INPUT_Q},
 										  {InputCategory::pad,PAD_INPUT_5} };
-	//キーコンフィグ
+	//攻撃
 	defaultMapTable[InputType::attack] = { {InputCategory::keybd,KEY_INPUT_X},
 										   {InputCategory::pad,PAD_INPUT_2} };
 	//弾
@@ -21,7 +21,7 @@ InputState::InputState()
 										  {InputCategory::pad,PAD_INPUT_C} };
 	//戻る
 	defaultMapTable[InputType::prev] = { {InputCategory::keybd,KEY_INPUT_F},
-										  {InputCategory::pad,PAD_INPUT_4} };
+										  {InputCategory::pad,PAD_INPUT_2} };
 	//ポーズ
 	defaultMapTable[InputType::pause] = { {InputCategory::keybd,KEY_INPUT_TAB},
 										 {InputCategory::pad,PAD_INPUT_8} };

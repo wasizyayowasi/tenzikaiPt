@@ -34,6 +34,7 @@ GameMain::GameMain(SceneManager& manager) : SceneBase(manager),updateFunc(&GameM
 	bottanHandle = my::myLoadGraph("data/GUIGraph/bottan.png");
 	
 	footstepSound = LoadSoundMem("data/soundEffect/small_explosion1.mp3");
+	appearanceSound = LoadSoundMem("data/soundEffect/appearance.mp3");
 
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
 	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
@@ -77,6 +78,7 @@ GameMain::~GameMain()
 
 	DeleteSoundMem(mainSound);
 	DeleteSoundMem(footstepSound);
+	DeleteSoundMem(appearanceSound);
 
 	for (int i = 0; i < maxWave; i++) {
 		space[i]->init(0,0);
@@ -121,7 +123,7 @@ void GameMain::init()
 			space[i]->enemySetPlayer(enemyHandle, coinHandle);
 			waveHp += space[i]->returnHp();
 		}
-		hp->setWaveHp(waveHp);
+		hp->setWaveHp(static_cast<int>(waveHp));
 	}
 	else {
 		for (int i = 0; i < wave - 1; i++) {
@@ -175,13 +177,13 @@ void GameMain::draw()
 	}
 
 	if (updateFunc == &GameMain::fadeInUpdate) {
-		DrawGraph(truckPos, 643, truckHandle, true);
+		DrawGraphF(truckPos, 643, truckHandle, true);
 	}
 
 	if (!hitRock) {
 		if (updateFunc == &GameMain::gameClearIntroduction) {
 			if (!player->rockCollision({ player->getPos().x,player->getPos().y - rockHeight })) {
-				DrawRotaGraph(player->getPos().x + offset.x, player->getPos().y - rockHeight, 2.0f, 0.0f, rockHandle, true, false);
+				DrawRotaGraphF(player->getPos().x + offset.x, player->getPos().y - rockHeight, 2.0f, 0.0f, rockHandle, true, false);
 				rockHeight -= 1.5f;
 			}
 			else {
@@ -200,7 +202,7 @@ void GameMain::draw()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(0, quakeY, tempScreenH, false);
+	DrawGraphF(0, quakeY, tempScreenH, false);
 
 }
 
@@ -215,7 +217,7 @@ void GameMain::gameClearIntroduction(const InputState& input)
 
 void GameMain::fadeInUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	truckPos += 10.0f;
 	if (--fadeTimer == 0) {
 		updateFunc = &GameMain::normalUpdate;
@@ -233,6 +235,8 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 		else {
 			startWave = true;
+			ChangePanSoundMem(soundVolume, appearanceSound);
+			PlaySoundMem(appearanceSound, DX_PLAYTYPE_BACK);
 		}
 	}
 
@@ -356,7 +360,7 @@ void GameMain::normalUpdate(const InputState& input)
 		}
 		if (targetOffset.x < -field->getWidth() + Game::kScreenWidth)
 		{
-			targetOffset.x = -field->getWidth() + Game::kScreenWidth;
+			targetOffset.x = static_cast<float>( -field->getWidth() + Game::kScreenWidth);
 		}
 		offset = targetOffset;
 	}
@@ -384,7 +388,7 @@ void GameMain::gameoverFadeOutUpdate(const InputState& input)
 		musicVolume--;
 		SetVolumeMusic(musicVolume);
 	}
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new Gameover(manager_,input,1));
 		StopMusic();
@@ -398,7 +402,7 @@ void GameMain::bossBattleSceneFadeOutUpdate(const InputState& input)
 		musicVolume--;
 		SetVolumeMusic(musicVolume);
 	}
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new BossBattleScene(manager_));
 		StopMusic();

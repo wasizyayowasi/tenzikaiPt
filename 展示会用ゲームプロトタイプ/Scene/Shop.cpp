@@ -17,6 +17,7 @@ Shop::Shop(SceneManager& manager, const InputState& input, Player* dPlayer, int 
 	AddFontResourceEx(fontPath, FR_PRIVATE, NULL);
 
 	fontHandle = CreateFontToHandle("Silver", 64, 9, -1);
+	fontHandle2 = CreateFontToHandle("Silver", 48, 9, -1);
 	uiSound = LoadSoundMem("data/soundEffect/ui3.mp3");
 	bottanHandle = LoadGraph("data/GUIGraph/bottan.png");
 
@@ -33,12 +34,13 @@ Shop::~Shop()
 {
 	DeleteSoundMem(uiSound);
 	DeleteFontToHandle(fontHandle);
+	DeleteFontToHandle(fontHandle2);
 	DeleteGraph(bottanHandle);
 }
 
 void Shop::update(const InputState& input)
 {
-	const int nameCount = shopTable.size() + 1;
+	const int nameCount = static_cast <int>(shopTable.size() + 1);
 
 	if (input.isTriggered(InputType::up)) {
 		ChangeVolumeSoundMem(160, uiSound);
@@ -232,8 +234,8 @@ void Shop::draw()
 	DrawBox(goodsWidth, goodsHeight, goodsX + 50, goodsY, 0xffffff, false);
 	DrawBox(goodsWidth + 300, goodsHeight, shopkeeperX, goodsY, 0xffffff, false);
 
-	DrawStringToHandle(Game::kScreenWidth - 200, Game::kScreenHeight - 55, "Œˆ’è", 0xffffff, fontHandle);
-	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "–ß‚é", 0xffffff, fontHandle);
+	DrawStringToHandle(Game::kScreenWidth - 200, Game::kScreenHeight - 55, "Œˆ’è", 0xffffff, fontHandle2);
+	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "–ß‚é", 0xffffff, fontHandle2);
 
 
 	for (const auto& name : inputState.inputNameTable) {

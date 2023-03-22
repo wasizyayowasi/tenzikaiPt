@@ -45,8 +45,6 @@ BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),upd
 	bossEnemy->setPlayer(player, enemyHandle, coinHandle);
 	bossEnemy->dispatch({ -700,400 });
 
-	init();
-
 	int sw, sh, bit;
 	GetScreenState(&sw, &sh, &bit);
 	tempScreenH = MakeScreen(sw, sh);
@@ -59,11 +57,11 @@ BossBattleScene::BossBattleScene(SceneManager& manager) : SceneBase(manager),upd
 
 	for (int i = 0; i < particleNum; i++)
 	{
-		pos[i].x = GetRand(Game::kScreenWidth);
-		pos[i].y = -GetRand(Game::kScreenHeight);
+		pos[i].x = static_cast<float>(GetRand(Game::kScreenWidth));
+		pos[i].y = static_cast<float>(- GetRand(Game::kScreenHeight));
 
 		vec[i].x = 0.0f;
-		vec[i].y = GetRand(20) + 20;
+		vec[i].y = static_cast<float>(GetRand(20) + 20);
 		vec[i].y /= 10.0f;
 	}
 }
@@ -85,10 +83,6 @@ BossBattleScene::~BossBattleScene()
 
 	DeleteSoundMem(cheerSound);
 	DeleteSoundMem(footstepSound);
-}
-
-void BossBattleScene::init()
-{
 }
 
 void BossBattleScene::update(const InputState& input)
@@ -116,7 +110,7 @@ void BossBattleScene::draw()
 
 	for (int x = 0; x < bossNumX; x++) {
 
-		int posX = x * chipSize + static_cast<int>(offset.x) + graphChipSize;
+		int posX = static_cast<int>(x * chipSize + static_cast<int>(offset.x) + graphChipSize);
 
 		if (posX > Game::kScreenWidth + chipSize) {
 			break;
@@ -130,7 +124,7 @@ void BossBattleScene::draw()
 			const int chipNo = groundData::bossGround[y][x];
 
 			if (chipNo == 1) {
-				DrawRotaGraph(x * chipSize + offset.x, (y - 1) * chipSize + 22,1.5f,0.0f, signboardHandle, true);
+				DrawRotaGraph(static_cast<int>(x * chipSize + offset.x), (y - 1) * chipSize + 22,1.5f,0.0f, signboardHandle, true);
 			}
 		}
 	}
@@ -156,7 +150,7 @@ void BossBattleScene::draw()
 	}
 
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(0, quakeY, tempScreenH, false);
+	DrawGraph(0, static_cast<int>(quakeY), tempScreenH, false);
 
 	if (!bossEnemy->isEnable()) {
 		particleDraw();
@@ -224,7 +218,7 @@ void BossBattleScene::normalUpdate(const InputState& input)
 	}
 	if (targetOffset.x < -field->getBossWidth() + Game::kScreenWidth)
 	{
-		targetOffset.x = -field->getBossWidth() + Game::kScreenWidth;
+		targetOffset.x = static_cast<float>( -field->getBossWidth() + Game::kScreenWidth);
 	}
 
 	offset = targetOffset * 0.5f + offset * 0.5f;
@@ -256,11 +250,11 @@ void BossBattleScene::particleUpdate()
 		pos[i] += vec[i];
 		if (pos[i].y > Game::kScreenHeight)
 		{
-			pos[i].x = GetRand(Game::kScreenWidth);
+			pos[i].x = static_cast<float>(GetRand(Game::kScreenWidth));
 			pos[i].y = 0.0f;
 
 			vec[i].x = 0.0f;
-			vec[i].y = GetRand(20) + 20;
+			vec[i].y = static_cast<float>(GetRand(20) + 20);
 			vec[i].y /= 10.0f;
 		}
 	}
@@ -278,7 +272,7 @@ void BossBattleScene::particleDraw()
 		float rate = (vec[i].length() / 4.0f);
 		//	DrawCircleAA(pos[i].x, pos[i].y, 4 * rate, 32, 0x808020, true);
 			// âìÇ≠ÇÃÇ‡ÇÃ(óéâ∫ë¨ìxÇ™íxÇ¢Ç‡ÇÃ)ÇÕè¨Ç≥Ç≠ÅAà√Ç≠ï`âÊÇ∑ÇÈ
-		DrawCircleAA(pos[i].x, pos[i].y, 4 * rate, 32, GetColor(0 * rate, 79 * rate, 128 * rate), true);
+		DrawCircleAA(pos[i].x, pos[i].y, 4 * rate, 32, GetColor(static_cast < int>(0 * rate), static_cast < int>(79 * rate), static_cast < int>(128 * rate)), true);
 	}
 	EndAADraw();
 	SetDrawScreen(DX_SCREEN_BACK);
@@ -307,7 +301,7 @@ void BossBattleScene::particleDraw()
 
 void BossBattleScene::fadeInUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast <int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (--fadeTimer == 0) {
 		updateFunc = &BossBattleScene::bossAppearanceUpdate;
 		fadeValue = 0;
@@ -320,7 +314,7 @@ void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 		musicVolume--;
 		SetVolumeMusic(musicVolume);
 	}
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new Gameover(manager_,input,2));
 		StopMusic();
@@ -330,7 +324,7 @@ void BossBattleScene::gameoverFadeOutUpdate(const InputState& input)
 
 void BossBattleScene::clearFadeOutUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new GameClear(manager_));
 		StopMusic();
@@ -347,7 +341,7 @@ void BossBattleScene::clearUpdate(const InputState& input)
 
 	if (--cheerTime == 0) {
 		PlaySoundMem(cheerSound, DX_PLAYTYPE_BACK);
-		cheerTime = 240;
+		cheerTime = 160;
 	}
 	
 	if (--cheerCount == 0) {

@@ -118,7 +118,7 @@ void Gameover::draw()
 
 void Gameover::fadeInUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+	fadeValue_ = static_cast < int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
 	if (--fadeTimer_ == 0) {
 		updateFunc_ = &Gameover::normalUpdate;
 		fadeValue_ = 0;
@@ -133,7 +133,7 @@ void Gameover::normalUpdate(const InputState& input)
 		SetVolumeMusic(musicVolume);
 	}
 
-	const int nameCount = gameOverChoiceTable.size();
+	const int nameCount = static_cast <int>(gameOverChoiceTable.size());
 
 	if (input.isTriggered(InputType::up)) {
 		ChangeVolumeSoundMem(160, uiSound);

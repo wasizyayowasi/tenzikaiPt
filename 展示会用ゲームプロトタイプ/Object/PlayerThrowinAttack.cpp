@@ -62,8 +62,8 @@ void PlayerThrowinAttack::update(Vec2 offset)
 		}
 	}
 
-	int underBlockX = (flyingObjectPos.x) / chipSize;
-	int underBlockY = (flyingObjectPos.y + chipSize) / chipSize;
+	int underBlockX = static_cast<int>(flyingObjectPos.x) / chipSize;
+	int underBlockY = static_cast<int>(flyingObjectPos.y + chipSize) / chipSize;
 
 	if (sceneNum == 0) {
 		chipNo = groundData::ground[underBlockY][underBlockX];
@@ -78,8 +78,8 @@ void PlayerThrowinAttack::update(Vec2 offset)
 	}
 	
 	if (!landingObject) {
-		tempX = flyingObjectPos.y + r + cos(45);
-		tempY = flyingObjectPos.y + r + sin(45);
+		tempX = static_cast <float>(flyingObjectPos.y + r + cos(45));
+		tempY = static_cast <float>(flyingObjectPos.y + r + sin(45));
 
 		normalize.x = tempX;
 		normalize.y = -tempY;
@@ -148,8 +148,8 @@ void PlayerThrowinAttack::bossUpdate(Vec2 offset)
 		}
 	}
 
-	int underBlockX = (flyingObjectPos.x) / chipSize;
-	int underBlockY = (flyingObjectPos.y + chipSize) / chipSize;
+	int underBlockX = static_cast<int>(flyingObjectPos.x) / chipSize;
+	int underBlockY = static_cast<int>(flyingObjectPos.y + chipSize) / chipSize;
 
 	const int chipNo = groundData::bossGround2[underBlockY][underBlockX];
 
@@ -186,12 +186,12 @@ void PlayerThrowinAttack::bossUpdate(Vec2 offset)
 
 void PlayerThrowinAttack::draw(int handle, Vec2 offset)
 {
-	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y + 10,1.5f, angle,handle, true, playerDirections);
+	DrawRotaGraphF(flyingObjectPos.x + offset.x, flyingObjectPos.y + 10,1.5f, angle,handle, true, playerDirections);
 }
 
 void PlayerThrowinAttack::bossDraw(int handle, Vec2 offset)
 {
-	DrawRotaGraph(flyingObjectPos.x + offset.x, flyingObjectPos.y - 100, 10.0f, angle, handle, true, playerDirections);
+	DrawRotaGraphF(flyingObjectPos.x + offset.x, flyingObjectPos.y - 100, 10.0f, angle, handle, true, playerDirections);
 }
 
 
@@ -224,7 +224,7 @@ bool PlayerThrowinAttack::enemyCollision(const Vec2& pos, Vec2 offset)
 			float enemyRight = pos.x + 30;
 			float enemyBottom = pos.y + 30;
 
-			DrawBox(enemyLeft, enemyTop, enemyRight, enemyBottom, 0xffffff, false);
+			DrawBoxAA(enemyLeft, enemyTop, enemyRight, enemyBottom, 0xffffff, false);
 
 			if (enemyLeft > flyingObjectPos.x + 20)		return false;
 			if (enemyRight < flyingObjectPos.x)			return false;
@@ -277,10 +277,10 @@ bool PlayerThrowinAttack::filedCollision(int x,int y,Vec2 offset)
 	float flyingObjectTop = flyingObjectPos.y + offset.y;
 	float flyingObjectBottom = flyingObjectPos.y + 24 + offset.y;
 
-	float fieldLeft = x * chipSize;
-	float fieldRight = x * chipSize + chipSize;
-	float fieldTop = y * chipSize ;
-	float fieldBottom = y * chipSize + chipSize;
+	int fieldLeft = x * chipSize;
+	int fieldRight = x * chipSize + chipSize;
+	int fieldTop = y * chipSize ;
+	int fieldBottom = y * chipSize + chipSize;
 
 	
 

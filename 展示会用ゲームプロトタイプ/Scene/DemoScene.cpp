@@ -6,15 +6,16 @@
 #include "../DrawFunctions.h"
 #include "../InputState.h"
 #include "../game.h"
+#include <algorithm>
 
-DemoScene::DemoScene(SceneManager& manager) : SceneBase(manager)
+DemoScene::DemoScene(SceneManager& manager) : SceneBase(manager),updateFunc(&DemoScene::fadeInUpdate)
 {
 	demoMovieHandle = my::myLoadGraph("data/movie/project Viking mainDemo.mp4");
 	PlayMovieToGraph(demoMovieHandle);
 
 	LPCSTR UIfontPath = "data/other/Silver.ttf";
 	AddFontResourceEx(UIfontPath, FR_PRIVATE, NULL);
-	UIFontHandle = CreateFontToHandle("Silver", 48, 9, -1);
+	UIFontHandle = CreateFontToHandle("Silver", 96, 9, -1);
 }
 
 DemoScene::~DemoScene()
@@ -25,38 +26,60 @@ DemoScene::~DemoScene()
 
 void DemoScene::update(const InputState& input)
 {
-	if (input.isTriggered(InputType::attack) || input.isTriggered(InputType::down) || input.isTriggered(InputType::left) || input.isTriggered(InputType::next) || input.isTriggered(InputType::nextItem) ||
-		input.isTriggered(InputType::pause) || input.isTriggered(InputType::prev) || input.isTriggered(InputType::prevItem) || input.isTriggered(InputType::right) || input.isTriggered(InputType::shot) ||
-		input.isTriggered(InputType::up)) {
-		updateFunc = &DemoScene::fadeOutUpdate;
-	}
+	(this->*updateFunc)(input);
 }
 
 void DemoScene::draw()
 {
 	
 	DrawExtendGraph(0, 0, Game::kScreenWidth, Game::kScreenHeight, demoMovieHandle, false);
+	
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
+	//‰æ–Ê‘S‘Ì‚ð^‚Á•‚É“h‚è‚Â‚Ô‚·
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	DrawStringToHandle(0, 800, "DEMO MOVIE", 0xff4444, UIFontHandle);
+	if (ultimateTimer > 0) {
+		if ((ultimateTimer / 10) % 10 <= 5) {
+			return;
+		}
+	}
+
+	DrawStringToHandle(1450, 950, "DEMO MOVIE", 0xff4444, UIFontHandle);
+
 }
 
 void DemoScene::normalUpdate(const InputState& input)
 {
-	
+	if (input.isTriggered(InputType::attack) || input.isTriggered(InputType::down) || input.isTriggered(InputType::left) || input.isTriggered(InputType::next) || input.isTriggered(InputType::nextItem) ||
+		input.isTriggered(InputType::pause) || input.isTriggered(InputType::prev) || input.isTriggered(InputType::prevItem) || input.isTriggered(InputType::right) || input.isTriggered(InputType::shot) ||
+		input.isTriggered(InputType::up)) {
+		updateFunc = &DemoScene::fadeOutUpdate;
+	}
+
+	if (GetMovieStateToGraph(demoMovieHandle) == 0) {
+		updateFunc = &DemoScene::fadeOutUpdate;
+	}
+
+	ultimateTimer = (std::max)(ultimateTimer - 1, 0);
+
+	if (ultimateTimer == 0) {
+		ultimateTimer = 120;
+	}
 }
 
 void DemoScene::fadeInUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (--fadeTimer == 0) {
-		updateFunc = &DemoScene::update;
+		updateFunc = &DemoScene::normalUpdate;
 		fadeValue = 0;
 	}
 }
 
 void DemoScene::fadeOutUpdate(const InputState& input)
 {
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new TitleScene(manager_));
 		StopMusic();

@@ -2,10 +2,12 @@
 #include "../DrawFunctions.h"
 #include "DxLib.h"
 
- int frameSpeed = 5;
-constexpr int assetSizeX = 115;
-constexpr int assetSizeY = 84;
+namespace {
+	int frameSpeed = 5;
+	constexpr int assetSizeX = 115;
+	constexpr int assetSizeY = 84;
 
+}
 
 PlayerMotion::PlayerMotion()
 {

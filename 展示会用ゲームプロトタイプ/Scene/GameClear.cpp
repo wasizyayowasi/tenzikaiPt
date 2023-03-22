@@ -64,7 +64,7 @@ void GameClear::fadeOutUpdate(const InputState& input)
 		SetVolumeMusic(musicVolume);
 	}
 
-	fadeValue = 255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval));
+	fadeValue = static_cast < int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
 	if (++fadeTimer == fadeInterval) {
 		manager_.changeScene(new TitleScene(manager_));
 		return;

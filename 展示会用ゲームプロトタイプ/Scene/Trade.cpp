@@ -23,7 +23,7 @@ Trade::~Trade()
 
 void Trade::update(const InputState& input)
 {
-	const int nameCount = purchaseChoiceTable.size();
+	const int nameCount = static_cast <int>(purchaseChoiceTable.size());
 
 	if (input.isTriggered(InputType::left)) {
 		ChangeVolumeSoundMem(160, uiSound);

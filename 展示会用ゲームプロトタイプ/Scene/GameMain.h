@@ -49,6 +49,7 @@ private:
 	
 	int mainSound = -1;
 	int footstepSound = -1;
+	int appearanceSound = -1;
 
 	int footstepSoundVolume = 130;
 	int soundCount = 20;

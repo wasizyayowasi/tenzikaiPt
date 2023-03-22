@@ -39,6 +39,10 @@ void BugSpace::init(int setX, int setY)
 
 	spacePos.x = static_cast<float>(setX * chipSize);
 	spacePos.y = static_cast<float>(setY * chipSize);
+
+	enemySpawnTime = 0;
+	enemySpawnInterval = 600;
+
 }
 
 void BugSpace::tutorialUpdate(Vec2 offset)
@@ -51,7 +55,7 @@ void BugSpace::tutorialUpdate(Vec2 offset)
 				soundTime = 85;
 			}
 			player->setMotion(true);
-			maxHp -= static_cast<float>(0.008);
+			maxHp -= static_cast<float>(0.08);
 		}
 		else {
 			player->setMotion(false);
@@ -84,7 +88,7 @@ void BugSpace::update(Vec2 offset)
 			if (--soundTime == 0) {
 				ChangeVolumeSoundMem(150, breakSound);
 				PlaySoundMem(breakSound, DX_PLAYTYPE_BACK);
-				soundTime = 80;
+				soundTime = 85;
 			}
 			player->setMotion(true);
 			maxHp -= static_cast<float>(0.008);

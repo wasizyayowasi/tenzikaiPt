@@ -73,7 +73,7 @@ void KeyConfigScene::firstUpdate(const InputState& input)
 
 	if (!isEditing) {
 	
-		const int nameCount = input.inputNameTable.size() + 2;
+		const int nameCount = static_cast <int>(input.inputNameTable.size() + 2);
 
 		if (input.isTriggered(InputType::up)) {
 			ChangeVolumeSoundMem(160, uiSound);

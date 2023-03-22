@@ -17,7 +17,7 @@ Inventory::~Inventory()
 
 void Inventory::update(const InputState& input)
 {
-	const int nameCount = inventoryChoice.size();
+	const int nameCount = static_cast <int>(inventoryChoice.size());
 
 	if (input.isTriggered(InputType::prevItem)) {
 		currentInputIndex = ((currentInputIndex - 1) + nameCount) % nameCount;

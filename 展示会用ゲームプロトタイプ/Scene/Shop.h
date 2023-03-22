@@ -45,6 +45,7 @@ private:
 	int bottanHandle = -1;
 	
 	int fontHandle = -1;
+	int fontHandle2 = -1;
 
 	int imgX = 2;
 	int imgY = 0;
