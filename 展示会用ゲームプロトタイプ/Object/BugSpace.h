@@ -8,7 +8,7 @@ class Enemy;
 class ObjectHp;
 
 namespace {
-	constexpr int enemyNum = 4;
+	constexpr int enemyNum = 3;
 }
 
 class BugSpace

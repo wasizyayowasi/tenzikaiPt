@@ -217,7 +217,7 @@ void TutorialScene::draw()
 		DrawStringToHandle(Game::kScreenWidth / 2 - size / 2, 460, "•ûŒüƒL[ –”‚Í ¶ƒXƒeƒBƒbƒN‚ÅˆÚ“®", 0xffffff, fontHandle);
 	}
 
-	if (targetPlayer.length() < 200 && personNum == 1) {
+	if (targetPlayer.length() < 200) {
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//æZ‡¬
 		DrawBox(300, 50, 1620, 520, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//’Êí•`‰æ‚É–ß‚·
@@ -227,7 +227,7 @@ void TutorialScene::draw()
 		DrawStringToHandle(Game::kScreenWidth / 2 + 20, 400, "“G‚©‚ç‰B‚ê‚Ü‚·", 0xffffff, fontHandle);
 	}
 
-	if (targetPlayer2.length() < 200 && personNum == 2) {
+	if (targetPlayer2.length() < 200) {
 		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//æZ‡¬
 		DrawBox(300, 50, 1620, 520, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//’Êí•`‰æ‚É–ß‚·
@@ -253,6 +253,16 @@ void TutorialScene::draw()
 			textDraw(2);
 			count--;
 		}
+	}
+	else {
+		if (imgX > 4) {
+			imgX = 0;
+		}
+		SetDrawBlendMode(DX_BLENDMODE_MULA, 196);//æZ‡¬
+		DrawBox(static_cast <int>(2870 + offset.x), 70, static_cast <int>(3250 + offset.x), 220, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);//’Êí•`‰æ‚É–ß‚·
+		DrawBox(static_cast <int>(2870 + offset.x), 70, static_cast <int>(3250 + offset.x), 220, 0xffffff, false);
+		DrawRectRotaGraph(static_cast <int>(3070 + offset.x), 150, imgX * 112, 0, 112, 153, 0.4f, 1.58f, arrowHandle, true, false);
 	}
 
 	if (space->isEnable()) {
@@ -423,6 +433,7 @@ void TutorialScene::textDraw(int num)
 		DrawBox(static_cast < int>(3040 - graphWidth * 2 - 50 + offset.x), 480, static_cast < int>(3040 + graphWidth * 2 + 50 + offset.x), 650 + graphHeight * 2 - 30, 0xffffff, false);
 		DrawRotaGraph(static_cast <int>(3040 + offset.x), 670, 4.0f, 0.0f, descriptionHandle4, true);
 		DrawString(static_cast<int>(3310 + offset.x), 520, "”j‰ó", 0xff0000);
+		DrawString(static_cast<int>(2700 + offset.x), 520, "”ƒ‚Á‚½ƒAƒCƒeƒ€‚Å", 0x00ff00);
 
 		break;
 	}

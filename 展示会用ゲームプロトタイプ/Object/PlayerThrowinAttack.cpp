@@ -108,7 +108,7 @@ void PlayerThrowinAttack::update(Vec2 offset)
 	if (flyingObjectPos.x < -30) {
 		init();
 	}
-	if (flyingObjectPos.x> Game::kScreenWidth * 2 - 20) {
+	if (flyingObjectPos.x> Game::kScreenWidth * 2 - 40) {
 		init();
 	}
 	

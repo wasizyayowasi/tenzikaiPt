@@ -10,7 +10,7 @@ namespace {
 
 Field::Field()
 {
-	groundHandle = my::myLoadGraph("data/FieldGraph/Tiles-1.png");
+	groundHandle = my::myLoadGraph("data/FieldGraph/Tiles-2.png");
 	buildingHandle = my::myLoadGraph("data/FieldGraph/Buildings1.png");
 	objectHandle = my::myLoadGraph("data/FieldGraph/Props-01.png");
 	buildingHandle2 = my::myLoadGraph("data/FieldGraph/Buildings2.png");

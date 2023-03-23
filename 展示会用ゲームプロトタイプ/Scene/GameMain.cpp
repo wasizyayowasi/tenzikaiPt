@@ -196,6 +196,9 @@ void GameMain::draw()
 		nextScene = true;
 	}
 
+	DrawRectRotaGraph(Game::kScreenWidth - 130, Game::kScreenHeight - 85, bottanImgX * graphSize, bottanImgY * graphSize, graphSize, graphSize, 4.0f, 0.0f, bottanHandle, true);
+	DrawStringToHandle(Game::kScreenWidth - 100, Game::kScreenHeight - 100,"ポーズ", 0xffffff,UIFontHandle);
+
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
 	//画面全体を真っ黒に塗りつぶす
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);

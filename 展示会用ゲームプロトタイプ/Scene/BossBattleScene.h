@@ -46,7 +46,7 @@ private:
 	int mainSound = -1;
 	int collapseSound = -1;
 	int footstepSound = -1;
-	int soundVolume = 150;
+	int soundVolume = 255;
 	int soundCount = 20;
 	int musicVolume = 0;
 

@@ -53,7 +53,7 @@ private:
 
 	int footstepSoundVolume = 130;
 	int soundCount = 20;
-	int soundVolume = 150;
+	int soundVolume = 255;
 	int musicVolume = 0;
 
 	float truckPos = 0;
@@ -101,6 +101,8 @@ private:
 
 	int imgX = 0;
 	int imgY = 0;
+	int bottanImgX = 10;
+	int bottanImgY = 14;
 	int time = 0;
 
 	Vec2 enemyPos = { 0,0 };

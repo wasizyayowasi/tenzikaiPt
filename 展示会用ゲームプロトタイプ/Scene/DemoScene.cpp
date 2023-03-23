@@ -33,11 +33,6 @@ void DemoScene::draw()
 {
 	
 	DrawExtendGraph(0, 0, Game::kScreenWidth, Game::kScreenHeight, demoMovieHandle, false);
-	
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
-	//‰æ–Ê‘S‘Ì‚ð^‚Á•‚É“h‚è‚Â‚Ô‚·
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	if (ultimateTimer > 0) {
 		if ((ultimateTimer / 10) % 10 <= 5) {
@@ -47,6 +42,10 @@ void DemoScene::draw()
 
 	DrawStringToHandle(1450, 950, "DEMO MOVIE", 0xff4444, UIFontHandle);
 
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
+	//‰æ–Ê‘S‘Ì‚ð^‚Á•‚É“h‚è‚Â‚Ô‚·
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void DemoScene::normalUpdate(const InputState& input)
