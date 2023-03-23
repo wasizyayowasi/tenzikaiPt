@@ -91,7 +91,7 @@ void BugSpace::update(Vec2 offset)
 				soundTime = 85;
 			}
 			player->setMotion(true);
-			maxHp -= static_cast<float>(0.008);
+			maxHp -= static_cast<float>(0.016);
 		}
 		else {
 			player->setMotion(false);

@@ -20,10 +20,12 @@ public:
 	virtual ~Pause();
 
 	virtual void update(const InputState& input)override;
+	void normalUpdate(const InputState& input);
 	void draw();
 
 	void bottanNum(int num);
 
+	void fadeOutUpdate(const InputState& input);
 private:
 	int uiSound = -1;
 	int uiSound2 = -1;
@@ -53,12 +55,15 @@ private:
 	int ultimateTimer = 0;
 
 	static constexpr int fadeInterval = 60;
-	int fadeTimer = fadeInterval;
-	int fadeValue = 255;
+	int fadeTimer = 0;
+	int fadeValue = 0;
+	unsigned int FadeColor = 0x000000;
 
 	//bool isEditing = false;//Œ»İ“Á’è‚Ì“ü—Í‚Í•ÒW’†‚Å‚·B
 	const InputState& inputState;
 
 	std::map<Choice, std::string> choiceTable;
+
+	void(Pause::*updateFunc)(const InputState& input);
 };
 

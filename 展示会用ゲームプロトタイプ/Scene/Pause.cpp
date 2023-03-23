@@ -12,7 +12,7 @@ namespace {
 	int graphSize = 16;;
 }
 
-Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager),inputState(input), currentInputIndex(0)
+Pause::Pause(SceneManager& manager,const InputState& input) : SceneBase(manager),inputState(input), currentInputIndex(0),updateFunc(&Pause::normalUpdate)
 {
 	choiceTable[Choice::keyConfig] = "キーコンフィグ";
 	choiceTable[Choice::title] = "タイトルへ";
@@ -50,6 +50,11 @@ Pause::~Pause()
 
 void Pause::update(const InputState& input)
 {
+	(this->*updateFunc)(input);
+}
+
+void Pause::normalUpdate(const InputState& input)
+{
 	if (input.isTriggered(InputType::pause)) {
 		manager_.popScene();
 		return;
@@ -57,7 +62,7 @@ void Pause::update(const InputState& input)
 
 	const int nameCount = static_cast<int>(choiceTable.size());
 
-	
+
 	if (input.isTriggered(InputType::up)) {
 		ChangeVolumeSoundMem(160, uiSound);
 		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
@@ -68,7 +73,7 @@ void Pause::update(const InputState& input)
 		PlaySoundMem(uiSound, DX_PLAYTYPE_BACK);
 		currentInputIndex = (currentInputIndex + 1) % nameCount;
 	}
-	
+
 	if (input.isTriggered(InputType::next)) {
 		ChangeVolumeSoundMem(180, uiSound2);
 		PlaySoundMem(uiSound2, DX_PLAYTYPE_BACK);
@@ -77,8 +82,7 @@ void Pause::update(const InputState& input)
 			manager_.pushScene(new KeyConfigScene(manager_, input));
 			break;
 		case 1:
-			StopMusic();
-			manager_.changeScene(new TitleScene (manager_));
+			updateFunc = &Pause::fadeOutUpdate;
 			return;
 		case 2:
 			manager_.popScene();
@@ -176,6 +180,11 @@ void Pause::draw()
 	moveImgY = imgY;
 	DrawRectRotaGraph(Game::kScreenWidth - 100, Game::kScreenHeight - 50, moveImgX * graphSize, moveImgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
 
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
+	//画面全体を真っ黒に塗りつぶす
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 }
 
 void Pause::bottanNum(int num)
@@ -242,5 +251,15 @@ void Pause::bottanNum(int num)
 		imgY = 14;
 		break;
 
+	}
+}
+
+void Pause::fadeOutUpdate(const InputState& input)
+{
+	fadeValue = static_cast <int>(255 * (static_cast<float>(fadeTimer) / static_cast<float>(fadeInterval)));
+	if (++fadeTimer == fadeInterval) {
+		StopMusic();
+		manager_.changeScene(new TitleScene(manager_));
+		return;
 	}
 }

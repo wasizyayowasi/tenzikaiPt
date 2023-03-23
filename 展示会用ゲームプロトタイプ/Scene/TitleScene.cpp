@@ -163,9 +163,6 @@ void TitleScene::draw()
 	DrawRectRotaGraph(Game::kScreenWidth / 2 - 32, 950, imgX * 16, imgY * 16, 16, 16, 3.0f, 0.0f, bottanHandle, true, false);
 	DrawStringToHandle(Game::kScreenWidth / 2, 940, "Œˆ’è", 0xff0000, UIfontHandle);
 
-	/*DrawRectRotaGraph(Game::kScreenWidth - 100, Game::kScreenHeight - 50, imgX * graphSize, imgY * graphSize, graphSize, graphSize, 3.0f, 0.0f, bottanHandle, true, false);
-	DrawStringToHandle(Game::kScreenWidth - 70, Game::kScreenHeight - 55, "Œˆ’è", 0xffffff, UIfontHandle);*/
-
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue);
 	//‰æ–Ê‘S‘Ì‚ğ^‚Á•‚É“h‚è‚Â‚Ô‚·
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, FadeColor, true);

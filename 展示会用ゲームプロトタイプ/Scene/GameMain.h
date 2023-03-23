@@ -85,7 +85,7 @@ private:
 
 	float waveHp = 0.0f;
 	int maxWave = 3;
-	int wave = 3;
+	int wave = 1;
 	int waveCount = 0;
 
 	bool configured = false;
@@ -95,7 +95,7 @@ private:
 	bool EndOfRaid = false;
 	bool bossWave = false;
 
-	unsigned int FadeColor = 0x000000;//フェード色黒
+	unsigned int FadeColor = 0x000000;
 
 	bool startWave = false;
 
